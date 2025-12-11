@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingSum 的数字中枢 | 博客 </title>
+    
+    <!-- 1. 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. 引入 Google Fonts: Exo 2 (前卫标题) 和 Inter (优雅正文) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- 3. 引入 Lucide Icons 图标库 (UMD 版本) -->
+    <script src="https://unpkg.com/lucide/dist/umd/lucide.min.js"></script>
+    
+    <!-- 4. 自定义样式 (动画、配色、字体) -->
+    <style>
+        :root {
+            --color-accent1: #00f2ff; /* 电子蓝 */
+            --color-accent2: #ff00ff; /* 品红 */
+            --color-bg: #030014;      /* 深空紫黑 */
+            --color-card: #0a0423;    /* 卡片背景 */
+        }
+
+        /* 基础样式 */
+        body {
+            background-color: var(--color-bg);
+            color: #d1d5db; /* text-gray-300 */
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* 防止横向滚动 */
+        }
+
+        /* 优化：动态环境光背景 (参照 Kun 博客) */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -150px;
+            pointer-events: none;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 10% 10%, var(--color-accent1) 0, transparent 40%),
+                radial-gradient(circle at 90% 80%, var(--color-accent2) 0, transparent 40%);
+            opacity: 0.15;
+            filter: blur(100px);
+            transform: translateZ(-1px); /* 确保在最底层 */
+        }
+
+        /* 标题字体 */
+        .font-heading {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+
+        /* 动画：流光渐变文字 */
+        .gradient-text {
+            background-image: linear-gradient(90deg, var(--color-accent1), var(--color-accent2), var(--color-accent1));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: text-flow 4s linear infinite;
+        }
+
+        @keyframes text-flow {
+            from { background-position: 0% center; }
+            to { background-position: 200% center; }
+        }
+
+        /* 动画：JS 控制的滚动淡入 */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 组件：玻璃拟态 + 辉光卡片 (优化：参照 Kun 博客的悬停效果) */
+        .card-glow {
+            background-color: var(--color-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            border-radius: 1rem; /* 16px */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative; /* 用于 ::before 伪元素 */
+            overflow: hidden; /* 隐藏溢出的 ::before */
+        }
+
+        /* 卡片内容必须在伪元素之上 */
+        .card-glow > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 优化：添加锥形渐变光晕 (参照 Kun 博客) */
+        .card-glow::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            opacity: 0;
+            z-index: 1;
+            background: conic-gradient(
+                from 180deg, 
+                transparent, 
+                var(--color-accent1), 
+                var(--color-accent2), 
+                transparent 70%
+            );
+            transition: opacity 0.45s ease-out;
+            pointer-events: none;
+            animation: rotate-gradient 8s linear infinite;
+        }
+
+        .card-glow:hover {
+            border-color: var(--color-accent1);
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.1), 0 0 40px rgba(0, 242, 255, 0.1);
+        }
+
+        .card-glow:hover::before {
+            opacity: 0.7;
+        }
+
+        @keyframes rotate-gradient {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+
+        /* 组件：高亮按钮 */
+        .btn-glow {
+            background-color: var(--color-accent1);
+            color: #000;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+        .btn-glow:hover {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.7);
+            transform: scale(1.05);
+        }
+        
+        /* 组件：次要按钮 (描边) */
+        .btn-outline {
+            border: 1px solid var(--color-accent2);
+            color: var(--color-accent2);
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover {
+            background-color: var(--color-accent2);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        }
+
+        /* 动画：技术栈无限滚动 */
+        .marquee {
+            overflow: hidden;
+            position: relative;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 40s linear infinite;
+            padding-left: 100%; /* 确保无缝连接 */
+        }
+        .marquee:hover .marquee-content {
+            animation-play-state: paused; /* 悬停时暂停 */
+        }
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* 优化：导航栏滚动样式 */
+        nav.is-scrolled {
+            background-color: rgba(3, 0, 20, 0.7); /* 增加背景不透明度 */
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease-out, border-color 0.3s ease-out;
+        }
+
+        /* 优化：打字机光标动画 */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.5rem; /* 匹配字体大小 */
+            background-color: var(--color-accent1);
+            animation: blink 0.9s infinite;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- ===== 导航栏 (已优化响应式) ===== -->
+    <!-- 悬浮、毛玻璃效果 -->
+    <nav id="site-nav" class="sticky top-0 z-50 w-full px-4 py-3 backdrop-blur-lg border-b border-gray-500/10 transition-colors duration-300">
+        <div class="container mx-auto flex justify-between items-center max-w-6xl">
+            <!-- Logo/名称 -->
+            <!-- 优化：链接到 GitHub Pages 根目录 -->
+            <a href="https://zjt666666zjt.github.io/" class="text-2xl font-heading text-white hover:text-[var(--color-accent1)] transition-colors">
+                KingSum<span class="text-[var(--color-accent2)]">.</span>
+            </a>
+            
+            <!-- 桌面导航链接 (包含社交图标) -->
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#featured-posts" class="text-gray-300 hover:text-white transition-colors">精选文章</a>
+                <a href="#projects" class="text-gray-300 hover:text-white transition-colors">个人项目</a>
+                <a href="#tech-stack" class="text-gray-300 hover:text-white transition-colors">技术栈</a>
+                <a href="https://github.com/zjt666666zjt" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">关于我</a>
+                
+                <!-- 桌面社交图标 -->
+                <div class="flex space-x-4 pl-4 border-l border-gray-500/30">
+                    <a href="https://github.com/zjt666666zjt" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-[var(--color-accent1)] transition-colors" title="GitHub">
+                        <i data-lucide="github" class="w-5 h-5"></i>
+                    </a>
+                    <!-- 移除了 LinkedIn -->
+                    <!-- 移除了 RSS -->
+                    <!-- 新增: Telegram 图标 -->
+                    <a href="https://t.me/despairbad" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-cyan-400 transition-colors" title="Telegram">
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 移动端汉堡按钮 (新增) -->
+            <!-- 优化：添加 z-50 确保按钮在全屏菜单之上 -->
+            <div class="md:hidden relative z-50">
+                <button id="mobile-menu-toggle" class="text-gray-300 hover:text-white p-2 rounded-md">
+                    <i id="icon-menu" data-lucide="menu" class="w-6 h-6"></i>
+                    <i id="icon-x" data-lucide="x" class="w-6 h-6 hidden"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 移动端弹出菜单 (新增) -->
+        <!-- 优化：改为 fixed 全屏菜单 (z-40)，解决重叠问题 -->
+        <!-- 优化：移除 /95 透明度和 backdrop-blur-lg，使其完全不透明 -->
+        <div id="mobile-menu" class="hidden md:hidden fixed inset-0 z-40 w-full h-screen bg-[var(--color-card)] overflow-y-auto">
+            <!-- 优化：增加 pt-24 (padding-top) 为导航栏留出空间 -->
+            <div class="flex flex-col space-y-4 p-6 pt-24">
+                <a href="#featured-posts" class="text-lg text-gray-200 hover:text-white p-2 rounded-md transition-colors">精选文章</a>
+                <a href="#projects" class="text-lg text-gray-200 hover:text-white p-2 rounded-md transition-colors">个人项目</a>
+                <a href="#tech-stack" class="text-lg text-gray-200 hover:text-white p-2 rounded-md transition-colors">技术栈</a>
+                <a href="https://github.com/zjt666666zjt" target="_blank" rel="noopener noreferrer" class="text-lg text-gray-200 hover:text-white p-2 rounded-md transition-colors">关于我</a>
+                
+                <!-- 移动端社交图标 -->
+                <div class="border-t border-gray-500/30 pt-6 flex space-x-6">
+                    <a href="https://github.com/zjt666666zjt" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-[var(--color-accent1)] transition-colors" title="GitHub">
+                        <i data-lucide="github" class="w-6 h-6"></i>
+                    </a>
+                    <!-- 移除了 LinkedIn -->
+                    <!-- 移除了 RSS -->
+                    <!-- 新增: Telegram 图B -->
+                    <a href="https://t.me/despairbad" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-cyan-400 transition-colors" title="Telegram">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== 主要内容 ===== -->
+    <main class="container mx-auto max-w-6xl px-4 py-16 md:py-24">
+
+        <!-- ===== Hero 区域 (优化：2栏布局 + 打字机) ===== -->
+        <header class="py-24 md:py-32 fade-in-section">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                
+                <!-- 左侧：文本内容 -->
+                <div class="text-center md:text-left">
+                    <!-- 优化：增加了 sm 断点 -->
+                    <h1 class="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl gradient-text mb-6">
+                        代码重构现实
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-300 max-w-xl mx-auto md:mx-0">
+                        欢迎来到 KingSum 的数字中枢。一个关于全栈开发、人工智能和未来技术的探索性博客。
+                    </p>
+                    
+                    <!-- 优化：打字机效果 (参照 Kun 博客) -->
+                    <p class="text-lg text-[var(--color-accent1)] mt-4 h-6 min-h-[1.5rem]">
+                        <span id="typing-text"></span><span class="typing-cursor"></span>
+                    </p>
+                    
+                    <div class="mt-10 flex justify-center md:justify-start gap-4">
+                        <a href="#featured-posts" class="btn-glow px-6 py-3 rounded-full">
+                            开始探索
+                        </a>
+                        <a href="https://github.com/zjt666666zjt" target="_blank" rel="noopener noreferrer" class="btn-outline px-6 py-3 rounded-full flex items-center gap-2">
+                            <i data-lucide="user-round" class="w-4 h-4"></i>
+                            关于我
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 右侧：视觉元素 (在 md 以下隐藏，保持不变) -->
+                <div class="hidden md:block">
+                    <div class="card-glow p-4 relative overflow-hidden">
+                        <!-- 内容包裹层，确保在 ::before 之上 -->
+                        <div class="relative z-10 font-mono text-sm text-gray-400">
+                            <div class="flex items-center space-x-1.5 p-2 bg-black/20 rounded-t-md">
+                                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                                <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+                                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                            </div>
+                            <div class="p-4">
+                                <span class="text-purple-400">const</span> <span class="text-white">developer</span> = {
+                                <br>&nbsp;&nbsp;<span class="text-white">name</span>: <span class="text-green-400">"KingSum"</span>,
+                                <br>&nbsp;&nbsp;<span class="text-white">focus</span>: [
+                                <br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"Full-Stack"</span>,
+                                <br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"AI Integration"</span>,
+                                <br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"Future Tech"</span>
+                                <br>&nbsp;&nbsp;]
+                                <br>};
+                                <br>
+                                <br><span class="text-purple-400">const</span> <span class="text-white">status</span> = <span class="text-green-400">"Building..."</span>;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- ===== 精选文章 (Bento 风格网格) ===== -->
+        <section id="featured-posts" class="mb-24">
+            <h2 class="font-heading text-3xl md:text-4xl text-white mb-8 fade-in-section">
+                <i data-lucide="star" class="inline-block w-8 h-8 text-[var(--color-accent1)] -mt-1"></i>
+                精选文章
+            </h2>
+            
+            <!-- Bento 网格布局 (已具备响应式) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 主文章 (2x2) -->
+                <!-- 更新：链接到 page1.html -->
+                <a href="https://zjt666666zjt.github.io/Pages/page1.html" class="card-glow md:col-span-2 md:row-span-2 p-6 flex flex-col justify-between group fade-in-section" style="transition-delay: 100ms;">
+                    <div>
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full bg-[var(--color-accent1)] text-black mb-4 inline-block">深度解析</span>
+                        <h3 class="font-heading text-2xl md:text-3xl text-white mb-3 group-hover:text-[var(--color-accent1)] transition-colors">
+                            从零到一：构建与部署多模态 AI 助手
+                        </h3>
+                        <p class="text-gray-400">
+                            本文将带你走过完整的流程，从数据预处理、模型选型 (LLaVA) 到使用 Docker 和 K8s 实现可扩展的云端部署...
+                        </p>
+                    </div>
+                    <div class="mt-6 flex items-center text-sm text-gray-500">
+                        <i data-lucide="calendar" class="w-4 h-4 mr-2"></i> 2025年11月10日
+                        <i data-lucide="clock" class="w-4 h-4 ml-4 mr-2"></i> 12 分钟阅读
+                    </div>
+                </a>
+
+                <!-- 文章 2 (1x1) -->
+                <!-- 更新：链接到 page2.html -->
+                <a href="https://zjt666666zjt.github.io/Pages/page2.html" class="card-glow p-6 group fade-in-section" style="transition-delay: 200ms;">
+                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-[var(--color-accent2)] text-white mb-4 inline-block">前端</span>
+                    <h3 class="font-heading text-xl text-white mb-2 group-hover:text-[var(--color-accent2)] transition-colors">
+                        React 2025：Signals 和并发的未来
+                    </h3>
+                    <p class="text-gray-400 text-sm line-clamp-3">
+                        React 19 带来了变革，但真正的未来在于 Signals...
+                    </p>
+                </a>
+                
+                <!-- 文章 3 (1x1) -->
+                <!-- 更新：链接到 page3.html -->
+                <a href="https://zjt666666zjt.github.io/Pages/page3.html" class="card-glow p-6 group fade-in-section" style="transition-delay: 300ms;">
+                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-yellow-400 text-black mb-4 inline-block">DevOps</span>
+                    <h3 class="font-heading text-xl text-white mb-2 group-hover:text-yellow-400 transition-colors">
+                        我的终极 VS Code 工作流配置
+                    </h3>
+                    <p class="text-gray-400 text-sm line-clamp-3">
+                        提升10倍效率的插件、快捷键和设置。
+                    </p>
+                </a>
+
+                <!-- 文章 4 (3x1) -->
+                <a href="#" class="card-glow md:col-span-3 p-6 flex flex-col md:flex-row justify-between items-start group fade-in-section" style="transition-delay: 400ms;">
+                    <div>
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full bg-green-500 text-black mb-4 inline-block">后端</span>
+                        <h3 class="font-heading text-xl md:text-2xl text-white mb-2 group-hover:text-green-400 transition-colors">
+                            Rust vs. Go：在微服务架构中的性能对决
+                        </h3>
+                        <p class="text-gray-400 max-w-2xl">
+                            深入比较两种现代语言在并发处理、内存安全和实际吞吐量上的差异。
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0 md:ml-6 flex-shrink-0 flex items-center text-sm text-gray-500">
+                        <i data-lucide="calendar" class="w-4 h-4 mr-2"></i> 2025年11月5日
+                        <i data-lucide="eye" class="w-4 h-4 ml-4 mr-2"></i> 3,021 次阅读
+                    </div>
+                </a>
+            </div>
+        </section>
+
+
+        <!-- ===== 技术栈 (无限滚动) ===== -->
+        <!-- 优化：添加 relative 并将渐变遮罩移入内部 -->
+        <section id="tech-stack" class="relative mb-24 py-16 overflow-hidden fade-in-section">
+            <h2 class="font-heading text-3xl md:text-4xl text-white text-center mb-10">
+                驱动我的技术栈
+            </h2>
+            <div class="marquee relative w-full h-16 flex items-center">
+                <!-- 必须有两组内容来实现无缝滚动 -->
+                <div class="marquee-content flex items-center space-x-12 px-6">
+                    <!-- 组 1 -->
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="atom" class="w-7 h-7 mr-2 text-cyan-400"></i>React</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="leaf" class="w-7 h-7 mr-2 text-green-500"></i>Node.js</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="code-xml" class="w-7 h-7 mr-2 text-blue-500"></i>TypeScript</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="flask-conical" class="w-7 h-7 mr-2 text-yellow-400"></i>Python</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="database" class="w-7 h-7 mr-2 text-indigo-400"></i>PostgreSQL</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="docker" class="w-7 h-7 mr-2 text-blue-600"></i>Docker</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="ship-wheel" class="w-7 h-7 mr-2 text-blue-400"></i>Kubernetes</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="brain-circuit" class="w-7 h-7 mr-2 text-purple-400"></i>PyTorch</span>
+                    
+                    <!-- 组 2 (重复) -->
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="atom" class="w-7 h-7 mr-2 text-cyan-400"></i>React</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="leaf" class="w-7 h-7 mr-2 text-green-500"></i>Node.js</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="code-xml" class="w-7 h-7 mr-2 text-blue-500"></i>TypeScript</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="flask-conical" class="w-7 h-7 mr-2 text-yellow-400"></i>Python</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="database" class="w-7 h-7 mr-2 text-indigo-400"></i>PostgreSQL</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="docker" class="w-7 h-7 mr-2 text-blue-600"></i>Docker</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="ship-wheel" class="w-7 h-7 mr-2 text-blue-400"></i>Kubernetes</span>
+                    <span class="flex items-center text-2xl text-gray-400 font-semibold"><i data-lucide="brain-circuit" class="w-7 h-7 mr-2 text-purple-400"></i>PyTorch</span>
+                </div>
+            </div>
+            <!-- 用于遮罩的渐变层 (优化：移入内部并调整宽度) -->
+            <div class="absolute top-0 left-0 w-2/12 sm:w-1/4 h-full bg-gradient-to-r from-[var(--color-bg)] to-transparent z-10"></div>
+            <div class="absolute top-0 right-0 w-2/12 sm:w-1/4 h-full bg-gradient-to-l from-[var(--color-bg)] to-transparent z-10"></div>
+        </section>
+
+        <!-- ===== 个人项目 (已具备响应式) ===== -->
+        <section id="projects" class="mb-24">
+            <h2 class="font-heading text-3xl md:text-4xl text-white mb-8 fade-in-section">
+                <i data-lucide="lightbulb" class="inline-block w-8 h-8 text-[var(--color-accent2)] -mt-1"></i>
+                个人项目
+            </h2>
+            
+            <!-- 优化：改为只显示一个精选项目 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 项目 1 (ChatGPT Exporter) -->
+                <div class="card-glow p-6 fade-in-section md:col-span-2" style="transition-delay: 100ms;">
+                    <div class="flex justify-between items-start mb-4">
+                        <!-- 更改图标为 download -->
+                        <i data-lucide="download" class="w-10 h-10 text-[var(--color-accent1)]"></i>
+                        <div class="flex space-x-3">
+                            <!-- 更新 GitHub 链接 -->
+                            <a href="https://github.com/zjt666666zjt/ChatGPT_Exporter" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-[var(--color-accent1)]" title="查看源码"><i data-lucide="github"></i></a>
+                            <!-- 移除了 "访问站点" 链接 -->
+                        </div>
+                    </div>
+                    <!-- 更新项目标题 -->
+                    <h3 class="font-heading text-2xl text-white mb-2">ChatGPT 历史记录导出器</h3>
+                    <!-- 更新项目描述 -->
+                    <p class="text-gray-400 mb-4">
+                        一键导出 ChatGPT 全部聊天记录（支持 JSON / Markdown / HTML 格式），并自动打包为 ZIP 文件保存到本地。
+                    </p>
+                    <!-- 更新技术标签 -->
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2 py-1 bg-gray-700 text-gray-300 rounded">Tampermonkey</span>
+                        <span class="text-xs px-2 py-1 bg-gray-700 text-gray-300 rounded">User Script</span>
+                        <span class="text-xs px-2 py-1 bg-gray-700 text-gray-300 rounded">JSON</span>
+                        <span class="text-xs px-2 py-1 bg-gray-700 text-gray-300 rounded">Markdown</span>
+                        <span class="text-xs px-2 py-1 bg-gray-700 text-gray-300 rounded">HTML</span>
+                    </div>
+                </div>
+
+                <!-- 移除了原有的项目 2 -->
+                
+            </div>
+        </section>
+
+        <!-- ===== CTA (行动召唤) ===== -->
+        <section class="card-glow p-8 md:p-12 text-center fade-in-section">
+            <h2 class="font-heading text-3xl md:text-4xl text-white mb-4">
+                保持连接
+            </h2>
+            <p class="text-lg text-gray-300 max-w-xl mx-auto mb-8">
+                我对新的挑战和合作持开放态度。如果你有一个有趣的想法，或者只是想打个招呼，请随时联系我。
+            </p>
+            <a href="https://t.me/despairbad" target="_blank" rel="noopener noreferrer" class="btn-glow px-8 py-3 rounded-full inline-flex items-center gap-2 text-lg">
+                <i data-lucide="send" class="w-5 h-5"></i>
+                联系我
+            </a>
+        </section>
+
+    </main>
+
+    <!-- ===== 页脚 (已具备响应式) ===== -->
+    <footer class="container mx-auto max-w-6xl px-4 py-8 mt-12 border-t border-gray-500/10">
+        <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+            <p>&copy; 2025 KingSum. 由代码和咖啡驱动。</p>
+            <p class="mt-2 md:mt-0">灵感源自未来</p>
+        </div>
+    </footer>
+
+    <!-- ===== 5. 核心 JavaScript (已添加移动菜单逻辑) ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            
+            // 1. 激活 Lucide 图标
+            try {
+                lucide.createIcons();
+            } catch (error) {
+                console.error("Lucide icons failed to load.", error);
+            }
+
+            // 2. 滚动淡入动画
+            const sections = document.querySelectorAll('.fade-in-section');
+            
+            if ("IntersectionObserver" in window) {
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    root: null, // 相对于视口
+                    threshold: 0.1 // 元素可见 10% 时触发
+                });
+
+                sections.forEach(section => {
+                    observer.observe(section);
+                });
+            } else {
+                // 不支持 IntersectionObserver 的旧浏览器
+                sections.forEach(section => {
+                    section.classList.add('is-visible');
+                });
+            }
+
+            // 3. 优化：导航栏滚动效果 (参照 Kun 博客)
+            const nav = document.getElementById('site-nav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 30) {
+                    nav.classList.add('is-scrolled');
+                } else {
+                    nav.classList.remove('is-scrolled');
+                }
+            });
+
+            // 4. 优化：打字机效果 (参照 Kun 博客)
+            const typingEl = document.getElementById("typing-text");
+            if (typingEl) {
+                const typingWords = [
+                    "探索 AI 与全栈开发",
+                    "构建未来的数字界面",
+                    "热衷于性能与动效",
+                    "分享技术与思考"
+                ];
+                let wordIndex = 0;
+                let charIndex = 0;
+                let deleting = false;
+
+                function typeLoop() {
+                    const current = typingWords[wordIndex];
+                    let delay = deleting ? 60 : 100;
+
+                    if (!deleting) {
+                        typingEl.textContent = current.slice(0, charIndex++);
+                        if (charIndex > current.length) {
+                            deleting = true;
+                            delay = 1200; // 单词显示后的停留时间
+                        }
+                    } else {
+                        typingEl.textContent = current.slice(0, charIndex--);
+                        if (charIndex < 0) {
+                            deleting = false;
+                            wordIndex = (wordIndex + 1) % typingWords.length;
+                            charIndex = 0;
+                            delay = 500; // 切换单词的间隔
+                        }
+                    }
+                    setTimeout(typeLoop, delay);
+                }
+                typeLoop();
+            }
+
+            // 5. (新增) 移动菜单切换逻辑
+            const menuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const iconMenu = document.getElementById('icon-menu');
+            const iconX = document.getElementById('icon-x');
+            const mobileLinks = mobileMenu.querySelectorAll('a'); // 获取菜单中的所有链接
+
+            if (menuToggle && mobileMenu && iconMenu && iconX) {
+                const toggleMenu = () => {
+                    // 切换菜单的可见性
+                    mobileMenu.classList.toggle('hidden');
+                    // 切换图标的可见性
+                    iconMenu.classList.toggle('hidden');
+                    iconX.classList.toggle('hidden');
+                    
+                    // (新增) 切换时锁定/解锁 body 滚动
+                    if (mobileMenu.classList.contains('hidden')) {
+                        document.body.style.overflow = '';
+                    } else {
+                        document.body.style.overflow = 'hidden';
+                    }
+                };
+                
+                // 绑定点击事件到汉堡按钮
+                menuToggle.addEventListener('click', toggleMenu);
+
+                // (优化) 点击移动菜单链接后自动关闭菜单
+                mobileLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        // 检查菜单是否为打开状态
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            toggleMenu();
+                        }
+                    });
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
