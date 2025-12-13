@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - 页面未找到 | KingSum</title>
+    
+    <!-- 1. 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. 引入 Google Fonts: Exo 2 和 Inter (与主页一致) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- 3. 引入 Lucide Icons 图标库 (UMD 版本) -->
+    <script src="https://unpkg.com/lucide/dist/umd/lucide.min.js"></script>
+    
+    <!-- 4. 自定义样式 (从主页 index.html 完整复制) -->
+    <!-- 确保风格 100% 一致 -->
+    <style>
+        :root {
+            --color-accent1: #00f2ff; /* 电子蓝 */
+            --color-accent2: #ff00ff; /* 品红 */
+            --color-bg: #030014;      /* 深空紫黑 */
+            --color-card: #0a0423;    /* 卡片背景 */
+        }
+
+        /* 基础样式 */
+        body {
+            background-color: var(--color-bg);
+            color: #d1d5db; /* text-gray-300 */
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* 防止横向滚动 */
+        }
+
+        /* 优化：动态环境光背景 (与主页一致) */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -150px;
+            pointer-events: none;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 10% 10%, var(--color-accent1) 0, transparent 40%),
+                radial-gradient(circle at 90% 80%, var(--color-accent2) 0, transparent 40%);
+            opacity: 0.15;
+            filter: blur(100px);
+            transform: translateZ(-1px); /* 确保在最底层 */
+        }
+
+        /* 标题字体 */
+        .font-heading {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+
+        /* 动画：流光渐变文字 */
+        .gradient-text {
+            background-image: linear-gradient(90deg, var(--color-accent1), var(--color-accent2), var(--color-accent1));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: text-flow 4s linear infinite;
+        }
+
+        @keyframes text-flow {
+            from { background-position: 0% center; }
+            to { background-position: 200% center; }
+        }
+
+        /* 动画：JS 控制的滚动淡入 */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 组件：高亮按钮 (与主页一致) */
+        .btn-glow {
+            background-color: var(--color-accent1);
+            color: #000;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+        .btn-glow:hover {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.7);
+            transform: scale(1.05);
+        }
+        
+        /* 注意：主页的其他样式 (如 .card-glow, .marquee 等) 
+           也在这里，但 404 页面没有用到它们。
+           保留它们以防未来需要，且不影响此页面。
+        */
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- ===== 简版导航 (仅 Logo) ===== -->
+    <nav class="absolute top-0 left-0 w-full p-4 md:p-6 z-10">
+        <div class="container mx-auto max-w-6xl">
+            <!-- Logo/名称 (链接回主页) -->
+            <a href="https://zjt666666zjt.github.io/" class="text-2xl font-heading text-white hover:text-[var(--color-accent1)] transition-colors">
+                KingSum<span class="text-[var(--color-accent2)]">.</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ===== 主要内容 - 404 ===== -->
+    <!-- 使用 min-h-screen 和 flex 实现垂直居中 -->
+    <main class="min-h-screen flex items-center justify-center text-center px-4 py-16">
+        
+        <!-- 使用 fade-in-section 实现加载动画 -->
+        <div class="fade-in-section">
+            
+            <!-- 404 标题 (流光渐变) -->
+            <h1 class="font-heading text-8xl md:text-9xl gradient-text mb-4">
+                404
+            </h1>
+            
+            <!-- 副标题 -->
+            <h2 class="font-heading text-3xl md:text-4xl text-white mb-6">
+                哎呀！页面“蒸发”了
+            </h2>
+            
+            <!-- 描述文本 -->
+            <p class="text-lg text-gray-300 max-w-lg mx-auto mb-10">
+                你要找的页面似乎已经迷失在数字宇宙中了。不用担心，我们可以带你回到安全的轨道。
+            </p>
+            
+            <!-- 返回主页按钮 (辉光) -->
+            <a href="https://zjt666666zjt.github.io/" class="btn-glow px-8 py-3 rounded-full inline-flex items-center gap-2 text-lg">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                返回主页
+            </a>
+        </div>
+
+    </main>
+
+    <!-- ===== 5. 核心 JavaScript (仅需 Lucide 和淡入) ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            
+            // 1. 激活 Lucide 图标
+            try {
+                lucide.createIcons();
+            } catch (error) {
+                console.error("Lucide icons failed to load.", error);
+            }
+
+            // 2. 滚动淡入动画
+            const sections = document.querySelectorAll('.fade-in-section');
+            
+            if ("IntersectionObserver" in window) {
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    root: null, // 相对于视口
+                    threshold: 0.1 // 元素可见 10% 时触发
+                });
+
+                sections.forEach(section => {
+                    observer.observe(section);
+                });
+            } else {
+                // 不支持 IntersectionObserver 的旧浏览器
+                sections.forEach(section => {
+                    section.classList.add('is-visible');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
