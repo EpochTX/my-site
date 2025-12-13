@@ -33,6 +33,7 @@
                         'float': 'float 6s ease-in-out infinite',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                        'shake-soft': 'shakeSoft 0.2s ease-in-out infinite',
                     },
                     keyframes: {
                         float: {
@@ -44,6 +45,11 @@
                             '50%': { opacity: 1, transform: 'scale(1.05)' },
                             '70%': { transform: 'scale(0.9)' },
                             '100%': { transform: 'scale(1)' },
+                        },
+                        shakeSoft: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '25%': { transform: 'translateX(-2px)' },
+                            '75%': { transform: 'translateX(2px)' },
                         }
                     }
                 }
@@ -68,12 +74,6 @@
         /* 列表项进入动画 */
         .list-enter-active, .list-leave-active { transition: all 0.4s ease; }
         .list-enter-from, .list-leave-to { opacity: 0; transform: translateY(20px) scale(0.9); }
-
-        /* 签筒3D效果 */
-        .cylinder {
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 h-screen w-screen overflow-hidden flex items-center justify-center font-sans selection:bg-indigo-100 selection:text-indigo-700">
@@ -117,7 +117,7 @@
                 <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden group cursor-pointer">
                     <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
                     <h3 class="font-bold mb-1 relative z-10">祝你好运!</h3>
-                    <p class="text-xs text-slate-300 relative z-10 opacity-80">每一天都是新的开始</p>
+                    <p class="text-xs text-slate-300 relative z-10 opacity-80">心诚则灵，万事皆吉</p>
                 </div>
             </div>
         </aside>
@@ -136,9 +136,6 @@
                     <button @click="toggleSound" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm">
                         <i class="fa-solid" :class="soundEnabled ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
                     </button>
-                    <button class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm">
-                        <i class="fa-solid fa-gear"></i>
-                    </button>
                 </div>
             </header>
 
@@ -146,11 +143,30 @@
             <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 no-scrollbar scroll-smooth">
                 <div class="max-w-5xl mx-auto h-full flex flex-col md:block">
 
-                    <!-- ================= 列表抽签模式 (方框输入重构) ================= -->
+                    <!-- ================= 列表抽签模式 ================= -->
                     <div v-if="currentTab === 'list'" class="h-full flex flex-col md:grid md:grid-cols-12 md:gap-8">
                         
-                        <!-- 左侧/上方：输入区 -->
+                        <!-- 左侧/上方：配置区 -->
                         <div class="md:col-span-5 flex flex-col gap-4 mb-4 md:mb-0">
+                            
+                            <!-- 标题设置卡片 -->
+                            <div class="bg-white rounded-3xl p-5 shadow-soft border border-slate-100">
+                                <label class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 cursor-pointer select-none" @click="useTitle = !useTitle">
+                                    <span>列表标题</span>
+                                    <div class="relative inline-block w-9 h-5 rounded-full transition-colors duration-200 ease-in-out" 
+                                         :class="useTitle ? 'bg-indigo-500' : 'bg-slate-200'">
+                                        <span class="absolute left-0.5 top-0.5 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out shadow-sm"
+                                              :class="useTitle ? 'translate-x-4' : 'translate-x-0'"></span>
+                                    </div>
+                                </label>
+                                <div v-if="useTitle" class="animate-[fadeIn_0.3s_ease]">
+                                    <input type="text" v-model="listTitle" placeholder="例如：今晚吃什么？"
+                                           class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm text-slate-700 placeholder:text-slate-400">
+                                </div>
+                                <div v-else class="text-xs text-slate-400 italic">未启用标题</div>
+                            </div>
+
+                            <!-- 选项添加卡片 -->
                             <div class="bg-white rounded-3xl p-5 shadow-soft border border-slate-100">
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">添加选项</label>
                                 <div class="flex gap-2 mb-4">
@@ -163,11 +179,9 @@
                                 </div>
                                 <div class="flex justify-between items-center text-xs text-slate-400 px-1">
                                     <span>按回车快速添加</span>
-                                    <div class="flex gap-3">
-                                        <button @click="fillExample" class="hover:text-indigo-500 transition">示例</button>
-                                        <span class="text-slate-300">|</span>
-                                        <button @click="clearList" class="hover:text-rose-500 transition">清空</button>
-                                    </div>
+                                    <button @click="clearList" class="hover:text-rose-500 transition px-2 py-1 rounded hover:bg-rose-50">
+                                        <i class="fa-solid fa-trash-can mr-1"></i>清空
+                                    </button>
                                 </div>
                             </div>
 
@@ -185,7 +199,10 @@
                         <div class="md:col-span-7 flex flex-col h-full overflow-hidden">
                             <div class="bg-white/60 md:bg-white rounded-3xl p-5 md:p-6 shadow-soft border border-slate-100 flex-1 flex flex-col relative overflow-hidden">
                                 <div class="flex justify-between items-center mb-4">
-                                    <h3 class="font-bold text-slate-700">选项池 <span class="text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-md text-xs ml-2">{{ listItems.length }}</span></h3>
+                                    <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                                        {{ useTitle && listTitle ? listTitle : '选项池' }}
+                                        <span class="text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-md text-xs">{{ listItems.length }}</span>
+                                    </h3>
                                     
                                     <!-- 桌面端大按钮 -->
                                     <button @click="startDraw" :disabled="isRolling || listItems.length < 1"
@@ -234,15 +251,10 @@
                                 <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 block">Generated Number</span>
                                 
                                 <div class="h-32 md:h-40 flex items-center justify-center">
-                                    <transition name="list" mode="out-in">
-                                        <div :key="displayNumber" class="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 tracking-tighter tabular-nums">
-                                            {{ displayNumber }}
-                                        </div>
-                                    </transition>
+                                    <div class="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 tracking-tighter tabular-nums">
+                                        {{ displayNumber }}
+                                    </div>
                                 </div>
-
-                                <!-- 背景装饰光 -->
-                                <div class="absolute inset-0 bg-indigo-500/5 blur-3xl rounded-full scale-0 group-hover:scale-100 transition-transform duration-700"></div>
                             </div>
 
                             <!-- 控制区 -->
@@ -271,32 +283,6 @@
                         </div>
                     </div>
 
-                    <!-- ================= 灵签模式 ================= -->
-                    <div v-else-if="currentTab === 'fortune'" class="h-full flex flex-col items-center justify-center relative">
-                        <!-- 签筒 -->
-                        <div class="relative cursor-pointer group" @click="startDraw">
-                            <div class="w-40 md:w-56 aspect-[3/5] bg-gradient-to-br from-rose-700 to-rose-900 rounded-3xl relative z-10 shadow-2xl flex flex-col items-center justify-center border-t-8 border-b-8 border-yellow-600/50 cylinder transition-transform duration-300"
-                                :class="{'animate-[shake_0.5s_ease-in-out_infinite]': isRolling, 'hover:-translate-y-2': !isRolling}">
-                                
-                                <div class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-yellow-500/30 flex items-center justify-center bg-rose-950/20 backdrop-blur-sm">
-                                    <span class="text-5xl md:text-6xl font-serif font-black text-yellow-500 drop-shadow-md">签</span>
-                                </div>
-                                <div class="mt-6 text-yellow-500/60 font-serif tracking-[0.5em] text-xs md:text-sm">心诚则灵</div>
-                                
-                                <!-- 签子露出效果 -->
-                                <div class="absolute -top-8 w-24 h-12 flex justify-center gap-1 z-0 transition-all duration-500" :class="isRolling ? '-translate-y-4' : 'translate-y-0'">
-                                     <div class="w-3 h-16 bg-yellow-200 rounded-t-sm shadow-md"></div>
-                                     <div class="w-3 h-20 bg-yellow-300 rounded-t-sm shadow-md -translate-y-2"></div>
-                                     <div class="w-3 h-14 bg-yellow-100 rounded-t-sm shadow-md translate-y-2"></div>
-                                </div>
-                            </div>
-                            <!-- 阴影 -->
-                            <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-32 h-6 bg-black/20 rounded-[100%] blur-md transition-all duration-300 group-hover:scale-75 group-hover:blur-lg"></div>
-                        </div>
-
-                        <p class="mt-12 text-slate-400 font-serif tracking-widest animate-pulse" v-if="!resultVisible">点击签筒摇动运势</p>
-                    </div>
-
                 </div>
             </div>
         </main>
@@ -314,40 +300,49 @@
             </button>
         </nav>
 
-        <!-- ================= 全屏结果 Overlay (美化版) ================= -->
+        <!-- ================= 全屏结果 Overlay (支持动画) ================= -->
         <transition name="list">
-            <div v-if="resultVisible" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm" @click="closeResult">
-                <div class="bg-white w-full max-w-md md:max-w-lg rounded-[2rem] shadow-2xl overflow-hidden relative animate-bounce-in" @click.stop>
+            <div v-if="resultVisible" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" @click="closeResult">
+                <div class="bg-white w-full max-w-md md:max-w-lg rounded-[2rem] shadow-2xl overflow-hidden relative" 
+                     :class="isRolling ? 'animate-shake-soft' : 'animate-bounce-in'"
+                     @click.stop>
                     
                     <!-- 顶部装饰图 -->
-                    <div class="h-32 bg-gradient-to-br from-indigo-500 via-purple-500 to-rose-500 relative flex items-center justify-center overflow-hidden">
+                    <div class="h-32 bg-gradient-to-br from-indigo-500 via-purple-500 to-rose-500 relative flex items-center justify-center overflow-hidden transition-all duration-500"
+                         :class="isRolling ? 'hue-rotate-15' : ''">
                         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
                         <div class="w-full h-full absolute top-0 left-0 bg-gradient-to-b from-transparent to-white/10"></div>
                         
-                        <!-- 装饰 Icon -->
-                        <i v-if="currentTab === 'fortune'" class="fa-solid fa-scroll text-6xl text-white/30 absolute -bottom-4 -right-4 rotate-12"></i>
-                        <i v-else class="fa-solid fa-trophy text-6xl text-white/30 absolute -bottom-4 -right-4 rotate-12"></i>
+                        <i class="fa-solid fa-trophy text-6xl text-white/30 absolute -bottom-4 -right-4 rotate-12"></i>
                         
-                        <h2 class="text-white text-3xl font-bold drop-shadow-md relative z-10">{{ currentTab === 'fortune' ? '运势签文' : '幸运降临' }}</h2>
+                        <h2 class="text-white text-3xl font-bold drop-shadow-md relative z-10">
+                            {{ isRolling ? '抽取中...' : '幸运降临' }}
+                        </h2>
                     </div>
 
                     <!-- 内容区 -->
                     <div class="p-8 text-center relative">
                         <!-- 结果展示 -->
-                        <div class="mb-8">
-                            <div v-if="currentTab === 'fortune'" class="space-y-4">
-                                <div class="inline-block px-3 py-1 bg-rose-100 text-rose-600 rounded-full text-xs font-bold mb-2">第 {{ fortuneResult.num }} 签</div>
-                                <h3 class="text-5xl font-serif font-black text-rose-700">{{ resultValue.title }}</h3>
-                                <div class="w-16 h-1 bg-slate-100 mx-auto rounded-full"></div>
-                                <p class="text-slate-600 text-sm leading-relaxed px-4">{{ resultValue.desc }}</p>
+                        <div class="mb-8 min-h-[120px] flex flex-col justify-center">
+                            <!-- 显示自定义标题 -->
+                            <div v-if="useTitle && listTitle && currentTab === 'list'" class="mb-3 animate-fade-in">
+                                <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold border border-indigo-100 shadow-sm">
+                                    {{ listTitle }}
+                                </span>
                             </div>
-                            <div v-else>
-                                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">The Result Is</p>
-                                <h3 class="text-4xl md:text-5xl font-black text-slate-800 break-words leading-tight">{{ resultValue }}</h3>
+                            <div v-else class="mb-2">
+                                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">The Result Is</p>
                             </div>
+
+                            <!-- 滚动动画区域 -->
+                            <h3 class="text-4xl md:text-5xl font-black text-slate-800 break-words leading-tight transition-all duration-100"
+                                :class="isRolling ? 'opacity-70 blur-[1px] scale-95' : 'opacity-100 scale-100'">
+                                {{ displayResultValue }}
+                            </h3>
                         </div>
 
-                        <button @click="closeResult" class="w-full py-3.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition">
+                        <button @click="closeResult" :disabled="isRolling"
+                            class="w-full py-3.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition disabled:opacity-0">
                             太棒了
                         </button>
                     </div>
@@ -365,23 +360,25 @@
                 const currentTab = ref('list');
                 const isRolling = ref(false);
                 const resultVisible = ref(false);
-                const resultValue = ref(null);
+                const resultValue = ref(null); // 最终结果
+                const displayResultValue = ref(null); // 动画过程中的显示值
                 const soundEnabled = ref(false);
 
-                // Tabs
+                // Tabs (移除了 Fortune)
                 const tabs = [
                     { id: 'list', name: '列表抽签', icon: 'fa-solid fa-list-ul' },
                     { id: 'number', name: '数字随机', icon: 'fa-solid fa-arrow-down-1-9' },
-                    { id: 'fortune', name: '求签问卜', icon: 'fa-solid fa-scroll' },
                 ];
 
                 const currentTabName = computed(() => {
                     return tabs.find(t => t.id === currentTab.value)?.name;
                 });
 
-                // --- 列表模式 (方框 Tag 逻辑) ---
+                // --- 列表模式 ---
                 const newItemInput = ref('');
-                const listItems = ref([]); // Array of objects {id, text}
+                const listItems = ref([]);
+                const listTitle = ref('');
+                const useTitle = ref(false);
 
                 const addItem = () => {
                     const text = newItemInput.value.trim();
@@ -404,44 +401,47 @@
                     saveList();
                 };
 
-                const fillExample = () => {
-                    const examples = ["吃火锅", "喝奶茶", "去健身", "看电影", "睡大觉", "写代码", "去旅行", "买彩票"];
-                    listItems.value = examples.map((text, idx) => ({ id: idx, text }));
+                // 默认只保留一个
+                const fillDefault = () => {
+                    listItems.value = [{ id: 1, text: "默认选项" }];
                     saveList();
                 };
 
                 const saveList = () => {
                     localStorage.setItem('luckyDrawItems', JSON.stringify(listItems.value));
+                    localStorage.setItem('luckyDrawTitle', listTitle.value);
+                    localStorage.setItem('luckyDrawUseTitle', useTitle.value);
                 };
 
                 // --- 数字模式 ---
                 const minNum = ref(1);
                 const maxNum = ref(100);
                 const allowRepeat = ref(true);
-                const displayNumber = ref(0); // 滚动时显示的数字
-
-                // --- 灵签模式 ---
-                const fortuneResult = ref({ num: 1 });
-                const fortunes = [
-                    { title: "大吉", desc: "枯木逢春色，旧颜换新容。此时运势极佳，宜积极进取，万事皆可期。" },
-                    { title: "上吉", desc: "天时地利人和，贵人自西方来。保持谦逊之心，福泽将至。" },
-                    { title: "中吉", desc: "风平浪静，行船安稳。虽无大风大浪，亦无惊涛骇浪，平安是福。" },
-                    { title: "小吉", desc: "梅花香自苦寒来。虽然目前有些许阻碍，但坚持下去必有回响。" },
-                    { title: "平签", desc: "本来无一物，何处惹尘埃。保持平常心，勿急勿躁，静待时机。" },
-                    { title: "末吉", desc: "山重水复疑无路，柳暗花明又一村。转机往往藏在最不起眼的地方。" }
-                ];
+                const displayNumber = ref(0); // 仪表盘静态展示用
 
                 // 初始化
                 onMounted(() => {
-                    const saved = localStorage.getItem('luckyDrawItems');
-                    if (saved) {
+                    const savedItems = localStorage.getItem('luckyDrawItems');
+                    if (savedItems) {
                         try {
-                            listItems.value = JSON.parse(saved);
-                        } catch(e) { fillExample(); }
+                            listItems.value = JSON.parse(savedItems);
+                        } catch(e) { fillDefault(); }
                     } else {
-                        fillExample();
+                        fillDefault();
                     }
+
+                    const savedTitle = localStorage.getItem('luckyDrawTitle');
+                    if(savedTitle) listTitle.value = savedTitle;
+                    
+                    const savedUseTitle = localStorage.getItem('luckyDrawUseTitle');
+                    if(savedUseTitle) useTitle.value = savedUseTitle === 'true';
+
                     displayNumber.value = minNum.value;
+                });
+
+                // 监听标题变化保存
+                watch([listTitle, useTitle], () => {
+                    saveList();
                 });
 
                 // 切换 Tab
@@ -451,66 +451,76 @@
                     isRolling.value = false;
                 };
 
-                // 核心抽奖逻辑
+                // 核心抽奖逻辑 (带动画)
                 const startDraw = () => {
                     if (isRolling.value) return;
+                    
+                    // 校验
                     if (currentTab.value === 'number' && minNum.value >= maxNum.value) {
                         alert('最小值必须小于最大值');
                         return;
                     }
-
-                    isRolling.value = true;
-                    resultVisible.value = false;
-
-                    // 动画持续时间
-                    const duration = currentTab.value === 'fortune' ? 2000 : 1000;
-                    
-                    // 数字滚动特效
-                    let interval;
-                    if(currentTab.value === 'number') {
-                        interval = setInterval(() => {
-                            displayNumber.value = Math.floor(Math.random() * (maxNum.value - minNum.value + 1)) + minNum.value;
-                        }, 50);
+                    if (currentTab.value === 'list' && listItems.value.length === 0) {
+                        return;
                     }
 
+                    isRolling.value = true;
+                    resultVisible.value = true; // 立即弹出窗口
+
+                    // 动画参数
+                    const duration = 2000; // 动画持续2秒
+                    const intervalTime = 80; // 文字跳动间隔
+                    let timer = null;
+
+                    // 动画循环函数
+                    const animateLoop = () => {
+                        if (currentTab.value === 'list') {
+                            const idx = Math.floor(Math.random() * listItems.value.length);
+                            displayResultValue.value = listItems.value[idx].text;
+                        } else {
+                            const num = Math.floor(Math.random() * (maxNum.value - minNum.value + 1)) + minNum.value;
+                            displayResultValue.value = num;
+                            displayNumber.value = num; // 同步更新背景仪表盘
+                        }
+                    };
+
+                    // 启动动画
+                    timer = setInterval(animateLoop, intervalTime);
+
+                    // 结束动画
                     setTimeout(() => {
-                        if(interval) clearInterval(interval);
-                        generateResult();
+                        clearInterval(timer);
+                        generateFinalResult();
                         isRolling.value = false;
-                        resultVisible.value = true;
-                        
-                        // 触发彩带
                         triggerConfetti();
                     }, duration);
                 };
 
-                const generateResult = () => {
+                const generateFinalResult = () => {
                     if (currentTab.value === 'list') {
                         const idx = Math.floor(Math.random() * listItems.value.length);
                         resultValue.value = listItems.value[idx].text;
-                    } else if (currentTab.value === 'number') {
+                        displayResultValue.value = resultValue.value;
+                    } else {
                         const res = Math.floor(Math.random() * (maxNum.value - minNum.value + 1)) + minNum.value;
                         resultValue.value = res;
+                        displayResultValue.value = res;
                         displayNumber.value = res;
-                    } else {
-                        const idx = Math.floor(Math.random() * fortunes.length);
-                        resultValue.value = fortunes[idx];
-                        fortuneResult.value.num = Math.floor(Math.random() * 99) + 1;
                     }
                 };
 
                 const triggerConfetti = () => {
-                    const colors = currentTab.value === 'fortune' ? ['#e11d48', '#fbbf24'] : ['#6366f1', '#a855f7'];
                     confetti({
                         particleCount: 150,
                         spread: 100,
                         origin: { y: 0.6 },
-                        colors: colors,
+                        colors: ['#6366f1', '#a855f7', '#f43f5e'],
                         zIndex: 9999
                     });
                 };
 
                 const closeResult = () => {
+                    if(isRolling.value) return;
                     resultVisible.value = false;
                 };
                 
@@ -520,10 +530,9 @@
 
                 return {
                     currentTab, currentTabName, tabs, switchTab,
-                    isRolling, resultVisible, resultValue,
-                    newItemInput, listItems, addItem, removeItem, clearList, fillExample,
+                    isRolling, resultVisible, resultValue, displayResultValue,
+                    newItemInput, listItems, listTitle, useTitle, addItem, removeItem, clearList,
                     minNum, maxNum, allowRepeat, displayNumber,
-                    fortuneResult,
                     startDraw, closeResult, soundEnabled, toggleSound
                 };
             }
