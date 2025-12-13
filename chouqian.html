@@ -240,6 +240,49 @@
                         </div>
                     </div>
 
+                    <!-- ================= 是否决策模式 (新增) ================= -->
+                    <div v-else-if="currentTab === 'yesno'" class="h-full flex flex-col items-center justify-center md:block">
+                        <div class="w-full max-w-lg mx-auto space-y-6 mt-4 md:mt-10">
+                            
+                            <!-- 标题配置卡片 (小) -->
+                            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 transition-all">
+                                <label class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 cursor-pointer select-none" @click="useYesNoTitle = !useYesNoTitle">
+                                    <span>决策问题</span>
+                                    <div class="relative inline-block w-9 h-5 rounded-full transition-colors duration-200 ease-in-out" 
+                                         :class="useYesNoTitle ? 'bg-indigo-500' : 'bg-slate-200'">
+                                        <span class="absolute left-0.5 top-0.5 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out shadow-sm"
+                                              :class="useYesNoTitle ? 'translate-x-4' : 'translate-x-0'"></span>
+                                    </div>
+                                </label>
+                                <div v-if="useYesNoTitle" class="animate-[fadeIn_0.3s_ease]">
+                                    <input type="text" v-model="yesNoTitle" placeholder="例如：要不要出门？"
+                                           class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm text-slate-700 placeholder:text-slate-400 text-center">
+                                </div>
+                                <div v-else class="text-xs text-slate-400 italic text-center">未启用问题描述</div>
+                            </div>
+
+                            <!-- 结果展示区 (大) -->
+                            <div class="relative bg-white rounded-[2.5rem] p-8 md:p-12 shadow-soft border border-slate-100 text-center overflow-hidden group min-h-[240px] flex flex-col items-center justify-center">
+                                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-indigo-500"></div>
+                                
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 block">The Answer Is</span>
+                                
+                                <div class="flex-1 flex items-center justify-center">
+                                    <div class="text-6xl md:text-8xl font-black tracking-tight transition-all duration-200"
+                                         :class="displayYesNo === 'YES' || displayYesNo === '是' ? 'text-teal-500' : (displayYesNo === 'NO' || displayYesNo === '否' ? 'text-rose-500' : 'text-slate-300')">
+                                        {{ displayYesNo }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button @click="startDraw" :disabled="isRolling"
+                                class="w-full bg-slate-900 hover:bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:shadow-indigo-200 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:translate-y-0">
+                                <i class="fa-solid" :class="isRolling ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
+                                {{ isRolling ? '决策中...' : '开始决策' }}
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- ================= 数字随机模式 ================= -->
                     <div v-else-if="currentTab === 'number'" class="h-full flex flex-col items-center justify-center md:block">
                         <div class="w-full max-w-lg mx-auto space-y-6 md:space-y-8 mt-4 md:mt-10">
@@ -324,10 +367,11 @@
                     <div class="p-8 text-center relative">
                         <!-- 结果展示 -->
                         <div class="mb-8 min-h-[120px] flex flex-col justify-center">
-                            <!-- 显示自定义标题 -->
-                            <div v-if="useTitle && listTitle && currentTab === 'list'" class="mb-3 animate-fade-in">
+                            
+                            <!-- 统一的标题显示逻辑 -->
+                            <div v-if="(currentTab === 'list' && useTitle && listTitle) || (currentTab === 'yesno' && useYesNoTitle && yesNoTitle)" class="mb-3 animate-fade-in">
                                 <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold border border-indigo-100 shadow-sm">
-                                    {{ listTitle }}
+                                    {{ currentTab === 'list' ? listTitle : yesNoTitle }}
                                 </span>
                             </div>
                             <div v-else class="mb-2">
@@ -335,8 +379,12 @@
                             </div>
 
                             <!-- 滚动动画区域 -->
-                            <h3 class="text-4xl md:text-5xl font-black text-slate-800 break-words leading-tight transition-all duration-100"
-                                :class="isRolling ? 'opacity-70 blur-[1px] scale-95' : 'opacity-100 scale-100'">
+                            <h3 class="font-black text-slate-800 break-words leading-tight transition-all duration-100"
+                                :class="[
+                                    isRolling ? 'opacity-70 blur-[1px] scale-95' : 'opacity-100 scale-100',
+                                    currentTab === 'yesno' ? (displayResultValue === 'YES' || displayResultValue === '是' ? 'text-teal-500' : 'text-rose-500') : '',
+                                    displayResultValue && displayResultValue.toString().length > 8 ? 'text-2xl md:text-3xl' : 'text-4xl md:text-5xl'
+                                ]">
                                 {{ displayResultValue }}
                             </h3>
                         </div>
@@ -364,9 +412,10 @@
                 const displayResultValue = ref(null); // 动画过程中的显示值
                 const soundEnabled = ref(false);
 
-                // Tabs (移除了 Fortune)
+                // Tabs
                 const tabs = [
                     { id: 'list', name: '列表抽签', icon: 'fa-solid fa-list-ul' },
+                    { id: 'yesno', name: '是否决策', icon: 'fa-solid fa-circle-half-stroke' }, // 新增
                     { id: 'number', name: '数字随机', icon: 'fa-solid fa-arrow-down-1-9' },
                 ];
 
@@ -413,6 +462,20 @@
                     localStorage.setItem('luckyDrawUseTitle', useTitle.value);
                 };
 
+                // --- 是否决策模式 ---
+                const yesNoTitle = ref('');
+                const useYesNoTitle = ref(false);
+                const displayYesNo = ref('?'); // 静态展示
+                
+                const saveYesNo = () => {
+                    localStorage.setItem('luckyDrawYesNoTitle', yesNoTitle.value);
+                    localStorage.setItem('luckyDrawUseYesNoTitle', useYesNoTitle.value);
+                }
+
+                watch([yesNoTitle, useYesNoTitle], () => {
+                    saveYesNo();
+                });
+
                 // --- 数字模式 ---
                 const minNum = ref(1);
                 const maxNum = ref(100);
@@ -421,6 +484,7 @@
 
                 // 初始化
                 onMounted(() => {
+                    // List
                     const savedItems = localStorage.getItem('luckyDrawItems');
                     if (savedItems) {
                         try {
@@ -436,6 +500,14 @@
                     const savedUseTitle = localStorage.getItem('luckyDrawUseTitle');
                     if(savedUseTitle) useTitle.value = savedUseTitle === 'true';
 
+                    // YesNo
+                    const savedYesNoTitle = localStorage.getItem('luckyDrawYesNoTitle');
+                    if(savedYesNoTitle) yesNoTitle.value = savedYesNoTitle;
+                    
+                    const savedUseYesNoTitle = localStorage.getItem('luckyDrawUseYesNoTitle');
+                    if(savedUseYesNoTitle) useYesNoTitle.value = savedUseYesNoTitle === 'true';
+
+                    // Number
                     displayNumber.value = minNum.value;
                 });
 
@@ -477,6 +549,11 @@
                         if (currentTab.value === 'list') {
                             const idx = Math.floor(Math.random() * listItems.value.length);
                             displayResultValue.value = listItems.value[idx].text;
+                        } else if (currentTab.value === 'yesno') {
+                            // 随机切换是/否
+                            const opts = ['YES', 'NO', '是', '否'];
+                            displayResultValue.value = opts[Math.floor(Math.random() * opts.length)];
+                            displayYesNo.value = displayResultValue.value;
                         } else {
                             const num = Math.floor(Math.random() * (maxNum.value - minNum.value + 1)) + minNum.value;
                             displayResultValue.value = num;
@@ -501,6 +578,13 @@
                         const idx = Math.floor(Math.random() * listItems.value.length);
                         resultValue.value = listItems.value[idx].text;
                         displayResultValue.value = resultValue.value;
+                    } else if (currentTab.value === 'yesno') {
+                        // 50% 概率
+                        const isYes = Math.random() > 0.5;
+                        const res = isYes ? '是' : '否';
+                        resultValue.value = res;
+                        displayResultValue.value = res;
+                        displayYesNo.value = res;
                     } else {
                         const res = Math.floor(Math.random() * (maxNum.value - minNum.value + 1)) + minNum.value;
                         resultValue.value = res;
@@ -533,6 +617,7 @@
                     isRolling, resultVisible, resultValue, displayResultValue,
                     newItemInput, listItems, listTitle, useTitle, addItem, removeItem, clearList,
                     minNum, maxNum, allowRepeat, displayNumber,
+                    yesNoTitle, useYesNoTitle, displayYesNo,
                     startDraw, closeResult, soundEnabled, toggleSound
                 };
             }
