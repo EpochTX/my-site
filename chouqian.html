@@ -4,52 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>幸运抽签站 Pro | Lucky Draw</title>
+    
+    <!-- 核心库修复：使用官方和 cdnjs 源以确保兼容性 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
     
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Poppins"', '"Noto Sans SC"', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#6366f1', // Indigo 500
-                        secondary: '#8b5cf6', // Violet 500
-                        accent: '#f43f5e', // Rose 500
-                        surface: '#ffffff',
-                        background: '#f8fafc',
-                    },
-                    boxShadow: {
-                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
-                        'glow': '0 0 20px rgba(99, 102, 241, 0.5)',
-                        'inner-light': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.3)',
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-                        'shake-soft': 'shakeSoft 0.2s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
+        // 确保 tailwind 对象存在后再配置，防止报错
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['"Poppins"', '"Noto Sans SC"', 'sans-serif'],
                         },
-                        bounceIn: {
-                            '0%': { opacity: 0, transform: 'scale(0.3)' },
-                            '50%': { opacity: 1, transform: 'scale(1.05)' },
-                            '70%': { transform: 'scale(0.9)' },
-                            '100%': { transform: 'scale(1)' },
+                        colors: {
+                            primary: '#6366f1', // Indigo 500
+                            secondary: '#8b5cf6', // Violet 500
+                            accent: '#f43f5e', // Rose 500
+                            surface: '#ffffff',
+                            background: '#f8fafc',
                         },
-                        shakeSoft: {
-                            '0%, 100%': { transform: 'translateX(0)' },
-                            '25%': { transform: 'translateX(-2px)' },
-                            '75%': { transform: 'translateX(2px)' },
+                        boxShadow: {
+                            'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                            'glow': '0 0 20px rgba(99, 102, 241, 0.5)',
+                            'inner-light': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.3)',
+                        },
+                        animation: {
+                            'float': 'float 6s ease-in-out infinite',
+                            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                            'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                            'shake-soft': 'shakeSoft 0.2s ease-in-out infinite',
+                            'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        },
+                        keyframes: {
+                            float: {
+                                '0%, 100%': { transform: 'translateY(0)' },
+                                '50%': { transform: 'translateY(-10px)' },
+                            },
+                            bounceIn: {
+                                '0%': { opacity: 0, transform: 'scale(0.3)' },
+                                '50%': { opacity: 1, transform: 'scale(1.05)' },
+                                '70%': { transform: 'scale(0.9)' },
+                                '100%': { transform: 'scale(1)' },
+                            },
+                            shakeSoft: {
+                                '0%, 100%': { transform: 'translateX(0)' },
+                                '25%': { transform: 'translateX(-2px)' },
+                                '75%': { transform: 'translateX(2px)' },
+                            },
+                            fadeIn: {
+                                '0%': { opacity: 0 },
+                                '100%': { opacity: 1 },
+                            }
                         }
                     }
                 }
@@ -63,12 +74,28 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 卡片玻璃质感 */
+        /* 卡片玻璃质感 - 移动端减少模糊以提升性能 */
         .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        @media (min-width: 768px) {
+            .glass-card {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+            }
+        }
+
+        /* v-cloak 防止 Vue 加载前的花括号闪烁 */
+        [v-cloak] {
+            display: none !important;
+        }
+
+        /* 硬件加速 */
+        .hardware-accel {
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         /* 列表项进入动画 */
@@ -78,17 +105,18 @@
 </head>
 <body class="bg-slate-100 text-slate-800 h-[100dvh] w-screen overflow-hidden flex items-center justify-center font-sans selection:bg-indigo-100 selection:text-indigo-700">
 
-    <!-- 背景装饰 -->
+    <!-- 背景装饰 - 减少模糊半径，开启硬件加速 -->
     <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-50 via-purple-50 to-rose-50"></div>
-        <div class="absolute top-10 left-10 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
-        <div class="absolute bottom-10 right-10 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style="animation-delay: 2s"></div>
+        <div class="absolute top-10 left-10 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply filter blur-[60px] opacity-20 animate-float hardware-accel"></div>
+        <div class="absolute bottom-10 right-10 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-[60px] opacity-20 animate-float hardware-accel" style="animation-delay: 2s"></div>
     </div>
 
-    <div id="app" class="w-full h-full md:h-[90vh] md:w-[95vw] md:max-w-7xl md:rounded-[2.5rem] md:shadow-2xl md:bg-white/80 md:backdrop-blur-xl md:border md:border-white/60 flex flex-col md:flex-row relative overflow-hidden transition-all duration-300">
+    <!-- 添加 v-cloak 防止闪烁 -->
+    <div id="app" v-cloak class="w-full h-full md:h-[90vh] md:w-[95vw] md:max-w-7xl md:rounded-[2.5rem] md:shadow-2xl md:bg-white/80 md:backdrop-blur-xl md:border md:border-white/60 flex flex-col md:flex-row relative overflow-hidden transition-all duration-300">
 
         <!-- 桌面端侧边栏 / 移动端顶部栏 -->
-        <aside class="flex-none bg-white/50 backdrop-blur-md md:bg-white md:w-72 flex md:flex-col items-center justify-between p-4 md:p-8 border-b md:border-b-0 md:border-r border-indigo-50 z-20 shrink-0">
+        <aside class="flex-none bg-white/90 backdrop-blur-md md:bg-white md:w-72 flex md:flex-col items-center justify-between p-4 md:p-8 border-b md:border-b-0 md:border-r border-indigo-50 z-20 shrink-0">
             <!-- Logo & Title -->
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
@@ -100,7 +128,7 @@
                 </div>
             </div>
 
-            <!-- 移动端右上角时间 (保持不变) -->
+            <!-- 移动端右上角时间 -->
             <div class="md:hidden flex flex-col items-end">
                 <span class="text-base font-bold text-slate-600 leading-none tabular-nums tracking-tight">{{ timeStr }}</span>
                 <span class="text-[10px] text-slate-400 font-medium scale-90 origin-right">{{ dateStr }}</span>
@@ -165,7 +193,7 @@
                         <div class="md:col-span-5 flex flex-col gap-4 mb-6 md:mb-0 shrink-0">
                             
                             <!-- 标题设置卡片 -->
-                            <div class="bg-white rounded-3xl p-5 shadow-soft border border-slate-100">
+                            <div class="bg-white rounded-3xl p-5 shadow-soft border border-slate-100 hardware-accel">
                                 <label class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 cursor-pointer select-none" @click="useTitle = !useTitle">
                                     <span>列表标题</span>
                                     <div class="relative inline-block w-9 h-5 rounded-full transition-colors duration-200 ease-in-out" 
@@ -174,7 +202,7 @@
                                               :class="useTitle ? 'translate-x-4' : 'translate-x-0'"></span>
                                     </div>
                                 </label>
-                                <div v-if="useTitle" class="animate-[fadeIn_0.3s_ease]">
+                                <div v-if="useTitle" class="animate-fade-in">
                                     <input type="text" v-model="listTitle" placeholder="例如：今晚吃什么？"
                                            class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm text-slate-700 placeholder:text-slate-400">
                                 </div>
@@ -182,7 +210,7 @@
                             </div>
 
                             <!-- 选项添加卡片 -->
-                            <div class="bg-white rounded-3xl p-5 shadow-soft border border-slate-100">
+                            <div class="bg-white rounded-3xl p-5 shadow-soft border border-slate-100 hardware-accel">
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">添加选项</label>
                                 <div class="flex gap-2 mb-4">
                                     <input type="text" v-model="newItemInput" @keyup.enter="addItem" 
@@ -203,7 +231,7 @@
                             <!-- 移动端在此处显示操作按钮 -->
                             <div class="md:hidden mt-auto pt-2">
                                 <button @click="startDraw" :disabled="isRolling || listItems.length < 1"
-                                    class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-bold shadow-xl shadow-indigo-200 active:scale-95 transition disabled:opacity-50 disabled:shadow-none">
+                                    class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-bold shadow-xl shadow-indigo-200 active:scale-95 transition disabled:opacity-50 disabled:shadow-none hardware-accel">
                                     <i class="fa-solid" :class="isRolling ? 'fa-spinner fa-spin' : 'fa-play'"></i> 
                                     {{ isRolling ? '抽取中...' : '开始抽签' }}
                                 </button>
@@ -211,9 +239,8 @@
                         </div>
 
                         <!-- 右侧/下方：方框展示池 -->
-                        <!-- 移动端优化：移除 h-full 和 overflow-hidden，允许内容撑开 -->
                         <div class="md:col-span-7 flex flex-col md:h-full md:overflow-hidden shrink-0">
-                            <div class="bg-white/60 md:bg-white rounded-3xl p-5 md:p-6 shadow-soft border border-slate-100 flex-1 flex flex-col relative md:overflow-hidden">
+                            <div class="bg-white/60 md:bg-white rounded-3xl p-5 md:p-6 shadow-soft border border-slate-100 flex-1 flex flex-col relative md:overflow-hidden hardware-accel">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="font-bold text-slate-700 flex items-center gap-2">
                                         {{ useTitle && listTitle ? listTitle : '选项池' }}
@@ -229,11 +256,10 @@
                                 </div>
 
                                 <!-- 方框 Grid -->
-                                <!-- 移动端优化：移除 flex-1 overflow-y-auto，让外层 Main 滚动 -->
                                 <div class="md:flex-1 md:overflow-y-auto pr-1 -mr-1">
                                     <transition-group name="list" tag="div" class="grid grid-cols-2 md:grid-cols-3 gap-3 content-start">
                                         <div v-for="(item, index) in listItems" :key="item.id" 
-                                            class="group relative bg-white border-2 border-slate-100 hover:border-indigo-400 rounded-xl p-3 flex items-center justify-center text-center h-20 md:h-24 shadow-sm hover:shadow-md transition-all cursor-default overflow-hidden select-none">
+                                            class="group relative bg-white border-2 border-slate-100 hover:border-indigo-400 rounded-xl p-3 flex items-center justify-center text-center h-20 md:h-24 shadow-sm hover:shadow-md transition-all cursor-default overflow-hidden select-none hardware-accel">
                                             
                                             <span class="font-bold text-slate-700 break-words w-full text-sm md:text-base leading-tight px-1">{{ item.text }}</span>
                                             
@@ -257,12 +283,12 @@
                         </div>
                     </div>
 
-                    <!-- ================= 是否决策模式 (新增) ================= -->
+                    <!-- ================= 是否决策模式 ================= -->
                     <div v-else-if="currentTab === 'yesno'" class="h-full flex flex-col items-center justify-center md:block">
                         <div class="w-full max-w-lg mx-auto space-y-6 mt-4 md:mt-10">
                             
-                            <!-- 标题配置卡片 (小) -->
-                            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 transition-all">
+                            <!-- 标题配置卡片 -->
+                            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 transition-all hardware-accel">
                                 <label class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 cursor-pointer select-none" @click="useYesNoTitle = !useYesNoTitle">
                                     <span>决策问题</span>
                                     <div class="relative inline-block w-9 h-5 rounded-full transition-colors duration-200 ease-in-out" 
@@ -271,15 +297,15 @@
                                               :class="useYesNoTitle ? 'translate-x-4' : 'translate-x-0'"></span>
                                     </div>
                                 </label>
-                                <div v-if="useYesNoTitle" class="animate-[fadeIn_0.3s_ease]">
+                                <div v-if="useYesNoTitle" class="animate-fade-in">
                                     <input type="text" v-model="yesNoTitle" placeholder="例如：要不要出门？"
                                            class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm text-slate-700 placeholder:text-slate-400 text-center">
                                 </div>
                                 <div v-else class="text-xs text-slate-400 italic text-center">未启用问题描述</div>
                             </div>
 
-                            <!-- 结果展示区 (大) -->
-                            <div class="relative bg-white rounded-[2.5rem] p-8 md:p-12 shadow-soft border border-slate-100 text-center overflow-hidden group min-h-[240px] flex flex-col items-center justify-center">
+                            <!-- 结果展示区 -->
+                            <div class="relative bg-white rounded-[2.5rem] p-8 md:p-12 shadow-soft border border-slate-100 text-center overflow-hidden group min-h-[240px] flex flex-col items-center justify-center hardware-accel">
                                 <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-indigo-500"></div>
                                 
                                 <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 block">The Answer Is</span>
@@ -293,7 +319,7 @@
                             </div>
 
                             <button @click="startDraw" :disabled="isRolling"
-                                class="w-full bg-slate-900 hover:bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:shadow-indigo-200 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:translate-y-0">
+                                class="w-full bg-slate-900 hover:bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:shadow-indigo-200 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:translate-y-0 hardware-accel">
                                 <i class="fa-solid" :class="isRolling ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
                                 {{ isRolling ? '决策中...' : '开始决策' }}
                             </button>
@@ -304,8 +330,8 @@
                     <div v-else-if="currentTab === 'number'" class="h-full flex flex-col items-center justify-center md:block">
                         <div class="w-full max-w-lg mx-auto space-y-6 md:space-y-8 mt-4 md:mt-10">
                             
-                            <!-- 结果显示区 (类似仪表盘) -->
-                            <div class="relative bg-white rounded-[2.5rem] p-8 md:p-12 shadow-soft border border-slate-100 text-center overflow-hidden group">
+                            <!-- 结果显示区 -->
+                            <div class="relative bg-white rounded-[2.5rem] p-8 md:p-12 shadow-soft border border-slate-100 text-center overflow-hidden group hardware-accel">
                                 <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
                                 
                                 <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 block">Generated Number</span>
@@ -318,7 +344,7 @@
                             </div>
 
                             <!-- 控制区 -->
-                            <div class="bg-white/60 md:bg-white rounded-3xl p-6 shadow-sm border border-slate-100 grid grid-cols-2 gap-4 items-center">
+                            <div class="bg-white/60 md:bg-white rounded-3xl p-6 shadow-sm border border-slate-100 grid grid-cols-2 gap-4 items-center hardware-accel">
                                 <div class="col-span-2 flex items-center justify-center gap-4 bg-slate-50 p-2 rounded-2xl">
                                     <input type="number" v-model.number="minNum" class="w-20 bg-transparent text-center font-bold text-xl outline-none p-2" placeholder="Min">
                                     <span class="text-slate-300 font-light">TO</span>
@@ -336,7 +362,7 @@
                             </div>
 
                             <button @click="startDraw" :disabled="isRolling"
-                                class="w-full bg-slate-900 hover:bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:shadow-indigo-200 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:translate-y-0">
+                                class="w-full bg-slate-900 hover:bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:shadow-indigo-200 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:translate-y-0 hardware-accel">
                                 <i class="fa-solid" :class="isRolling ? 'fa-spinner fa-spin' : 'fa-dice'"></i>
                                 {{ isRolling ? '计算中...' : '生成随机数' }}
                             </button>
@@ -425,8 +451,8 @@
                 const currentTab = ref('list');
                 const isRolling = ref(false);
                 const resultVisible = ref(false);
-                const resultValue = ref(null); // 最终结果
-                const displayResultValue = ref(null); // 动画过程中的显示值
+                const resultValue = ref(null);
+                const displayResultValue = ref(null);
                 const soundEnabled = ref(false);
 
                 // 时间相关 Refs
@@ -436,7 +462,7 @@
                 // Tabs
                 const tabs = [
                     { id: 'list', name: '列表抽签', icon: 'fa-solid fa-list-ul' },
-                    { id: 'yesno', name: '是否决策', icon: 'fa-solid fa-circle-half-stroke' }, // 新增
+                    { id: 'yesno', name: '是否决策', icon: 'fa-solid fa-circle-half-stroke' },
                     { id: 'number', name: '数字随机', icon: 'fa-solid fa-arrow-down-1-9' },
                 ];
 
@@ -501,7 +527,7 @@
                 const minNum = ref(1);
                 const maxNum = ref(100);
                 const allowRepeat = ref(true);
-                const displayNumber = ref(0); // 仪表盘静态展示用
+                const displayNumber = ref(0);
 
                 // 时间更新逻辑
                 const updateTime = () => {
@@ -561,7 +587,7 @@
                     isRolling.value = false;
                 };
 
-                // 核心抽奖逻辑 (带动画)
+                // 核心抽奖逻辑 (性能优化版)
                 const startDraw = () => {
                     if (isRolling.value) return;
                     
@@ -577,38 +603,47 @@
                     isRolling.value = true;
                     resultVisible.value = true; // 立即弹出窗口
 
-                    // 动画参数
                     const duration = 2000; // 动画持续2秒
-                    const intervalTime = 80; // 文字跳动间隔
-                    let timer = null;
+                    const startTime = Date.now();
+                    let lastFrameTime = 0;
+                    const frameInterval = 80; // 限制帧率以节省性能
 
-                    // 动画循环函数
-                    const animateLoop = () => {
-                        if (currentTab.value === 'list') {
-                            const idx = Math.floor(Math.random() * listItems.value.length);
-                            displayResultValue.value = listItems.value[idx].text;
-                        } else if (currentTab.value === 'yesno') {
-                            // 随机切换是/否
-                            const opts = ['YES', 'NO', '是', '否'];
-                            displayResultValue.value = opts[Math.floor(Math.random() * opts.length)];
-                            displayYesNo.value = displayResultValue.value;
-                        } else {
-                            const num = Math.floor(Math.random() * (maxNum.value - minNum.value + 1)) + minNum.value;
-                            displayResultValue.value = num;
-                            displayNumber.value = num; // 同步更新背景仪表盘
+                    // 使用 requestAnimationFrame 替代 setInterval
+                    const animateLoop = (timestamp) => {
+                        if (!isRolling.value) return;
+
+                        const elapsed = Date.now() - startTime;
+                        
+                        // 结束条件
+                        if (elapsed >= duration) {
+                            generateFinalResult();
+                            isRolling.value = false;
+                            triggerConfetti();
+                            return;
                         }
+
+                        // 简单的节流，模拟 80ms 间隔
+                        if (timestamp - lastFrameTime >= frameInterval) {
+                            lastFrameTime = timestamp;
+                            
+                            if (currentTab.value === 'list') {
+                                const idx = Math.floor(Math.random() * listItems.value.length);
+                                displayResultValue.value = listItems.value[idx].text;
+                            } else if (currentTab.value === 'yesno') {
+                                const opts = ['YES', 'NO', '是', '否'];
+                                displayResultValue.value = opts[Math.floor(Math.random() * opts.length)];
+                                displayYesNo.value = displayResultValue.value;
+                            } else {
+                                const num = Math.floor(Math.random() * (maxNum.value - minNum.value + 1)) + minNum.value;
+                                displayResultValue.value = num;
+                                displayNumber.value = num;
+                            }
+                        }
+
+                        requestAnimationFrame(animateLoop);
                     };
 
-                    // 启动动画
-                    timer = setInterval(animateLoop, intervalTime);
-
-                    // 结束动画
-                    setTimeout(() => {
-                        clearInterval(timer);
-                        generateFinalResult();
-                        isRolling.value = false;
-                        triggerConfetti();
-                    }, duration);
+                    requestAnimationFrame(animateLoop);
                 };
 
                 const generateFinalResult = () => {
@@ -617,7 +652,6 @@
                         resultValue.value = listItems.value[idx].text;
                         displayResultValue.value = resultValue.value;
                     } else if (currentTab.value === 'yesno') {
-                        // 50% 概率
                         const isYes = Math.random() > 0.5;
                         const res = isYes ? '是' : '否';
                         resultValue.value = res;
