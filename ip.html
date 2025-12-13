@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>NET SIGHT - Ultimate IP Intelligence</title>
+<style>
+    :root {
+        --bg-color: #020617;
+        --panel-bg: rgba(15, 23, 42, 0.85);
+        --panel-border: rgba(56, 189, 248, 0.2);
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --accent-color: #06b6d4; /* Cyan */
+        --accent-glow: rgba(6, 182, 212, 0.3);
+        --domestic-accent: #f59e0b; /* Amber */
+        --domestic-glow: rgba(245, 158, 11, 0.3);
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --map-height: 280px;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        background-image: 
+            radial-gradient(circle at 15% 50%, rgba(6, 182, 212, 0.08), transparent 25%),
+            radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.08), transparent 25%);
+        color: var(--text-primary);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 70px 20px 40px; /* Top padding for fixed button */
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-color); }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    .main-wrapper {
+        width: 100%;
+        max-width: 1800px; /* 放宽宽度以适应左右并排 */
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    /* Fixed Language Control */
+    .controls {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .lang-btn {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        color: var(--accent-color);
+        padding: 10px 20px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .lang-btn:hover { 
+        background: var(--accent-color); 
+        color: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .panel {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 24px;
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 
+                    0 20px 50px -10px rgba(0, 0, 0, 0.7);
+        overflow: hidden;
+        position: relative;
+        animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel.domestic { border-color: rgba(245, 158, 11, 0.3); }
+    .panel.domestic::before { background: linear-gradient(90deg, transparent, var(--domestic-accent), transparent); }
+    .panel.domestic .header .brand .logo-icon { color: var(--domestic-accent); filter: drop-shadow(0 0 8px var(--domestic-glow)); }
+    .panel.domestic .live-indicator { color: var(--domestic-accent); background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); }
+    .panel.domestic .live-indicator .blink { background: var(--domestic-accent); box-shadow: 0 0 8px var(--domestic-accent); }
+    .panel.domestic .val.highlight { color: var(--domestic-accent); }
+    .panel.domestic .tag.active { border-color: var(--domestic-accent); color: var(--domestic-accent); background: rgba(245, 158, 11, 0.1); }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .panel::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent-color), transparent); opacity: 0.5;
+    }
+
+    /* Header */
+    .header {
+        padding: 20px 30px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(0,0,0,0.2);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 22px; height: 22px; color: var(--accent-color); }
+    .brand-text { font-size: 15px; font-weight: 800; letter-spacing: 1.5px; color: #fff; text-transform: uppercase; }
+    .live-indicator { display: flex; align-items: center; gap: 6px; font-size: 10px; padding: 4px 8px; border-radius: 20px; border: 1px solid rgba(6, 182, 212, 0.2); color: var(--accent-color); background: rgba(6, 182, 212, 0.1); font-weight: 600;}
+    .blink { width: 5px; height: 5px; background: var(--accent-color); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+    /* Hero */
+    .hero-section { display: grid; grid-template-columns: 1fr 300px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    
+    .ip-overview { padding: 30px; display: flex; flex-direction: column; justify-content: center; }
+    .flag-large { font-size: 48px; margin-bottom: 10px; display: inline-block; }
+    .ip-display { font-family: 'Monaco', monospace; font-size: 36px; font-weight: 700; color: #fff; margin-bottom: 8px; letter-spacing: -1px; word-break: break-all; }
+    .location-text { font-size: 16px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    
+    .map-box { height: var(--map-height); background: #0f172a; position: relative; overflow: hidden; border-left: 1px solid rgba(255,255,255,0.05); }
+    .map-frame { width: 100%; height: 100%; border: none; filter: grayscale(100%) invert(90%) contrast(85%); opacity: 0.8; }
+
+    /* Tags */
+    .tags-container { padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); text-transform: uppercase; }
+    .tag.active { background: rgba(6, 182, 212, 0.1); border-color: rgba(6, 182, 212, 0.3); color: var(--accent-color); }
+    .tag.danger { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: var(--danger-color); }
+
+    /* Grid */
+    .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; padding: 25px 30px; flex: 1; }
+    
+    .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; }
+    .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--accent-color); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    
+    .info-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; line-height: 1.5; }
+    .info-item.block { flex-direction: column; gap: 2px; }
+    .info-item.block .val { text-align: left; max-width: 100%; }
+    
+    .label { color: var(--text-secondary); font-size: 12px; }
+    .val { color: var(--text-primary); font-weight: 500; text-align: right; word-break: break-all; max-width: 65%; font-size: 12px; }
+    .val.highlight { color: var(--accent-color); }
+    .val.mono { font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; }
+    .val.link { text-decoration: underline; cursor: pointer; color: var(--accent-color); }
+
+    .score-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 5px; overflow: hidden; }
+    .score-fill { height: 100%; transition: width 0.5s ease; }
+
+    /* Loading */
+    .loading-view { padding: 80px; text-align: center; color: var(--text-secondary); font-size: 12px; letter-spacing: 1px; }
+    .loader { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: var(--accent-color); animation: spin 1s linear infinite; margin: 0 auto 15px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .section-divider { color: var(--text-secondary); font-size: 12px; text-align: center; letter-spacing: 2px; opacity: 0.5; font-weight: 700; margin: 10px 0; display: flex; align-items: center; gap: 15px; }
+    .section-divider::before, .section-divider::after { content: ''; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
+
+    /* --- PC / Wide Screen Optimization (Side-by-Side) --- */
+    @media (min-width: 1100px) {
+        .main-wrapper {
+            flex-direction: row; /* 左右排列 */
+            align-items: flex-start;
+            padding: 0 40px;
+        }
+        .panel {
+            flex: 1; /* 平分宽度 */
+            min-width: 0; /* 防止 grid 溢出 */
+        }
+        /* 隐藏中间的横向分割线 */
+        .section-divider { display: none; }
+        
+        .hero-section { grid-template-columns: 1fr; border-bottom: none; }
+        .map-box { border-left: none; border-top: 1px solid rgba(255,255,255,0.05); height: 220px; }
+        .ip-overview { padding: 30px; text-align: center; }
+        .location-text { justify-content: center; }
+        .tags-container { justify-content: center; }
+        
+        .grid-layout { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    }
+
+    /* --- Mobile Optimization --- */
+    @media (max-width: 900px) {
+        body { padding: 60px 10px 30px; gap: 20px; }
+        .controls { top: 15px; right: 15px; }
+        .lang-btn { padding: 6px 12px; font-size: 12px; }
+        
+        .hero-section { grid-template-columns: 1fr; border-bottom: none; }
+        .ip-overview { padding: 30px 20px; text-align: center; }
+        .location-text { justify-content: center; }
+        .tags-container { justify-content: center; }
+        
+        .flag-large { font-size: 48px; }
+        .ip-display { font-size: 32px; }
+        
+        .map-box { border-left: none; border-top: 1px solid rgba(255,255,255,0.05); height: 200px; }
+        
+        .grid-layout { grid-template-columns: 1fr; padding: 20px; gap: 15px; }
+        
+        .header { padding: 15px 20px; }
+        .brand-text { font-size: 14px; }
+        
+        .section-divider { margin: 20px 0; gap: 10px; font-size: 11px; }
+    }
+
+</style>
+</head>
+<body>
+
+<div class="controls">
+    <button class="lang-btn" onclick="toggleLang()" id="langBtn">
+        <span>🇺🇸</span> <span id="langText">Switch to English</span>
+    </button>
+</div>
+
+<div class="main-wrapper">
+    
+    <!-- Global Panel -->
+    <div id="panel-global" class="panel">
+        <div class="loading-view"><div class="loader"></div><div id="loading-global">SCANNING INTERNATIONAL EXIT...</div></div>
+    </div>
+
+    <div class="section-divider" id="divider-text">DOMESTIC CONNECTION</div>
+
+    <!-- Domestic Panel -->
+    <div id="panel-domestic" class="panel domestic">
+        <div class="loading-view"><div class="loader" style="border-top-color: var(--domestic-accent);"></div><div id="loading-domestic">SCANNING DOMESTIC EXIT...</div></div>
+    </div>
+
+</div>
+
+<script>
+// --- I18N Configuration ---
+const i18n = {
+    en: {
+        btn_label: "切换到中文",
+        title_global: "INTERNATIONAL EXIT",
+        title_domestic: "DOMESTIC EXIT",
+        divider: "DOMESTIC / DIRECT CONNECTION",
+        loading_global: "SCANNING INTERNATIONAL EXIT...",
+        loading_domestic: "SCANNING DOMESTIC EXIT...",
+        error_api: "API ERROR",
+        error_conn: "CONNECTION FAILED",
+        error_domestic: "DOMESTIC NETWORK UNREACHABLE",
+        live: "LIVE",
+        
+        // Cards
+        card_network: "NETWORK INFRASTRUCTURE",
+        card_geo: "GEO DETAILS",
+        card_security: "SECURITY PROFILE",
+        card_abuse: "ABUSE CONTACT",
+        card_whois: "WHOIS INTELLIGENCE SUMMARY",
+        
+        // Labels
+        l_asn: "ASN",
+        l_org: "Organization",
+        l_rir: "RIR",
+        l_route: "Route",
+        l_type: "Company Type",
+        l_domain: "Domain",
+        l_datacenter: "Datacenter",
+        l_dc_net: "DC Network",
+        l_comp_net: "Company Net",
+        l_whois_link: "Whois Link",
+        l_continent: "Continent",
+        l_callcode: "Calling Code",
+        l_currency: "Currency",
+        l_timezone: "Timezone",
+        l_local_time: "Local Time",
+        l_unix: "Unix Time",
+        l_dst: "DST",
+        l_zip: "Zip Code",
+        l_eu: "EU Member",
+        l_score: "Abuse Score",
+        l_bogon: "Is Bogon",
+        l_tor: "Is Tor",
+        l_proxy: "Is Proxy",
+        l_crawler: "Is Crawler",
+        l_abuser: "Is Abuser",
+        l_vpn: "Is VPN",
+        l_mobile: "Is Mobile",
+        l_sat: "Is Satellite",
+        l_name: "Name",
+        l_email: "Email",
+        l_phone: "Phone",
+        l_address: "Address",
+        l_netname: "Netname",
+        l_range: "Net Range",
+        l_descr: "Description",
+        l_modified: "Last Modified",
+        l_maintainer: "Maintainer",
+        l_source: "Source",
+        
+        // Values
+        v_yes: "Yes",
+        v_no: "No",
+        v_active: "Active",
+        v_inactive: "Inactive",
+        v_unknown: "Unknown",
+        v_low_risk: "Low Risk",
+        v_high_risk: "High Risk",
+        
+        // Footer
+        footer: "GENERATED BY NET SIGHT • DATA SOURCE: IPAPI.IS"
+    },
+    zh: {
+        btn_label: "Switch to English",
+        title_global: "国际 / 代理出口",
+        title_domestic: "国内 / 直连出口",
+        divider: "国内直连网络",
+        loading_global: "正在扫描国际出口...",
+        loading_domestic: "正在扫描国内出口...",
+        error_api: "API 错误",
+        error_conn: "连接失败",
+        error_domestic: "无法获取国内网络",
+        live: "实时",
+        
+        // Cards
+        card_network: "网络基础设施",
+        card_geo: "地理位置详情",
+        card_security: "安全风险画像",
+        card_abuse: "投诉联系人 (Abuse)",
+        card_whois: "Whois 核心情报",
+        
+        // Labels
+        l_asn: "ASN 编号",
+        l_org: "所属机构",
+        l_rir: "注册局 (RIR)",
+        l_route: "路由网段",
+        l_type: "公司类型",
+        l_domain: "官方域名",
+        l_datacenter: "数据中心",
+        l_dc_net: "机房网段",
+        l_comp_net: "公司网段",
+        l_whois_link: "Whois 链接",
+        l_continent: "大洲",
+        l_callcode: "国际区号",
+        l_currency: "货币",
+        l_timezone: "时区",
+        l_local_time: "本地时间",
+        l_unix: "Unix 时间戳",
+        l_dst: "夏令时",
+        l_zip: "邮政编码",
+        l_eu: "欧盟成员",
+        l_score: "滥用评分",
+        l_bogon: "保留地址 (Bogon)",
+        l_tor: "Tor 节点",
+        l_proxy: "代理 IP",
+        l_crawler: "网络爬虫",
+        l_abuser: "滥用记录",
+        l_vpn: "VPN",
+        l_mobile: "移动网络",
+        l_sat: "卫星网络",
+        l_name: "姓名",
+        l_email: "邮箱",
+        l_phone: "电话",
+        l_address: "地址",
+        l_netname: "网络名称",
+        l_range: "IP 范围",
+        l_descr: "描述",
+        l_modified: "最后更新",
+        l_maintainer: "维护者",
+        l_source: "来源",
+        
+        // Values
+        v_yes: "是",
+        v_no: "否",
+        v_active: "启用",
+        v_inactive: "未启用",
+        v_unknown: "未知",
+        v_low_risk: "低风险",
+        v_high_risk: "高风险",
+        
+        // Footer
+        footer: "由 NET SIGHT 生成 • 数据源: IPAPI.IS"
+    }
+};
+
+// 静态翻译映射表
+const continentMap = {
+    'AS': '亚洲', 'EU': '欧洲', 'NA': '北美洲', 'SA': '南美洲', 'AF': '非洲', 'OC': '大洋洲', 'AN': '南极洲'
+};
+
+const companyTypeMap = {
+    'isp': '互联网服务提供商 (ISP)',
+    'hosting': '数据中心 / 托管',
+    'business': '商业机构',
+    'education': '教育机构',
+    'government': '政府机构'
+};
+
+let currentLang = 'zh'; // Default Language
+const API_KEY = "e98a0946e625ab30381d";
+
+// Store data to allow switching language without re-fetching
+let globalDataCache = null;
+let domesticDataCache = null;
+
+function toggleLang() {
+    currentLang = currentLang === 'en' ? 'zh' : 'en';
+    const t = i18n[currentLang];
+    
+    // Update Button
+    document.getElementById('langText').textContent = t.btn_label; 
+    document.querySelector('.lang-btn span:first-child').textContent = currentLang === 'en' ? '🇨🇳' : '🇺🇸';
+
+    // Update Loading Text if still loading
+    const lg = document.getElementById('loading-global');
+    if(lg) lg.textContent = t.loading_global;
+    const ld = document.getElementById('loading-domestic');
+    if(ld) ld.textContent = t.loading_domestic;
+    document.getElementById('divider-text').textContent = t.divider;
+
+    // Re-render panels if data exists
+    if (globalDataCache) {
+        renderPanel('panel-global', globalDataCache.d, globalDataCache.whois, t.title_global);
+    }
+    if (domesticDataCache) {
+        renderPanel('panel-domestic', domesticDataCache.d, domesticDataCache.whois, t.title_domestic);
+    }
+}
+
+// --- Main Logic ---
+
+async function initDashboard() {
+    // Initial Text Setup
+    const t = i18n[currentLang];
+    document.getElementById('divider-text').textContent = t.divider;
+    
+    // 1. Global
+    fetchIPData(null).then(data => {
+        if(data) {
+            globalDataCache = data;
+            renderPanel('panel-global', data.d, data.whois, i18n[currentLang].title_global);
+        } else {
+            showError('panel-global', i18n[currentLang].error_api);
+        }
+    });
+
+    // 2. Domestic
+    try {
+        const ip = await getDomesticIP();
+        if (ip) {
+            fetchIPData(ip).then(data => {
+                if(data) {
+                    domesticDataCache = data;
+                    renderPanel('panel-domestic', data.d, data.whois, i18n[currentLang].title_domestic);
+                } else {
+                    showError('panel-domestic', i18n[currentLang].error_api);
+                }
+            });
+        } else {
+            showError('panel-domestic', i18n[currentLang].error_domestic);
+        }
+    } catch (e) {
+        showError('panel-domestic', i18n[currentLang].error_domestic);
+    }
+}
+
+async function fetchIPData(specificIP) {
+    try {
+        let url = `https://api.ipapi.is/?key=${API_KEY}`;
+        if (specificIP) url += `&q=${specificIP}`;
+
+        const mainRes = await fetch(url);
+        const d = await mainRes.json();
+        if (d.error) return null;
+
+        let whoisText = "";
+        try {
+            const whoisRes = await fetch(`https://api.ipapi.is/?whois=${d.ip}&key=${API_KEY}`);
+            if (whoisRes.ok) whoisText = await whoisRes.text();
+            else whoisText = "Whois Fetch Failed";
+        } catch (err) { whoisText = err.message; }
+
+        return { d, whois: whoisText };
+    } catch (e) {
+        return null;
+    }
+}
+
+// Multi-source Failover for Domestic IP
+async function getDomesticIP() {
+    const services = [
+        { url: 'https://my.ip.cn/?json=true', type: 'custom_ip_cn' },
+        { url: 'https://api.ipify.org?format=json', type: 'json', key: 'ip' },
+        { url: 'https://ifconfig.me/ip', type: 'text' },
+        { url: 'https://api.db-ip.com/v2/free/self', type: 'json', key: 'ipAddress' }
+    ];
+    for (const svc of services) {
+        try {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), 3000);
+            const res = await fetch(svc.url, { signal: controller.signal });
+            clearTimeout(id);
+            if (!res.ok) continue;
+            
+            let ip = '';
+            if (svc.type === 'json') {
+                ip = (await res.json())[svc.key];
+            } else if (svc.type === 'custom_ip_cn') {
+                const text = await res.text();
+                // 专门针对 "ip: 223.x.x.x 归属地..." 这种非标准格式进行正则提取
+                const match = text.match(/(?:ip|IP)[:：]\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
+                if (match) {
+                    ip = match[1];
+                } else {
+                    // 尝试作为JSON解析
+                    try {
+                        const json = JSON.parse(text);
+                        ip = json.ip;
+                    } catch(e) {
+                        // 最后的兜底
+                        const simpleMatch = text.match(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/);
+                        if(simpleMatch) ip = simpleMatch[0];
+                    }
+                }
+            } else {
+                ip = await res.text();
+            }
+            if (ip && ip.trim()) return ip.trim();
+        } catch (e) { continue; }
+    }
+    return null;
+}
+
+function showError(id, msg) {
+    document.getElementById(id).innerHTML = `<div style="padding:40px;text-align:center;color:var(--danger-color)">❌ ${msg}</div>`;
+}
+
+// --- Rendering ---
+
+function parseWhois(text) {
+    if (!text) return {};
+    const extract = (regex) => { const match = text.match(regex); return match ? match[1].trim() : null; };
+    return {
+        netname: extract(/netname:\s*(.+)/i) || extract(/Network Name:\s*(.+)/i),
+        descr: extract(/descr:\s*(.+)/i),
+        inetnum: extract(/(?:inetnum|NetRange):\s*(.+)/i),
+        abuse: extract(/(?:abuse-mailbox|OrgAbuseEmail|e-mail):\s*(.+)/i),
+        maintainedBy: extract(/mnt-by:\s*(.+)/i),
+        lastModified: extract(/(?:last-modified|Updated):\s*(.+)/i),
+        source: extract(/source:\s*(.+)/i)
+    };
+}
+
+// 翻译辅助函数
+function translateCountry(code) {
+    if (currentLang === 'zh' && code && window.Intl && Intl.DisplayNames) {
+        try {
+            return new Intl.DisplayNames(['zh-CN'], { type: 'region' }).of(code);
+        } catch (e) { return code; }
+    }
+    return code; // English mode or fail: return code (will be handled by map later or just shown)
+}
+
+function translateContinent(code) {
+    if (currentLang === 'zh' && continentMap[code]) return continentMap[code];
+    return code;
+}
+
+function translateType(type) {
+    if (currentLang === 'zh' && companyTypeMap[type]) return companyTypeMap[type];
+    return type;
+}
+
+function renderPanel(containerId, d, whoisText, title) {
+    const t = i18n[currentLang];
+    const container = document.getElementById(containerId);
+    
+    // Parsed Data
+    const flag = getFlag(d.location?.country_code);
+    const whois = parseWhois(whoisText);
+    const lat = d.location?.latitude || 0;
+    const lon = d.location?.longitude || 0;
+    const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=10&output=embed&iwloc=near`;
+
+    // Translation Processing
+    const countryName = currentLang === 'zh' ? translateCountry(d.location?.country_code) : d.location?.country;
+    const continentName = translateContinent(d.location?.continent);
+    const companyType = translateType(d.company?.type);
+
+    // Format Values
+    const localTime = d.location?.local_time ? d.location.local_time.replace('T', ' ').split('+')[0] : '-';
+    const score = d.company?.abuser_score || "0";
+    const scoreVal = parseInt(score);
+    const scoreColor = scoreVal > 0 ? 'var(--danger-color)' : 'var(--success-color)';
+    const scoreLabel = scoreVal > 0 ? t.v_high_risk : t.v_low_risk;
+    
+    // Dynamic Labels
+    const valBool = (val) => val ? t.v_yes : t.v_no;
+    
+    // Tags
+    const tagsConfig = [
+        { key: 'is_datacenter', icon: '🏢' },
+        { key: 'is_proxy', icon: '🛡️' },
+        { key: 'is_vpn', icon: '🔒' },
+        { key: 'is_tor', icon: '🧅', danger: true },
+        { key: 'is_abuser', icon: '🚫', danger: true },
+        { key: 'is_mobile', icon: '📱' },
+        { key: 'is_satellite', icon: '🛰️' },
+        { key: 'is_bogon', icon: '👻' },
+        { key: 'is_crawler', icon: '🤖' },
+        { key: 'is_eu_member', icon: '🇪🇺' }
+    ];
+    
+    // Map keys to I18N labels (e.g., is_datacenter -> l_datacenter)
+    const tagMap = {
+        is_datacenter: 'l_datacenter', is_proxy: 'l_proxy', is_vpn: 'l_vpn', is_tor: 'l_tor',
+        is_abuser: 'l_abuser', is_mobile: 'l_mobile', is_satellite: 'l_sat', is_bogon: 'l_bogon',
+        is_crawler: 'l_crawler', is_eu_member: 'l_eu'
+    };
+
+    const tagsHtml = tagsConfig.map(item => {
+        const isActive = d[item.key] === true;
+        const className = isActive ? (item.danger ? 'active danger' : 'active') : '';
+        const label = t[tagMap[item.key]];
+        return `<div class="tag ${className}">${item.icon} ${label}</div>`;
+    }).join('');
+
+    // Field Helpers
+    const row = (label, val, className='') => 
+        `<div class="info-item"><span class="label">${label}</span><span class="val ${className}">${val || '-'}</span></div>`;
+    
+    const rowBlock = (label, val, className='') =>
+        `<div class="info-item block"><span class="label">${label}</span><span class="val ${className}">${val || '-'}</span></div>`;
+
+    container.innerHTML = `
+        <div class="header">
+            <div class="brand">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                <span class="brand-text">${title}</span>
+            </div>
+            <div class="live-indicator"><div class="blink"></div>${t.live}</div>
+        </div>
+
+        <div class="hero-section">
+            <div class="ip-overview">
+                <div class="flag-large">${flag}</div>
+                <div class="ip-display">${d.ip}</div>
+                <div class="location-text">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    ${d.location?.city || '-'}, ${d.location?.state || '-'}, ${countryName || '-'}
+                </div>
+                <div class="tags-container" style="padding:0;">${tagsHtml}</div>
+            </div>
+            <div class="map-box">
+                <iframe class="map-frame" src="${mapUrl}"></iframe>
+                <div class="map-overlay">${lat.toFixed(5)}, ${lon.toFixed(5)}</div>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            <div class="card">
+                <div class="card-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg> ${t.card_network}</div>
+                ${row(t.l_asn, d.asn?.asn ? `AS${d.asn.asn}` : '-', 'highlight')}
+                ${row(t.l_org, d.company?.name || d.asn?.org)}
+                ${row(t.l_rir, d.rir)}
+                ${row(t.l_route, d.asn?.route, 'mono')}
+                ${row(t.l_type, companyType)}
+                ${row(t.l_domain, d.company?.domain, 'link', `window.open('http://${d.company?.domain}')`)}
+                ${d.company?.whois ? row(t.l_whois_link, 'View', 'link', `window.open('${d.company.whois}')`) : ''}
+                ${d.company?.network ? row(t.l_comp_net, d.company.network, 'mono') : ''}
+                ${d.datacenter ? `<div style="margin-top:10px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:10px;"></div>` : ''}
+                ${d.datacenter ? rowBlock(t.l_datacenter, d.datacenter.datacenter, 'highlight') : ''}
+                ${d.datacenter ? row(t.l_dc_net, d.datacenter.network, 'mono') : ''}
+            </div>
+
+            <div class="card">
+                <div class="card-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg> ${t.card_geo}</div>
+                ${row(t.l_continent, `${continentName} (${d.location?.country_code})`)}
+                ${row(t.l_callcode, `+${d.location?.calling_code}`)}
+                ${row(t.l_currency, d.location?.currency_code)}
+                ${row(t.l_timezone, d.location?.timezone)}
+                ${row(t.l_local_time, localTime)}
+                ${row(t.l_unix, d.location?.local_time_unix, 'mono')}
+                ${row(t.l_dst, d.location?.is_dst ? t.v_active : t.v_inactive)}
+                ${row(t.l_zip, d.location?.zip)}
+                ${row(t.l_eu, valBool(d.location?.is_eu_member))}
+            </div>
+
+            <div class="card">
+                <div class="card-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> ${t.card_security}</div>
+                <div class="info-item"><span class="label">${t.l_score}</span><span class="val" style="color: ${scoreColor}">${score} (${scoreLabel})</span></div>
+                <div class="score-container"><div class="score-fill" style="width: ${Math.min(parseInt(score), 100)}%; background-color: ${scoreColor}"></div></div>
+                <div style="margin-top:15px"></div>
+                ${row(t.l_bogon, valBool(d.is_bogon))}
+                ${row(t.l_tor, valBool(d.is_tor))}
+                ${row(t.l_proxy, valBool(d.is_proxy))}
+                ${row(t.l_crawler, valBool(d.is_crawler))}
+                ${row(t.l_abuser, valBool(d.is_abuser))}
+                ${row(t.l_vpn, valBool(d.is_vpn))}
+            </div>
+
+            <div class="card">
+                <div class="card-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg> ${t.card_abuse}</div>
+                ${rowBlock(t.l_name, d.abuse?.name)}
+                ${row(t.l_email, d.abuse?.email, 'link')}
+                ${row(t.l_phone, d.abuse?.phone)}
+                ${rowBlock(t.l_address, d.abuse?.address, 'val')}
+            </div>
+
+            <div class="card" style="border-color: rgba(255, 255, 255, 0.1); grid-column: 1 / -1;">
+                <div class="card-header" style="color:#fff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 12l-4-4v3H2v2h8v3m12-4a10 10 0 01-19.54 3h2.13a8 8 0 100-6H2.46A10 10 0 0122 12z"/></svg> ${t.card_whois}</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    ${rowBlock(t.l_netname, whois.netname, 'highlight mono')}
+                    ${rowBlock(t.l_range, whois.inetnum, 'mono')}
+                    ${rowBlock(t.l_descr, whois.descr ? whois.descr.substring(0, 40) : '-')}
+                    ${rowBlock(t.l_modified, whois.lastModified, 'mono')}
+                    ${rowBlock(t.l_maintainer, whois.maintainedBy, 'mono')}
+                    ${rowBlock(t.l_source, whois.source, 'mono')}
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align:center; padding-bottom: 20px; color: var(--text-secondary); font-size: 10px; opacity: 0.4;">${t.footer}</div>
+    `;
+}
+
+function getFlag(code) {
+    if(!code) return '🌐';
+    try {
+        return String.fromCodePoint(...code.toUpperCase().split('').map(c => 127397 + c.charCodeAt()));
+    } catch(e) { return '🌐'; }
+}
+
+initDashboard();
+</script>
+</body>
+</html>
