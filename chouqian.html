@@ -89,7 +89,7 @@
 
         <!-- 桌面端侧边栏 / 移动端顶部栏 -->
         <aside class="flex-none bg-white/50 backdrop-blur-md md:bg-white md:w-72 flex md:flex-col items-center justify-between p-4 md:p-8 border-b md:border-b-0 md:border-r border-indigo-50 z-20">
-            <!-- Logo -->
+            <!-- Logo & Title -->
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
                     <i class="fa-solid fa-clover text-xl md:text-2xl animate-pulse-slow"></i>
@@ -98,6 +98,12 @@
                     <h1 class="font-bold text-lg md:text-2xl tracking-tight text-slate-800">Lucky<span class="text-indigo-500">Draw</span></h1>
                     <p class="text-[10px] md:text-xs text-slate-400 font-medium tracking-wider uppercase">Pro Edition</p>
                 </div>
+            </div>
+
+            <!-- 移动端右上角时间 (新增) -->
+            <div class="md:hidden flex flex-col items-end">
+                <span class="text-base font-bold text-slate-600 leading-none tabular-nums tracking-tight">{{ timeStr }}</span>
+                <span class="text-[10px] text-slate-400 font-medium scale-90 origin-right">{{ dateStr }}</span>
             </div>
 
             <!-- 桌面端导航菜单 -->
@@ -126,7 +132,7 @@
         <main class="flex-1 relative flex flex-col overflow-hidden bg-white/30 md:bg-slate-50/50">
             
             <!-- 桌面端头部 -->
-            <header class="hidden md:flex items-center justify-between px-8 py-6">
+            <header class="hidden md:flex items-center justify-between px-8 py-6 z-20 relative">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-800">{{ currentTabName }}</h2>
                     <p class="text-sm text-slate-400">配置参数并开始您的好运之旅</p>
@@ -139,8 +145,14 @@
                 </div>
             </header>
 
+            <!-- 桌面端右下角时间水印 (新增) -->
+            <div class="hidden md:block absolute bottom-6 right-8 text-right z-0 pointer-events-none select-none opacity-40 hover:opacity-100 transition-opacity duration-500">
+                <div class="text-6xl font-black text-slate-200 tracking-tighter tabular-nums leading-none">{{ timeStr }}</div>
+                <div class="text-sm font-bold text-slate-300 uppercase tracking-[0.2em] mr-1">{{ dateStr }}</div>
+            </div>
+
             <!-- 滚动内容容器 -->
-            <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 no-scrollbar scroll-smooth">
+            <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 no-scrollbar scroll-smooth z-10 relative">
                 <div class="max-w-5xl mx-auto h-full flex flex-col md:block">
 
                     <!-- ================= 列表抽签模式 ================= -->
@@ -401,7 +413,7 @@
     </div>
 
     <script>
-        const { createApp, ref, computed, onMounted, watch } = Vue;
+        const { createApp, ref, computed, onMounted, onUnmounted, watch } = Vue;
 
         createApp({
             setup() {
@@ -411,6 +423,10 @@
                 const resultValue = ref(null); // 最终结果
                 const displayResultValue = ref(null); // 动画过程中的显示值
                 const soundEnabled = ref(false);
+
+                // 时间相关 Refs
+                const dateStr = ref('');
+                const timeStr = ref('');
 
                 // Tabs
                 const tabs = [
@@ -482,6 +498,15 @@
                 const allowRepeat = ref(true);
                 const displayNumber = ref(0); // 仪表盘静态展示用
 
+                // 时间更新逻辑
+                const updateTime = () => {
+                    const now = new Date();
+                    timeStr.value = now.toLocaleTimeString('zh-CN', { hour12: false });
+                    dateStr.value = now.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+                };
+
+                let timeInterval;
+
                 // 初始化
                 onMounted(() => {
                     // List
@@ -509,6 +534,14 @@
 
                     // Number
                     displayNumber.value = minNum.value;
+
+                    // 启动时钟
+                    updateTime();
+                    timeInterval = setInterval(updateTime, 1000);
+                });
+
+                onUnmounted(() => {
+                    if (timeInterval) clearInterval(timeInterval);
                 });
 
                 // 监听标题变化保存
@@ -618,7 +651,8 @@
                     newItemInput, listItems, listTitle, useTitle, addItem, removeItem, clearList,
                     minNum, maxNum, allowRepeat, displayNumber,
                     yesNoTitle, useYesNoTitle, displayYesNo,
-                    startDraw, closeResult, soundEnabled, toggleSound
+                    startDraw, closeResult, soundEnabled, toggleSound,
+                    dateStr, timeStr
                 };
             }
         }).mount('#app');
