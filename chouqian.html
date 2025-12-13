@@ -100,7 +100,7 @@
                 </div>
             </div>
 
-            <!-- 移动端右上角时间 (新增) -->
+            <!-- 移动端右上角时间 (保持不变) -->
             <div class="md:hidden flex flex-col items-end">
                 <span class="text-base font-bold text-slate-600 leading-none tabular-nums tracking-tight">{{ timeStr }}</span>
                 <span class="text-[10px] text-slate-400 font-medium scale-90 origin-right">{{ dateStr }}</span>
@@ -137,19 +137,22 @@
                     <h2 class="text-2xl font-bold text-slate-800">{{ currentTabName }}</h2>
                     <p class="text-sm text-slate-400">配置参数并开始您的好运之旅</p>
                 </div>
-                <!-- 顶部操作 -->
-                <div class="flex gap-3">
-                    <button @click="toggleSound" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm">
-                        <i class="fa-solid" :class="soundEnabled ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
-                    </button>
+                
+                <div class="flex items-center gap-6">
+                    <!-- 桌面端时间显示 (调整为小黑字体) -->
+                    <div class="flex flex-col items-end">
+                        <span class="text-lg font-bold text-slate-600 leading-none tabular-nums tracking-tight">{{ timeStr }}</span>
+                        <span class="text-xs text-slate-400 font-medium tracking-wide">{{ dateStr }}</span>
+                    </div>
+
+                    <!-- 顶部操作 -->
+                    <div class="flex gap-3">
+                        <button @click="toggleSound" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm">
+                            <i class="fa-solid" :class="soundEnabled ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
+                        </button>
+                    </div>
                 </div>
             </header>
-
-            <!-- 桌面端右下角时间水印 (新增) -->
-            <div class="hidden md:block absolute bottom-6 right-8 text-right z-0 pointer-events-none select-none opacity-40 hover:opacity-100 transition-opacity duration-500">
-                <div class="text-6xl font-black text-slate-200 tracking-tighter tabular-nums leading-none">{{ timeStr }}</div>
-                <div class="text-sm font-bold text-slate-300 uppercase tracking-[0.2em] mr-1">{{ dateStr }}</div>
-            </div>
 
             <!-- 滚动内容容器 -->
             <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 no-scrollbar scroll-smooth z-10 relative">
