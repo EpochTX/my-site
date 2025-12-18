@@ -12,22 +12,25 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
         body { font-family: 'Plus Jakarta Sans', 'Noto Sans SC', sans-serif; background-color: #f8fafc; }
         
-        /* 自定义滚动条 */
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; border: 2px solid transparent; background-clip: content-box; }
         .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
 
-        /* 重点词汇高亮样式 */
         .highlight-word {
-            color: #4f46e5;
-            font-weight: 700;
-            background-color: #eef2ff;
+            color: #4338ca;
+            font-weight: 800;
+            background-color: #e0e7ff;
             padding: 0 4px;
             border-radius: 4px;
             margin: 0 2px;
             display: inline-block;
-            border-bottom: 2px solid #c7d2fe;
+            border-bottom: 2px solid #818cf8;
+            transition: all 0.2s;
+        }
+        .highlight-word:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -37,8 +40,6 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- 核心全量数据 (2010-2025 全文收录) ---
-        // 这里保留 [] 标记，但渲染时会直接显示为高亮文字
         const FULL_DATABASE = {
             "小作文": {
                 "万能模板": [
@@ -449,7 +450,6 @@ Taking all these factors into consideration, it can be predicted that job satisf
 
             const currentEssays = FULL_DATABASE[selectedCategory][selectedSubCategory];
 
-            // Render text with highlighted keywords directly
             const renderContent = (text) => {
                 const regex = /\[(.*?)\]/g;
                 const parts = text.split(regex);
@@ -458,7 +458,6 @@ Taking all these factors into consideration, it can be predicted that job satisf
                     if (index % 2 === 0) {
                         return <span key={`text-${index}`} className="whitespace-pre-wrap leading-8 text-slate-700 text-lg">{part}</span>;
                     } else {
-                        // Highlighted word directly rendered
                         return (
                             <span key={`highlight-${index}`} className="highlight-word">
                                 {part}
@@ -470,7 +469,6 @@ Taking all these factors into consideration, it can be predicted that job satisf
 
             return (
                 <div className="flex h-screen overflow-hidden bg-[#f8fafc]">
-                    {/* Sidebar Navigation */}
                     <aside className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ${sidebarOpen ? 'w-80' : 'w-0 overflow-hidden'}`}>
                         <div className="p-6 border-b border-slate-100 bg-slate-50 flex items-center gap-3 sticky top-0 z-10">
                             <div className="p-2 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-200">
@@ -508,9 +506,7 @@ Taking all these factors into consideration, it can be predicted that job satisf
                         </div>
                     </aside>
 
-                    {/* Main Content */}
                     <main className="flex-1 flex flex-col h-full relative">
-                        {/* Header */}
                         <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-5 flex items-center justify-between sticky top-0 z-20 shadow-sm">
                             <div className="flex items-center gap-4">
                                 <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
@@ -527,7 +523,6 @@ Taking all these factors into consideration, it can be predicted that job satisf
                             </div>
                         </header>
 
-                        {/* Essays List (Scrollable) */}
                         <div className="flex-1 overflow-y-auto custom-scroll p-6 md:p-10 bg-[#f8fafc]">
                             <div className="max-w-4xl mx-auto space-y-10 pb-20">
                                 {currentEssays.map((essay, idx) => (
