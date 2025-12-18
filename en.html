@@ -1,14 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Search, CheckCircle2, XCircle, Eye, RefreshCw, BookOpen, ChevronRight } from 'lucide-react';
-
-        <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-    <noscript>
-        <img
-          src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true"
-          alt=""
-          referrerpolicy="no-referrer-when-downgrade"
-        />
-    </noscript>
+import React, { useState, useMemo, useEffect } from 'react';
+import { Search, CheckCircle2, XCircle, Eye, RefreshCw, BookOpen, Shuffle, Trophy, EyeOff } from 'lucide-react';
 
 const sentenceData = [
   { category: "通用开头", text: "I am writing with [sincerity] and [eagerness] to do sth.", answers: ["sincerity", "eagerness"] },
@@ -78,19 +69,42 @@ const sentenceData = [
 ];
 
 const App = () => {
+  const [sentences, setSentences] = useState(sentenceData);
   const [activeTab, setActiveTab] = useState("全部");
   const [searchTerm, setSearchTerm] = useState("");
   const [userAnswers, setUserAnswers] = useState({});
+  const [showAllHints, setShowAllHints] = useState(false);
   const [showHints, setShowHints] = useState({});
 
   const categories = useMemo(() => ["全部", ...new Set(sentenceData.map(d => d.category))], []);
 
   const filteredData = useMemo(() => {
-    return sentenceData.filter(item => 
+    return sentences.filter(item => 
       (activeTab === "全部" || item.category === activeTab) &&
       (item.text.toLowerCase().includes(searchTerm.toLowerCase()) || item.category.includes(searchTerm))
     );
-  }, [activeTab, searchTerm]);
+  }, [activeTab, searchTerm, sentences]);
+
+  // 计算掌握进度
+  const masteryStats = useMemo(() => {
+    let completed = 0;
+    sentences.forEach((s, sIdx) => {
+      const parts = s.text.split(/\[(.*?)\]/g);
+      let blankIdx = 0;
+      let allCorrect = true;
+      parts.forEach((part, pIdx) => {
+        if (pIdx % 2 === 1) {
+          const answer = userAnswers[`${sIdx}-${blankIdx}`]?.toLowerCase().trim();
+          if (answer !== part.toLowerCase()) allCorrect = false;
+          blankIdx++;
+        }
+      });
+      if (allCorrect && Object.keys(userAnswers).some(key => key.startsWith(`${sIdx}-`))) {
+        completed++;
+      }
+    });
+    return { completed, total: sentences.length };
+  }, [userAnswers, sentences]);
 
   const handleInputChange = (sentenceIndex, blankIndex, value) => {
     setUserAnswers(prev => ({
@@ -106,30 +120,58 @@ const App = () => {
     }));
   };
 
+  const shuffleSentences = () => {
+    const shuffled = [...sentences].sort(() => Math.random() - 0.5);
+    setSentences(shuffled);
+    setUserAnswers({}); // 乱序后重置，因为索引变了
+  };
+
   const resetProgress = () => {
     setUserAnswers({});
     setShowHints({});
+    setShowAllHints(false);
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <header className="mb-8 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-2">
-            英语高分句型背诵
-          </h1>
-          <p className="text-slate-500">Practice your essential English writing templates</p>
+        {/* Header Section */}
+        <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-blue-500 mb-2">
+              英语写作 · 填空练习
+            </h1>
+            <p className="text-slate-500 font-medium">修复乱码版 - 增加进度追踪与乱序模式</p>
+          </div>
+          
+          {/* 进度条展示 */}
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 min-w-[200px]">
+            <div className="bg-emerald-100 p-2 rounded-xl text-emerald-600">
+              <Trophy className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <div className="flex justify-between text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">
+                <span>掌握进度</span>
+                <span>{masteryStats.completed} / {masteryStats.total}</span>
+              </div>
+              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div 
+                  className="bg-emerald-500 h-full transition-all duration-500 ease-out"
+                  style={{ width: `${(masteryStats.completed / masteryStats.total) * 100}%` }}
+                />
+              </div>
+            </div>
+          </div>
         </header>
 
-        {/* Search and Tabs */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6 space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+        {/* Search and Tabs Container */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 mb-6 space-y-5">
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 w-5 h-5 transition-colors" />
             <input
               type="text"
-              placeholder="搜索句型、场景或单词..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              placeholder="搜索任何单词、场景或题目..."
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-700"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -140,10 +182,10 @@ const App = () => {
               <button
                 key={cat}
                 onClick={() => setActiveTab(cat)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
                   activeTab === cat 
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-100" 
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 -translate-y-0.5" 
+                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                 }`}
               >
                 {cat}
@@ -152,37 +194,75 @@ const App = () => {
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-between items-center mb-6">
-          <span className="text-sm font-medium text-slate-500">
-            共找到 {filteredData.length} 个句型
-          </span>
+        {/* Toolbar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 px-2">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={shuffleSentences}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+            >
+              <Shuffle className="w-4 h-4 text-indigo-500" /> 随机乱序
+            </button>
+            <button 
+              onClick={() => setShowAllHints(!showAllHints)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all shadow-sm"
+            >
+              {showAllHints ? <EyeOff className="w-4 h-4 text-rose-500" /> : <Eye className="w-4 h-4 text-blue-500" />}
+              {showAllHints ? "关闭全局提示" : "一键显示全答案"}
+            </button>
+          </div>
+          
           <button 
             onClick={resetProgress}
-            className="flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 transition-colors"
+            className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-rose-500 transition-colors"
           >
-            <RefreshCw className="w-4 h-4" /> 重置所有进度
+            <RefreshCw className="w-4 h-4" /> 清空练习进度
           </button>
         </div>
 
-        {/* Main List */}
-        <div className="space-y-4">
+        {/* Sentence Cards */}
+        <div className="grid grid-cols-1 gap-5">
           {filteredData.map((item, sIdx) => {
-            // Split the text into parts and blanks
             const parts = item.text.split(/\[(.*?)\]/g);
             let blankCounter = 0;
+            
+            // 检查当前卡片是否全部正确
+            let currentCardCorrect = true;
+            let currentCardHasInput = false;
+            let tempBlankIdx = 0;
+            parts.forEach((p, i) => {
+                if (i % 2 === 1) {
+                    const val = userAnswers[`${sIdx}-${tempBlankIdx}`] || "";
+                    if (val.trim() !== "") currentCardHasInput = true;
+                    if (val.toLowerCase().trim() !== p.toLowerCase()) currentCardCorrect = false;
+                    tempBlankIdx++;
+                }
+            });
+
+            const isMastered = currentCardHasInput && currentCardCorrect;
 
             return (
-              <div key={sIdx} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow group">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded">
+              <div 
+                key={sIdx} 
+                className={`bg-white rounded-3xl border-2 p-6 md:p-8 transition-all duration-300 ${
+                  isMastered 
+                    ? "border-emerald-500 shadow-xl shadow-emerald-50 bg-emerald-50/10" 
+                    : "border-slate-100 hover:border-blue-200 shadow-sm"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest">
                     {item.category}
                   </span>
+                  {isMastered && (
+                    <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-sm">
+                      <CheckCircle2 className="w-5 h-5" /> 已掌握
+                    </div>
+                  )}
                 </div>
                 
-                <div className="text-lg leading-relaxed text-slate-700">
+                <div className="text-xl md:text-2xl font-medium leading-relaxed text-slate-800 mb-8">
                   {parts.map((part, pIdx) => {
-                    // This is a blank
                     if (pIdx % 2 === 1) {
                       const bIdx = blankCounter++;
                       const userInput = userAnswers[`${sIdx}-${bIdx}`] || "";
@@ -190,50 +270,41 @@ const App = () => {
                       const hasInput = userInput.trim() !== "";
                       
                       return (
-                        <span key={pIdx} className="inline-block mx-1 relative">
+                        <span key={pIdx} className="inline-block relative align-baseline mx-1">
                           <input
                             type="text"
                             value={userInput}
                             onChange={(e) => handleInputChange(sIdx, bIdx, e.target.value)}
-                            placeholder="_____"
-                            className={`px-2 py-0.5 w-32 text-center border-b-2 outline-none transition-all bg-transparent font-semibold ${
+                            placeholder="请填写"
+                            style={{ width: `${Math.max(part.length + 2, 6)}ch` }}
+                            className={`px-3 py-1 text-center border-b-4 outline-none transition-all bg-slate-50/50 rounded-t-lg font-bold ${
                               !hasInput 
-                                ? "border-slate-300 focus:border-blue-500" 
+                                ? "border-slate-200 focus:border-blue-500 focus:bg-blue-50/30" 
                                 : isCorrect 
-                                  ? "border-emerald-500 text-emerald-600" 
-                                  : "border-rose-400 text-rose-500"
+                                  ? "border-emerald-500 text-emerald-600 bg-emerald-50/50" 
+                                  : "border-rose-400 text-rose-500 bg-rose-50/50"
                             }`}
                           />
-                          {hasInput && (
-                            <div className="absolute -right-5 top-1/2 -translate-y-1/2">
-                              {isCorrect ? (
-                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                              ) : (
-                                <XCircle className="w-4 h-4 text-rose-400" />
-                              )}
-                            </div>
-                          )}
                         </span>
                       );
                     }
-                    // This is normal text
-                    return <span key={pIdx}>{part}</span>;
+                    return <span key={pIdx} className="text-slate-700">{part}</span>;
                   })}
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-50 flex justify-between items-center">
+                <div className="flex items-center justify-between">
                    <button 
                     onClick={() => toggleHint(sIdx)}
-                    className="flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors"
+                    className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     <Eye className="w-4 h-4" /> 
-                    {showHints[sIdx] ? "隐藏答案" : "查看答案"}
+                    {showHints[sIdx] ? "隐藏提示" : "查看本条提示"}
                   </button>
                   
-                  {showHints[sIdx] && (
-                    <div className="flex gap-2">
+                  {(showHints[sIdx] || showAllHints) && (
+                    <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-right-2">
                       {item.answers.map((ans, aIdx) => (
-                        <span key={aIdx} className="px-2 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-md border border-amber-100">
+                        <span key={aIdx} className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-black rounded-lg border border-amber-200 shadow-sm">
                           {ans}
                         </span>
                       ))}
@@ -247,14 +318,23 @@ const App = () => {
 
         {/* Empty State */}
         {filteredData.length === 0 && (
-          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
-            <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500">没有找到相关句型，换个关键词试试？</p>
+          <div className="text-center py-32 bg-white rounded-[40px] border-4 border-dashed border-slate-100">
+            <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                <BookOpen className="w-10 h-10" />
+            </div>
+            <p className="text-xl font-bold text-slate-400">换个关键词试试看吧？</p>
           </div>
         )}
 
-        <footer className="mt-12 text-center text-slate-400 text-sm pb-8">
-          Practice makes perfect. Keep writing!
+        <footer className="mt-16 text-center">
+            <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">
+              Keep practicing, mastery is just a few blanks away.
+            </p>
+            <div className="mt-4 flex justify-center gap-4 text-slate-300">
+                <span className="w-2 h-2 rounded-full bg-current"></span>
+                <span className="w-2 h-2 rounded-full bg-current"></span>
+                <span className="w-2 h-2 rounded-full bg-current"></span>
+            </div>
         </footer>
       </div>
     </div>
