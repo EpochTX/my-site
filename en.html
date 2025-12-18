@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>英语写作核心句型练习器</title>
 
-  <!-- Simple Analytics (可选：不影响页面；若你担心外链导致问题可删掉整段) -->
+  <!-- Simple Analytics (可选) -->
   <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
   <noscript>
     <img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade" />
@@ -35,7 +35,9 @@
   <script type="text/babel">
     const { useState, useMemo, useEffect, useRef } = React;
 
-    // --- 核心句型数据 (包含全部 19 个分类) ---
+    // --------------------------
+    // 1) 句型数据（你原来的）
+    // --------------------------
     const sentenceData = [
       // 一、通用开头
       { category: "通用开头", text: "I am writing with [sincerity] and [eagerness] to inform you of sth.", answers: ["sincerity", "eagerness"] },
@@ -165,7 +167,168 @@
       { category: "中国文化", text: "Conveying profound national [pride].", answers: ["pride"] }
     ];
 
-    // --- SVG 图标 ---
+    // --------------------------
+    // 2) 每个题材 1 篇三段式范文（带填空）
+    //    说明：用 [ ] 标记可填空词；显示答案时用 placeholder 提示
+    // --------------------------
+    const categoryEssays = {
+      "通用开头": {
+        title: "通用书信（目的清晰）",
+        paragraphs: [
+          "I am writing with [sincerity] and [eagerness] to inform you of a matter that I believe deserves your attention.",
+          "To be specific, I would like to share the key details in an organized way. First, the background is that [background] has recently occurred, which directly affects [impact]. Second, I have already taken [action] to handle it responsibly, yet I still need your guidance on [request]. If possible, please let me know the proper procedure and any documents I should prepare.",
+          "I would appreciate it if you could give this matter your due [attention]. I look forward to your favorable [reply] at your convenience."
+        ]
+      },
+      "求职/申请信": {
+        title: "志愿者/实习申请信",
+        paragraphs: [
+          "I am writing with sincerity and eagerness to [apply] for the position of [volunteer] advertised on your website.",
+          "This role perfectly matches my background and expectations. I have gained relevant experience by actively participating in [experience] and completing several tasks such as [task]. In addition, I am good at [skill], which helps me communicate efficiently and work well in a team. If selected, I would be fully committed to [contribution], and I can start from [startDate] with a flexible schedule.",
+          "Thank you for considering my application. I would be grateful for an interview opportunity and look forward to your favorable [reply]."
+        ]
+      },
+      "建议信": {
+        title: "给学校/机构的建议信",
+        paragraphs: [
+          "Delighted to hear from you, I am writing to present my [suggestions] regarding the improvement of [topic].",
+          "It is an undeniable fact that the current arrangement brings convenience; however, some issues still remain. For example, [problem1] often leads to [result1], and [problem2] may discourage students from [result2]. To improve this situation, it is recommended to adopt the following effective measures: first, set up [measure1] to ensure [goal1]; second, provide [measure2] so that participants can [goal2]. I believe these steps are practical and cost-effective.",
+          "I sincerely hope my suggestions will be of some [help]. I would appreciate it if you could take them into careful [consideration]."
+        ]
+      },
+      "投诉信": {
+        title: "服务投诉信（要求解决）",
+        paragraphs: [
+          "I am writing to express my strong [dissatisfaction] with the service I received on [date].",
+          "Much to my disappointment, the service failed to meet my reasonable expectations. Specifically, I encountered [issue1] when I tried to [action1], and the staff even gave an unfriendly [order] to “leave”. As a result, I suffered both inconvenience and frustration, which seriously affected my schedule. Therefore, I kindly demand that you offer a formal [apology] and provide a clear solution, such as [solution]. I sincerely hope immediate actions will be taken to rectify this situation.",
+          "Thank you for your attention. I look forward to your prompt [reply] and a satisfactory resolution."
+        ]
+      },
+      "招聘/告示": {
+        title: "校园活动招募告示",
+        paragraphs: [
+          "To ensure the smooth [progress] of our upcoming activity, we are now recruiting students to serve as [role].",
+          "The activity will be held on [date] at [place]. Applicants are expected to be responsible, cooperative, and available for [duty] such as guiding guests, maintaining order, and assisting with registration. Prior experience in [experience] is a plus, but not required. If you are interested, please send your name, class, and contact information to [email] before [deadline]. Selected members will receive [benefit], and outstanding volunteers will be awarded certificates.",
+          "Should you have any questions, please don’t [hesitate] to contact us. We are looking forward to your active [participation]."
+        ]
+      },
+      "邀请信": {
+        title: "正式邀请信（讲座/活动）",
+        paragraphs: [
+          "On behalf of the Student Union, I am honored to invite you to attend our [event] on [date].",
+          "The event will take place at [place] from [timeStart] to [timeEnd]. During the session, you will be warmly welcomed by our host, and we will arrange a short introduction, followed by your keynote speech on [topic]. After that, a Q&A segment will be held so that students can interact with you directly. We believe your insights will greatly inspire participants and enrich their understanding of [field].",
+          "It would be our great [pleasure] if you could accept this invitation. We look forward to seeing you and hearing from you soon."
+        ]
+      },
+      "通用结尾": {
+        title: "通用结尾段练习",
+        paragraphs: [
+          "I am writing to make sure the key information is clearly delivered and properly understood.",
+          "If there is any additional material needed, please let me know. I will be available for further discussion at your [convenience], and I am willing to provide extra details or supporting documents whenever necessary.",
+          "I would appreciate it if you could give this matter your due [attention]. I look forward to your favorable [reply]."
+        ]
+      },
+      "朋友间结尾": {
+        title: "给朋友的建议与祝福",
+        paragraphs: [
+          "I’m writing to share my thoughts and support after hearing about your recent situation.",
+          "To be honest, it is normal to feel stressed at times. What matters is that you take small but steady steps. You can start by setting a realistic plan for [goal], and try to practice [habit] every day. Also, don’t hesitate to talk to people you trust, because a friendly conversation can make a big difference. If you need, I can help you review [task] or practice together.",
+          "I sincerely hope my suggestions will be of some [help]. Wish you every [success] in your future career."
+        ]
+      },
+      "告示/邀请结尾": {
+        title: "告示/邀请结尾模板",
+        paragraphs: [
+          "This notice is intended to inform you of the key arrangement and how to participate smoothly.",
+          "To avoid any confusion, please make sure you complete [registration] before [deadline] and bring [item] with you. If you cannot attend as planned, kindly inform us in advance. We truly hope everyone can follow the schedule so that the whole event can run efficiently and pleasantly.",
+          "Should you have any questions, please don’t [hesitate] to contact me. We are looking forward to your active [participation]."
+        ]
+      },
+      "求职高分": {
+        title: "高分求职段（能力匹配）",
+        paragraphs: [
+          "I am writing to apply for the position of [position], as it perfectly aligns with my experience and career plan.",
+          "Holding a Bachelor’s degree in [Economics] and having completed projects related to [project], I possess a solid understanding of the entire workflow. In previous internships, I actively participated in [participating] in teamwork, communicated with stakeholders, and delivered measurable outcomes such as [result]. Moreover, I am proficient in [tool] and have a strong sense of responsibility, which enables me to handle tasks efficiently under pressure.",
+          "Enclosed herewith is my resume for your reference. I would appreciate an interview opportunity and look forward to your [reply]."
+        ]
+      },
+      "投诉核心": {
+        title: "投诉信核心段强化",
+        paragraphs: [
+          "I am writing to complain about an unpleasant experience that occurred during [service] on [date].",
+          "Feeling [cheated], I asked for alternative solutions, only to receive the reply of “no one available” and an unfriendly [order] to “leave”. This behavior is unacceptable and has caused me significant inconvenience, including [loss]. Therefore, I kindly demand that you offer a formal [apology] and take immediate actions to [rectify] the situation. A reasonable compensation plan such as [compensation] would also be appreciated.",
+          "I trust that your company will handle this matter with due [urgency]. I look forward to your prompt response."
+        ]
+      },
+      "建议核心": {
+        title: "建议信核心段强化",
+        paragraphs: [
+          "I am writing to offer several constructive proposals concerning [topic] in our community/school.",
+          "It is an [undeniable] fact that the current system has benefits; however, we still face the problem that its present [design] fails to satisfy users’ demands. To improve this situation, it is recommended to adopt the following effective measures. First, relevant personnel should receive stricter training in [skills] before [operating]. Second, a complete reward and punishment mechanism must be [set] up to ensure efficiency and accountability. These measures can be implemented step by step with clear indicators.",
+          "I sincerely hope my suggestions will contribute to real improvement. Thank you for your consideration."
+        ]
+      },
+      "请假信": {
+        title: "请假信（理由充分）",
+        paragraphs: [
+          "I am writing to ask for leave due to a health condition that prevents me from attending [class/event] as scheduled.",
+          "Recently, I have been suffering from [symptom], and this condition makes me unable to carry out any [daily] activities normally. After consulting my doctor, I was advised to [stay] in bed for [days] days and avoid strenuous work. Therefore, I regret to inform you that I cannot [attend] the class/meeting on [date]. Attached herewith is the medical certificate for your [reference].",
+          "I sincerely hope you can grant my request. Thank you for your understanding, and I look forward to returning as soon as possible."
+        ]
+      },
+      "不能赴约": {
+        title: "无法赴约（礼貌改期）",
+        paragraphs: [
+          "I am writing to express my regret that I cannot attend the gathering on [date] as planned.",
+          "Unfortunately, I will be fully [occupied] then due to an important exam scheduled the day after tomorrow, which requires careful preparation. This makes me deeply regret missing the chance of such a [joyful] get-together. To show my respect, I have asked my colleague [Susan] to attend on my [behalf] and deliver my greetings. If it works for you, could we arrange a [face-to-face] meeting afterwards? I truly value our friendship and communication.",
+          "I really look forward to having a [heart-to-heart] talk with you soon. Thanks for your understanding."
+        ]
+      },
+      "损坏物品": {
+        title: "损坏物品道歉信（承担责任）",
+        paragraphs: [
+          "I am writing to offer my sincere apology for accidentally damaging your [book] yesterday.",
+          "Frankly speaking, I have felt [guilty] for delaying my apology. I must take full [responsibility] for what happened, because it was my carelessness that caused the damage. I understand the item has great [sentimental] value to you, and I truly regret any inconvenience and disappointment this may have brought. Please rest [assured] that I will either repair it professionally or replace it with a new one, according to your preference.",
+          "Again, I am sorry for my mistake. I hope you can accept my apology, and I will be more careful in the future."
+        ]
+      },
+      "活动会议": {
+        title: "会议/活动通知（流程清楚）",
+        paragraphs: [
+          "I am writing to inform you of the arrangement of our upcoming [presentation/meeting] on [date].",
+          "The following is the [arrangement] of this event. First, our host will give a brief opening at [time]. Then, our respected president will deliver a detailed [speech] on [topic]. After that, distinguished guests will [award] several outstanding employees. Participants are required to complete online [registration] by [deadline] to confirm attendance. Attached herewith is our official invitation and a simple agenda for your reference.",
+          "We would appreciate your punctual participation. Should you have any questions, please contact us anytime."
+        ]
+      },
+      "介绍美食": {
+        title: "介绍美食与文化（细节丰富）",
+        paragraphs: [
+          "I am writing to introduce a special dining experience that can help you understand Chinese culture better.",
+          "My father is [willing] to share his stories about traditional Chinese culture before warmly [inviting] you to have dinner with our family. You can taste a variety of [authentic] Chinese food, especially dumplings, which [embody] the essence of Chinese cuisine. We will also show you how dumplings are made, from mixing fillings to wrapping them neatly. I believe this hands-on experience will be enjoyable and meaningful.",
+          "This visit may arouse a strong sense of national [pride] and cultural appreciation. I sincerely hope you can join us and have a wonderful time."
+        ]
+      },
+      "比赛邀请": {
+        title: "比赛通知/邀请（规则明确）",
+        paragraphs: [
+          "I am writing to invite you to take part in our contest and to share key information for your preparation.",
+          "To ensure the smooth [progress] of the contest, please read the contents carefully. Participants should complete [registration] before [deadline], and late registration will not be allowed. Works are required to be [submitted] on time without extension. This year’s discussion topic aims to solve the [dilemma] of the housing issue, which may bring additional [psychological] pressure in a recession, so we encourage you to propose practical and creative solutions supported by evidence.",
+          "We look forward to your active participation and outstanding work. Feel free to contact us if you need further information."
+        ]
+      },
+      "中国文化": {
+        title: "中国文化介绍（建筑主题）",
+        paragraphs: [
+          "I am writing to introduce a representative aspect of Chinese culture—traditional architecture—and to share why it is worth appreciating.",
+          "Chinese architecture originated at the [dawn] of Chinese civilization and developed into a unique system emphasizing harmony and balance. The Great Wall is a [masterpiece] of Chinese architecture, not only because of its scale but also because of the spirit behind it. Its beauty [originates] from its inherent cultural meaning and practical wisdom. More importantly, it reflects the [unyielding] spirit of the Chinese people through history.",
+          "I hope this brief introduction can convey profound national [pride] and spark your interest. If you’d like, I can recommend more places to explore."
+        ]
+      }
+    };
+
+    // --------------------------
+    // 3) SVG 图标（你原来的）
+    // --------------------------
     const Icon = ({ name, className }) => {
       const icons = {
         search: <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />,
@@ -175,7 +338,8 @@
         eyeOff: <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" />,
         cloud: <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" />,
         trophy: <path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7c0 3.31 2.69 6 6 6s6-2.69 6-6V2z" />,
-        refresh: <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+        refresh: <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />,
+        book: <path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
       };
       return (
         <svg className={className || "w-5 h-5"} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
@@ -184,48 +348,158 @@
       );
     };
 
-    // --- localStorage 持久化 ---
-    const STORAGE_KEY = "english-writing-progress-v1";
+    // --------------------------
+    // 4) localStorage（句型答案 + 范文答案）
+    // --------------------------
+    const STORAGE_KEY_SENTENCES = "english-writing-progress-v1";
+    const STORAGE_KEY_ESSAYS = "english-writing-essay-progress-v1";
 
-    function safeLoadAnswers() {
+    function safeLoad(key) {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(key);
         if (!raw) return {};
         const parsed = JSON.parse(raw);
         return parsed && typeof parsed === "object" ? parsed : {};
       } catch (e) {
-        console.warn("Failed to load progress:", e);
+        console.warn("Failed to load:", key, e);
         return {};
       }
     }
 
-    function safeSaveAnswers(obj) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+    function safeSave(key, obj) {
+      localStorage.setItem(key, JSON.stringify(obj));
     }
 
+    // 通用：把一段文字按 [blank] 切分成可渲染 parts
+    function splitByBlanks(text) {
+      return text.split(/\[(.*?)\]/g);
+    }
+
+    // --------------------------
+    // 5) 范文卡片组件（可填空/可显示答案）
+    // --------------------------
+    const EssayCard = ({
+      category,
+      essay,
+      showAllHints,
+      essayAnswers,
+      onChange
+    }) => {
+      if (!essay) return null;
+
+      // 计数每篇范文的 blank index（跨三段累计）
+      let globalBlankCounter = 0;
+
+      const renderParagraph = (paraText, pIdx) => {
+        const parts = splitByBlanks(paraText);
+        let localBlankCounter = 0; // 只是为了可读性，实际 key 用 global
+
+        return (
+          <p key={pIdx} className="text-[15px] md:text-base leading-relaxed text-slate-800">
+            {parts.map((part, idx) => {
+              if (idx % 2 === 1) {
+                const blankId = globalBlankCounter++;
+                localBlankCounter++;
+
+                const key = `${category}-${blankId}`;
+                const userInput = essayAnswers[key] || "";
+                const isCorrect = userInput.toLowerCase().trim() === part.toLowerCase();
+
+                return (
+                  <span key={idx} className="inline-block relative align-baseline mx-1">
+                    <input
+                      type="text"
+                      value={userInput}
+                      onChange={(e) => onChange(category, blankId, e.target.value)}
+                      placeholder={showAllHints ? part : "___"}
+                      style={{ width: `${Math.max(part.length + 0.5, 3)}ch` }}
+                      className={`px-1 py-0 text-center border-b-2 outline-none transition-all font-bold bg-transparent
+                        ${userInput.trim() === "" ? "border-slate-300" : (isCorrect ? "text-emerald-600 border-emerald-500" : "text-rose-600 border-rose-500")}
+                      `}
+                    />
+                  </span>
+                );
+              }
+              return <span key={idx}>{part}</span>;
+            })}
+          </p>
+        );
+      };
+
+      return (
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 mb-6">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-2xl bg-indigo-50 text-indigo-600">
+                  <Icon name="book" className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg md:text-xl font-black text-slate-900">
+                    {category} · 范文填空
+                  </h2>
+                  <p className="text-slate-500 text-xs font-semibold mt-1">
+                    {essay.title} · 三段式（目的 / 细节 / 结尾）
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <span className="px-2 py-1 rounded-xl bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+              Sample
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {essay.paragraphs.map((p, i) => (
+              <div key={i} className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-black tracking-wider uppercase text-slate-400">
+                    Paragraph {i + 1}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {i === 0 ? "Purpose" : i === 1 ? "Details" : "Closing"}
+                  </span>
+                </div>
+                {renderParagraph(p, i)}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 text-[11px] text-slate-400 font-semibold">
+            小提示：答案用 <span className="font-black">[ ]</span> 标记；点“显示答案”可直接看到每空提示。
+          </div>
+        </div>
+      );
+    };
+
+    // --------------------------
+    // 6) 主应用
+    // --------------------------
     const App = () => {
       const [sentences, setSentences] = useState(sentenceData);
       const [activeTab, setActiveTab] = useState("全部");
       const [filterMode, setFilterMode] = useState("全部");
       const [searchTerm, setSearchTerm] = useState("");
       const [userAnswers, setUserAnswers] = useState({});
+      const [essayAnswers, setEssayAnswers] = useState({});
       const [showAllHints, setShowAllHints] = useState(false);
       const [isSaving, setIsSaving] = useState(false);
 
       const saveTimerRef = useRef(null);
+      const saveEssayTimerRef = useRef(null);
 
       useEffect(() => {
-        // 首次加载进度
-        setUserAnswers(safeLoadAnswers());
+        setUserAnswers(safeLoad(STORAGE_KEY_SENTENCES));
+        setEssayAnswers(safeLoad(STORAGE_KEY_ESSAYS));
       }, []);
 
-      const saveProgressDebounced = (newAnswers) => {
-        // 简单防抖，避免每个键入都同步写盘导致卡顿
-        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      const saveProgressDebounced = (key, obj, timerRef) => {
+        if (timerRef.current) clearTimeout(timerRef.current);
         setIsSaving(true);
-        saveTimerRef.current = setTimeout(() => {
+        timerRef.current = setTimeout(() => {
           try {
-            safeSaveAnswers(newAnswers);
+            safeSave(key, obj);
           } finally {
             setIsSaving(false);
           }
@@ -274,7 +548,14 @@
       const handleInputChange = (sentenceIndex, blankIndex, value) => {
         const newAnswers = { ...userAnswers, [`${sentenceIndex}-${blankIndex}`]: value };
         setUserAnswers(newAnswers);
-        saveProgressDebounced(newAnswers);
+        saveProgressDebounced(STORAGE_KEY_SENTENCES, newAnswers, saveTimerRef);
+      };
+
+      const handleEssayChange = (category, blankId, value) => {
+        const key = `${category}-${blankId}`;
+        const newAnswers = { ...essayAnswers, [key]: value };
+        setEssayAnswers(newAnswers);
+        saveProgressDebounced(STORAGE_KEY_ESSAYS, newAnswers, saveEssayTimerRef);
       };
 
       const shuffleSentences = () => {
@@ -282,15 +563,19 @@
       };
 
       const resetProgress = () => {
-        if (window.confirm("确定要重置所有进度吗？")) {
-          setUserAnswers({});
+        if (window.confirm("确定要重置所有进度吗？（句型+范文都会清空）")) {
           setIsSaving(true);
+          setUserAnswers({});
+          setEssayAnswers({});
           setTimeout(() => {
-            safeSaveAnswers({});
+            safeSave(STORAGE_KEY_SENTENCES, {});
+            safeSave(STORAGE_KEY_ESSAYS, {});
             setIsSaving(false);
-          }, 50);
+          }, 80);
         }
       };
+
+      const currentEssay = activeTab !== "全部" ? categoryEssays[activeTab] : null;
 
       return (
         <div className="min-h-screen p-4 md:p-8">
@@ -303,7 +588,9 @@
                   </h1>
                   {isSaving && <Icon name="cloud" className="w-5 h-5 text-blue-400 animate-pulse" />}
                 </div>
-                <p className="text-slate-500 font-medium text-sm">本地自动保存 · 覆盖 19 类核心场景</p>
+                <p className="text-slate-500 font-medium text-sm">
+                  本地自动保存 · 句型填空 + 每题材 1 篇三段式范文
+                </p>
               </div>
 
               <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 min-w-[260px]">
@@ -312,7 +599,7 @@
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
-                    <span>总计掌握</span>
+                    <span>句型掌握</span>
                     <span>{masteryStats.completed} / {masteryStats.total}</span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -369,7 +656,8 @@
                   <Icon name="shuffle" className="w-3.5 h-3.5 text-indigo-500" /> 乱序挑战
                 </button>
                 <button onClick={() => setShowAllHints(!showAllHints)} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all shadow-sm">
-                  <Icon name={showAllHints ? "eyeOff" : "eye"} className={`w-3.5 h-3.5 ${showAllHints ? "text-rose-500" : "text-blue-500"}`} /> {showAllHints ? "隐藏提示" : "显示答案"}
+                  <Icon name={showAllHints ? "eyeOff" : "eye"} className={`w-3.5 h-3.5 ${showAllHints ? "text-rose-500" : "text-blue-500"}`} />
+                  {showAllHints ? "隐藏提示" : "显示答案"}
                 </button>
               </div>
               <button onClick={resetProgress} className="flex items-center gap-2 text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">
@@ -377,6 +665,18 @@
               </button>
             </div>
 
+            {/* ✅ 新增：当前题材的范文填空（只有在选中某个题材时出现） */}
+            {activeTab !== "全部" && (
+              <EssayCard
+                category={activeTab}
+                essay={currentEssay}
+                showAllHints={showAllHints}
+                essayAnswers={essayAnswers}
+                onChange={handleEssayChange}
+              />
+            )}
+
+            {/* 句型卡片列表 */}
             <div className="grid grid-cols-1 gap-4 mb-20">
               {filteredData.map((item, fIdx) => {
                 const originalIndex = sentences.indexOf(item);
