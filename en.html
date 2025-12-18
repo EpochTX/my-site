@@ -1,431 +1,437 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英语写作核心句型练习器</title>
-    
-    <!-- Simple Analytics Tracking -->
-    <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-    <noscript>
-        <img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade" />
-    </noscript>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>英语写作核心句型练习器</title>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & Babel Standalone -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <!-- Simple Analytics (可选：不影响页面；若你担心外链导致问题可删掉整段) -->
+  <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  <noscript>
+    <img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade" />
+  </noscript>
 
-    <!-- Firebase Compat SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        input::placeholder { color: #cbd5e1; font-weight: 400; font-size: 0.8em; }
-        .mastered-input { border-color: #10b981 !important; color: #059669 !important; background-color: #f0fdf4 !important; }
-        .wrong-input { border-color: #ef4444 !important; color: #dc2626 !important; background-color: #fef2f2 !important; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-    </style>
+  <!-- React & Babel Standalone -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    input::placeholder { color: #cbd5e1; font-weight: 400; font-size: 0.8em; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+  </style>
 </head>
+
 <body class="bg-slate-50 text-slate-900">
-    <div id="root"></div>
+  <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useMemo, useEffect } = React;
+  <script type="text/babel">
+    const { useState, useMemo, useEffect, useRef } = React;
 
-        // --- 核心句型数据 (包含全部 19 个分类) ---
-        const sentenceData = [
-            // 一、通用开头
-            { category: "通用开头", text: "I am writing with [sincerity] and [eagerness] to inform you of sth.", answers: ["sincerity", "eagerness"] },
-            { category: "通用开头", text: "I am writing with great [pleasure] to express my views on sth.", answers: ["pleasure"] },
-            { category: "通用开头", text: "I am writing with [specific] purpose to seek your assistance in sth.", answers: ["specific"] },
-            { category: "通用开头", text: "I am writing in response to [advertisement] posted / published on [media].", answers: ["advertisement", "media"] },
-            { category: "通用开头", text: "I am writing to you concerning the matter of [complaint].", answers: ["complaint"] },
-            { category: "通用开头", text: "I am writing on behalf of [organization] to extend our sincere [apology].", answers: ["organization", "apology"] },
-            { category: "通用开头", text: "I am writing to convey my [views] regarding the issue of environmental protection.", answers: ["views"] },
-            
-            // 二、求职申请
-            { category: "求职/申请信", text: "I am writing with sincerity and eagerness to [apply] for the position of [volunteer].", answers: ["apply", "volunteer"] },
-            { category: "求职/申请信", text: "I am writing to apply for the volunteer/internship position advertised on [Internet].", answers: ["Internet"] },
-            { category: "求职/申请信", text: "I am greatly interested in the position of manager, as it perfectly matches my [expectations].", answers: ["expectations"] },
-            { category: "求职/申请信", text: "Having learned that your company is recruiting [tutors], I am writing to submit my application.", answers: ["tutors"] },
-            { category: "求职/申请信", text: "I would like to take this opportunity to apply for [scholarship] offered by your organization.", answers: ["scholarship"] },
+    // --- 核心句型数据 (包含全部 19 个分类) ---
+    const sentenceData = [
+      // 一、通用开头
+      { category: "通用开头", text: "I am writing with [sincerity] and [eagerness] to inform you of sth.", answers: ["sincerity", "eagerness"] },
+      { category: "通用开头", text: "I am writing with great [pleasure] to express my views on sth.", answers: ["pleasure"] },
+      { category: "通用开头", text: "I am writing with [specific] purpose to seek your assistance in sth.", answers: ["specific"] },
+      { category: "通用开头", text: "I am writing in response to [advertisement] posted / published on [media].", answers: ["advertisement", "media"] },
+      { category: "通用开头", text: "I am writing to you concerning the matter of [complaint].", answers: ["complaint"] },
+      { category: "通用开头", text: "I am writing on behalf of [organization] to extend our sincere [apology].", answers: ["organization", "apology"] },
+      { category: "通用开头", text: "I am writing to convey my [views] regarding the issue of environmental protection.", answers: ["views"] },
 
-            // 三、建议信
-            { category: "建议信", text: "I am writing with sincerity and integrity to present my [suggestions] regarding the service.", answers: ["suggestions"] },
-            { category: "建议信", text: "I am writing to offer several [constructive] proposals concerning the campus life.", answers: ["constructive"] },
-            { category: "建议信", text: "I am writing in the hope that my suggestions may [contribute] to the improvement of the facility.", answers: ["contribute"] },
-            { category: "建议信", text: "[Delighted] to hear from you, I am writing with honor to give you some suggestions on learning English.", answers: ["Delighted"] },
-            { category: "建议信", text: "Knowing that you are [troubled] by loneliness, I would like to share some advice with you.", answers: ["troubled"] },
+      // 二、求职申请
+      { category: "求职/申请信", text: "I am writing with sincerity and eagerness to [apply] for the position of [volunteer].", answers: ["apply", "volunteer"] },
+      { category: "求职/申请信", text: "I am writing to apply for the volunteer/internship position advertised on [Internet].", answers: ["Internet"] },
+      { category: "求职/申请信", text: "I am greatly interested in the position of manager, as it perfectly matches my [expectations].", answers: ["expectations"] },
+      { category: "求职/申请信", text: "Having learned that your company is recruiting [tutors], I am writing to submit my application.", answers: ["tutors"] },
+      { category: "求职/申请信", text: "I would like to take this opportunity to apply for [scholarship] offered by your organization.", answers: ["scholarship"] },
 
-            // 四、投诉信
-            { category: "投诉信", text: "I am writing to express my strong [dissatisfaction] with the products I bought.", answers: ["dissatisfaction"] },
-            { category: "投诉信", text: "I regret to inform you that I have [encountered] an unpleasant experience concerning the tour.", answers: ["encountered"] },
-            { category: "投诉信", text: "I feel [compelled] to write to complain about the poor service I received on June 1st.", answers: ["compelled"] },
-            { category: "投诉信", text: "Much to my disappointment, the service provided failed to meet my reasonable [expectations].", answers: ["expectations"] },
+      // 三、建议信
+      { category: "建议信", text: "I am writing with sincerity and integrity to present my [suggestions] regarding the service.", answers: ["suggestions"] },
+      { category: "建议信", text: "I am writing to offer several [constructive] proposals concerning the campus life.", answers: ["constructive"] },
+      { category: "建议信", text: "I am writing in the hope that my suggestions may [contribute] to the improvement of the facility.", answers: ["contribute"] },
+      { category: "建议信", text: "[Delighted] to hear from you, I am writing with honor to give you some suggestions on learning English.", answers: ["Delighted"] },
+      { category: "建议信", text: "Knowing that you are [troubled] by loneliness, I would like to share some advice with you.", answers: ["troubled"] },
 
-            // 五、招聘/告示
-            { category: "招聘/告示", text: "With sincerity, we are [looking] for the appropriate students serving as volunteers.", answers: ["looking"] },
-            { category: "招聘/告示", text: "With enthusiasm, we are now [recruiting] members to participate in the club.", answers: ["recruiting"] },
-            { category: "招聘/告示", text: "To ensure the smooth [progress] of the activity, the following information is announced.", answers: ["progress"] },
-            { category: "招聘/告示", text: "This notice is intended to [inform] all graduates of the upcoming ceremony.", answers: ["inform"] },
+      // 四、投诉信
+      { category: "投诉信", text: "I am writing to express my strong [dissatisfaction] with the products I bought.", answers: ["dissatisfaction"] },
+      { category: "投诉信", text: "I regret to inform you that I have [encountered] an unpleasant experience concerning the tour.", answers: ["encountered"] },
+      { category: "投诉信", text: "I feel [compelled] to write to complain about the poor service I received on June 1st.", answers: ["compelled"] },
+      { category: "投诉信", text: "Much to my disappointment, the service provided failed to meet my reasonable [expectations].", answers: ["expectations"] },
 
-            // 六、邀请信
-            { category: "邀请信", text: "With sincerity, we are [cordially] inviting you to attend the art festival.", answers: ["cordially"] },
-            { category: "邀请信", text: "We are [honored] to invite you to participate in the seminar.", answers: ["honored"] },
-            { category: "邀请信", text: "It is our great [pleasure] to extend an invitation to you for the party.", answers: ["pleasure"] },
-            { category: "邀请信", text: "On [behalf] of the Student Union, I would like to invite you to the lecture.", answers: ["behalf"] },
+      // 五、招聘/告示
+      { category: "招聘/告示", text: "With sincerity, we are [looking] for the appropriate students serving as volunteers.", answers: ["looking"] },
+      { category: "招聘/告示", text: "With enthusiasm, we are now [recruiting] members to participate in the club.", answers: ["recruiting"] },
+      { category: "招聘/告示", text: "To ensure the smooth [progress] of the activity, the following information is announced.", answers: ["progress"] },
+      { category: "招聘/告示", text: "This notice is intended to [inform] all graduates of the upcoming ceremony.", answers: ["inform"] },
 
-            // 七、通用结尾
-            { category: "通用结尾", text: "I will be available for further discussion at your [convenience].", answers: ["convenience"] },
-            { category: "通用结尾", text: "I will appreciate it if you take it into careful [consideration].", answers: ["consideration"] },
-            { category: "通用结尾", text: "I would be grateful if you could give this matter your due [attention].", answers: ["attention"] },
-            { category: "通用结尾", text: "I look forward to your favorable [reply].", answers: ["reply"] },
+      // 六、邀请信
+      { category: "邀请信", text: "With sincerity, we are [cordially] inviting you to attend the art festival.", answers: ["cordially"] },
+      { category: "邀请信", text: "We are [honored] to invite you to participate in the seminar.", answers: ["honored"] },
+      { category: "邀请信", text: "It is our great [pleasure] to extend an invitation to you for the party.", answers: ["pleasure"] },
+      { category: "邀请信", text: "On [behalf] of the Student Union, I would like to invite you to the lecture.", answers: ["behalf"] },
 
-            // 八、朋友间结尾
-            { category: "朋友间结尾", text: "Looking forward to hearing from [you] soon.", answers: ["you"] },
-            { category: "朋友间结尾", text: "I sincerely hope my suggestions will be of some [help].", answers: ["help"] },
-            { category: "朋友间结尾", text: "Wish you every [success] in your future career.", answers: ["success"] },
+      // 七、通用结尾
+      { category: "通用结尾", text: "I will be available for further discussion at your [convenience].", answers: ["convenience"] },
+      { category: "通用结尾", text: "I will appreciate it if you take it into careful [consideration].", answers: ["consideration"] },
+      { category: "通用结尾", text: "I would be grateful if you could give this matter your due [attention].", answers: ["attention"] },
+      { category: "通用结尾", text: "I look forward to your favorable [reply].", answers: ["reply"] },
 
-            // 九、告示/邀请结尾
-            { category: "告示/邀请结尾", text: "Should you have any questions, please don’t [hesitate] to contact me.", answers: ["hesitate"] },
-            { category: "告示/邀请结尾", text: "For further information, feel free to contact us at [anytime].", answers: ["anytime"] },
-            { category: "告示/邀请结尾", text: "We are looking forward to your active [participation].", answers: ["participation"] },
+      // 八、朋友间结尾
+      { category: "朋友间结尾", text: "Looking forward to hearing from [you] soon.", answers: ["you"] },
+      { category: "朋友间结尾", text: "I sincerely hope my suggestions will be of some [help].", answers: ["help"] },
+      { category: "朋友间结尾", text: "Wish you every [success] in your future career.", answers: ["success"] },
 
-            // 十、求职高分
-            { category: "求职高分", text: "The demands for this position perfectly [align] with my rich experience and professional proficiency.", answers: ["align"] },
-            { category: "求职高分", text: "Holding a Bachelor's degree in [Economics], I possess a thorough [understanding] of the entire project life-cycle.", answers: ["Economics", "understanding"] },
-            { category: "求职高分", text: "I gained precious professional experience by actively [participating] in volunteer work and internships.", answers: ["participating"] },
-            { category: "求职高分", text: "[Enclosed] herewith is the properly filled job application together with all relevant certificates.", answers: ["Enclosed"] },
-            { category: "求职高分", text: "I am confident that my qualifications will meet your [specific] requirements.", answers: ["specific"] },
-            { category: "求职高分", text: "The recognition of my consistent devotion is expected to be duly [granted].", answers: ["granted"] },
+      // 九、告示/邀请结尾
+      { category: "告示/邀请结尾", text: "Should you have any questions, please don’t [hesitate] to contact me.", answers: ["hesitate"] },
+      { category: "告示/邀请结尾", text: "For further information, feel free to contact us at [anytime].", answers: ["anytime"] },
+      { category: "告示/邀请结尾", text: "We are looking forward to your active [participation].", answers: ["participation"] },
 
-            // 十一、投诉核心
-            { category: "投诉核心", text: "Feeling [cheated], I asked about alternative solutions to this matter.", answers: ["cheated"] },
-            { category: "投诉核心", text: "...only to receive the reply of \"no one available\" and an unfriendly [order] to \"leave\".", answers: ["order"] },
-            { category: "投诉核心", text: "Therefore, I kindly demand that you offer a formal [apology] to me.", answers: ["apology"] },
-            { category: "投诉核心", text: "I sincerely hope that immediate actions will be taken to [rectify] this situation.", answers: ["rectify"] },
-            { category: "投诉核心", text: "I trust that your company will handle this matter with due [urgency].", answers: ["urgency"] },
+      // 十、求职高分
+      { category: "求职高分", text: "The demands for this position perfectly [align] with my rich experience and professional proficiency.", answers: ["align"] },
+      { category: "求职高分", text: "Holding a Bachelor's degree in [Economics], I possess a thorough [understanding] of the entire project life-cycle.", answers: ["Economics", "understanding"] },
+      { category: "求职高分", text: "I gained precious professional experience by actively [participating] in volunteer work and internships.", answers: ["participating"] },
+      { category: "求职高分", text: "[Enclosed] herewith is the properly filled job application together with all relevant certificates.", answers: ["Enclosed"] },
+      { category: "求职高分", text: "I am confident that my qualifications will meet your [specific] requirements.", answers: ["specific"] },
+      { category: "求职高分", text: "The recognition of my consistent devotion is expected to be duly [granted].", answers: ["granted"] },
 
-            // 十二、建议核心
-            { category: "建议核心", text: "It is an [undeniable] fact that modern technology has brought us numerous benefits.", answers: ["undeniable"] },
-            { category: "建议核心", text: "However, we inevitably face the problem that its current [design] fails to satisfy our demands.", answers: ["design"] },
-            { category: "建议核心", text: "To improve this situation, it is recommended to adopt the following [effective] measures.", answers: ["effective"] },
-            { category: "建议核心", text: "Relevant personnel should receive stricter training in [skills] before [operating].", answers: ["skills", "operating"] },
-            { category: "建议核心", text: "A complete reward and punishment mechanism must be [set] up to ensure efficiency.", answers: ["set"] },
+      // 十一、投诉核心
+      { category: "投诉核心", text: "Feeling [cheated], I asked about alternative solutions to this matter.", answers: ["cheated"] },
+      { category: "投诉核心", text: "...only to receive the reply of \"no one available\" and an unfriendly [order] to \"leave\".", answers: ["order"] },
+      { category: "投诉核心", text: "Therefore, I kindly demand that you offer a formal [apology] to me.", answers: ["apology"] },
+      { category: "投诉核心", text: "I sincerely hope that immediate actions will be taken to [rectify] this situation.", answers: ["rectify"] },
+      { category: "投诉核心", text: "I trust that your company will handle this matter with due [urgency].", answers: ["urgency"] },
 
-            // 十三、请假信
-            { category: "请假信", text: "This condition makes me unable to carry out any [daily] activities.", answers: ["daily"] },
-            { category: "请假信", text: "After consulting my doctor, I was advised to [stay] in bed.", answers: ["stay"] },
-            { category: "请假信", text: "Thus, I regret to inform you that I cannot [attend] as scheduled.", answers: ["attend"] },
-            { category: "请假信", text: "Attached herewith is the medical certificate for your [reference].", answers: ["reference"] },
-            { category: "请假信", text: "I sincerely ask for your kind approval to [grant] me another opportunity.", answers: ["grant"] },
+      // 十二、建议核心
+      { category: "建议核心", text: "It is an [undeniable] fact that modern technology has brought us numerous benefits.", answers: ["undeniable"] },
+      { category: "建议核心", text: "However, we inevitably face the problem that its current [design] fails to satisfy our demands.", answers: ["design"] },
+      { category: "建议核心", text: "To improve this situation, it is recommended to adopt the following [effective] measures.", answers: ["effective"] },
+      { category: "建议核心", text: "Relevant personnel should receive stricter training in [skills] before [operating].", answers: ["skills", "operating"] },
+      { category: "建议核心", text: "A complete reward and punishment mechanism must be [set] up to ensure efficiency.", answers: ["set"] },
 
-            // 十四、不能赴约
-            { category: "不能赴约", text: "I will be fully [occupied] then for an important exam scheduled the day after tomorrow.", answers: ["occupied"] },
-            { category: "不能赴约", text: "This makes me deeply regret missing the chance of such a [joyful] gathering.", answers: ["joyful"] },
-            { category: "不能赴约", text: "I have asked my colleague [Susan] to attend on my [behalf].", answers: ["Susan", "behalf"] },
-            { category: "不能赴约", text: "Could we arrange a [face-to-face] meeting afterwards?", answers: ["face-to-face"] },
-            { category: "不能赴约", text: "I really look forward to having a [heart-to-heart] talk with you.", answers: ["heart-to-heart"] },
+      // 十三、请假信
+      { category: "请假信", text: "This condition makes me unable to carry out any [daily] activities.", answers: ["daily"] },
+      { category: "请假信", text: "After consulting my doctor, I was advised to [stay] in bed.", answers: ["stay"] },
+      { category: "请假信", text: "Thus, I regret to inform you that I cannot [attend] as scheduled.", answers: ["attend"] },
+      { category: "请假信", text: "Attached herewith is the medical certificate for your [reference].", answers: ["reference"] },
+      { category: "请假信", text: "I sincerely ask for your kind approval to [grant] me another opportunity.", answers: ["grant"] },
 
-            // 十五、损坏物品
-            { category: "损坏物品", text: "Frankly speaking, I have felt [guilty] for delaying my apology.", answers: ["guilty"] },
-            { category: "损坏物品", text: "I must take full [responsibility] for accidentally damaging the [book].", answers: ["responsibility", "book"] },
-            { category: "损坏物品", text: "The item has great [sentimental] value as a family heirloom of yours.", answers: ["sentimental"] },
-            { category: "损坏物品", text: "Please rest [assured] that it will be restored to its original state.", answers: ["assured"] },
+      // 十四、不能赴约
+      { category: "不能赴约", text: "I will be fully [occupied] then for an important exam scheduled the day after tomorrow.", answers: ["occupied"] },
+      { category: "不能赴约", text: "This makes me deeply regret missing the chance of such a [joyful] gathering.", answers: ["joyful"] },
+      { category: "不能赴约", text: "I have asked my colleague [Susan] to attend on my [behalf].", answers: ["Susan", "behalf"] },
+      { category: "不能赴约", text: "Could we arrange a [face-to-face] meeting afterwards?", answers: ["face-to-face"] },
+      { category: "不能赴约", text: "I really look forward to having a [heart-to-heart] talk with you.", answers: ["heart-to-heart"] },
 
-            // 十六、活动会议
-            { category: "活动会议", text: "The following is the [arrangement] of this presentation.", answers: ["arrangement"] },
-            { category: "活动会议", text: "Our respected president will give a detailed [speech] on the current situation.", answers: ["speech"] },
-            { category: "活动会议", text: "Distinguished guests will [award] several outstanding employees.", answers: ["award"] },
-            { category: "活动会议", text: "Participants are required to complete online [registration] by May 1st.", answers: ["registration"] },
-            { category: "活动会议", text: "[Attached] herewith is our official invitation.", answers: ["Attached"] },
+      // 十五、损坏物品
+      { category: "损坏物品", text: "Frankly speaking, I have felt [guilty] for delaying my apology.", answers: ["guilty"] },
+      { category: "损坏物品", text: "I must take full [responsibility] for accidentally damaging the [book].", answers: ["responsibility", "book"] },
+      { category: "损坏物品", text: "The item has great [sentimental] value as a family heirloom of yours.", answers: ["sentimental"] },
+      { category: "损坏物品", text: "Please rest [assured] that it will be restored to its original state.", answers: ["assured"] },
 
-            // 十七、介绍美食
-            { category: "介绍美食", text: "My father is [willing] to share his stories about traditional Chinese culture.", answers: ["willing"] },
-            { category: "介绍美食", text: "Before warmly [inviting] you to have dinner with our family.", answers: ["inviting"] },
-            { category: "介绍美食", text: "You can taste a variety of [authentic] Chinese food.", answers: ["authentic"] },
-            { category: "介绍美食", text: "Dumplings [embody] the essence of Chinese cuisine.", answers: ["embody"] },
-            { category: "介绍美食", text: "This experience will arouse a strong sense of national [pride].", answers: ["pride"] },
+      // 十六、活动会议
+      { category: "活动会议", text: "The following is the [arrangement] of this presentation.", answers: ["arrangement"] },
+      { category: "活动会议", text: "Our respected president will give a detailed [speech] on the current situation.", answers: ["speech"] },
+      { category: "活动会议", text: "Distinguished guests will [award] several outstanding employees.", answers: ["award"] },
+      { category: "活动会议", text: "Participants are required to complete online [registration] by May 1st.", answers: ["registration"] },
+      { category: "活动会议", text: "[Attached] herewith is our official invitation.", answers: ["Attached"] },
 
-            // 十八、比赛邀请
-            { category: "比赛邀请", text: "To ensure the smooth [progress] of the contest, please read the contents carefully.", answers: ["progress"] },
-            { category: "比赛邀请", text: "Late [registration] will not be allowed.", answers: ["registration"] },
-            { category: "比赛邀请", text: "Works are required to be [submitted] on time without extension.", answers: ["submitted"] },
-            { category: "比赛邀请", text: "The discussion topic aims to solve the [dilemma] of the housing issue.", answers: ["dilemma"] },
-            { category: "比赛邀请", text: "It may bring us additional [psychological] pressure in the recession.", answers: ["psychological"] },
+      // 十七、介绍美食
+      { category: "介绍美食", text: "My father is [willing] to share his stories about traditional Chinese culture.", answers: ["willing"] },
+      { category: "介绍美食", text: "Before warmly [inviting] you to have dinner with our family.", answers: ["inviting"] },
+      { category: "介绍美食", text: "You can taste a variety of [authentic] Chinese food.", answers: ["authentic"] },
+      { category: "介绍美食", text: "Dumplings [embody] the essence of Chinese cuisine.", answers: ["embody"] },
+      { category: "介绍美食", text: "This experience will arouse a strong sense of national [pride].", answers: ["pride"] },
 
-            // 十九、中国文化
-            { category: "中国文化", text: "Chinese architecture originated at the [dawn] of Chinese civilization.", answers: ["dawn"] },
-            { category: "中国文化", text: "The Great Wall is a [masterpiece] of Chinese architecture.", answers: ["masterpiece"] },
-            { category: "中国文化", text: "Its beauty [originates] from its inherent spirit.", answers: ["originates"] },
-            { category: "中国文化", text: "It reflects the [unyielding] spirit of the Chinese people.", answers: ["unyielding"] },
-            { category: "中国文化", text: "Conveying profound national [pride].", answers: ["pride"] }
-        ];
+      // 十八、比赛邀请
+      { category: "比赛邀请", text: "To ensure the smooth [progress] of the contest, please read the contents carefully.", answers: ["progress"] },
+      { category: "比赛邀请", text: "Late [registration] will not be allowed.", answers: ["registration"] },
+      { category: "比赛邀请", text: "Works are required to be [submitted] on time without extension.", answers: ["submitted"] },
+      { category: "比赛邀请", text: "The discussion topic aims to solve the [dilemma] of the housing issue.", answers: ["dilemma"] },
+      { category: "比赛邀请", text: "It may bring us additional [psychological] pressure in the recession.", answers: ["psychological"] },
 
-        // --- SVG 图标 ---
-        const Icon = ({ name, className }) => {
-            const icons = {
-                search: <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />,
-                check: <path d="M5 13l4 4L19 7" />,
-                shuffle: <path d="M16 3h5v5M4 20L21 3m0 11v5h-5M4 4l5 5" />,
-                eye: <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 15a3 3 0 100-6 3 3 0 000 6z" />,
-                eyeOff: <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" />,
-                cloud: <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" />,
-                trophy: <path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7c0 3.31 2.69 6 6 6s6-2.69 6-6V2z" />,
-                refresh: <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-            };
-            return (
-                <svg className={className || "w-5 h-5"} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                    {icons[name] || <circle cx="12" cy="12" r="10" />}
-                </svg>
-            );
-        };
+      // 十九、中国文化
+      { category: "中国文化", text: "Chinese architecture originated at the [dawn] of Chinese civilization.", answers: ["dawn"] },
+      { category: "中国文化", text: "The Great Wall is a [masterpiece] of Chinese architecture.", answers: ["masterpiece"] },
+      { category: "中国文化", text: "Its beauty [originates] from its inherent spirit.", answers: ["originates"] },
+      { category: "中国文化", text: "It reflects the [unyielding] spirit of the Chinese people.", answers: ["unyielding"] },
+      { category: "中国文化", text: "Conveying profound national [pride].", answers: ["pride"] }
+    ];
 
-        // --- Firebase Init ---
-        const firebaseConfig = JSON.parse(__firebase_config);
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'english-learning-expanded';
+    // --- SVG 图标 ---
+    const Icon = ({ name, className }) => {
+      const icons = {
+        search: <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />,
+        check: <path d="M5 13l4 4L19 7" />,
+        shuffle: <path d="M16 3h5v5M4 20L21 3m0 11v5h-5M4 4l5 5" />,
+        eye: <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 15a3 3 0 100-6 3 3 0 000 6z" />,
+        eyeOff: <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" />,
+        cloud: <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" />,
+        trophy: <path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7c0 3.31 2.69 6 6 6s6-2.69 6-6V2z" />,
+        refresh: <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+      };
+      return (
+        <svg className={className || "w-5 h-5"} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+          {icons[name] || <circle cx="12" cy="12" r="10" />}
+        </svg>
+      );
+    };
 
-        const App = () => {
-            const [user, setUser] = useState(null);
-            const [sentences, setSentences] = useState(sentenceData);
-            const [activeTab, setActiveTab] = useState("全部");
-            const [filterMode, setFilterMode] = useState("全部");
-            const [searchTerm, setSearchTerm] = useState("");
-            const [userAnswers, setUserAnswers] = useState({});
-            const [showAllHints, setShowAllHints] = useState(false);
-            const [isSaving, setIsSaving] = useState(false);
+    // --- localStorage 持久化 ---
+    const STORAGE_KEY = "english-writing-progress-v1";
 
-            useEffect(() => {
-                const initAuth = async () => {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await auth.signInWithCustomToken(__initial_auth_token);
-                    } else {
-                        await auth.signInAnonymously();
-                    }
-                };
-                initAuth();
-                const unsubscribe = auth.onAuthStateChanged(setUser);
-                return () => unsubscribe();
-            }, []);
+    function safeLoadAnswers() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (e) {
+        console.warn("Failed to load progress:", e);
+        return {};
+      }
+    }
 
-            useEffect(() => {
-                if (!user) return;
-                const docRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('progress').doc('current');
-                const unsubscribe = docRef.onSnapshot((snapshot) => {
-                    if (snapshot.exists) {
-                        const data = snapshot.data();
-                        if (data.answers) setUserAnswers(data.answers);
-                    }
-                });
-                return () => unsubscribe();
-            }, [user]);
+    function safeSaveAnswers(obj) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+    }
 
-            const saveProgress = async (newAnswers) => {
-                if (!user) return;
-                setIsSaving(true);
-                try {
-                    const docRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('progress').doc('current');
-                    await docRef.set({ answers: newAnswers, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-                } catch (err) { console.error(err); }
-                finally { setIsSaving(false); }
-            };
+    const App = () => {
+      const [sentences, setSentences] = useState(sentenceData);
+      const [activeTab, setActiveTab] = useState("全部");
+      const [filterMode, setFilterMode] = useState("全部");
+      const [searchTerm, setSearchTerm] = useState("");
+      const [userAnswers, setUserAnswers] = useState({});
+      const [showAllHints, setShowAllHints] = useState(false);
+      const [isSaving, setIsSaving] = useState(false);
 
-            const categories = useMemo(() => ["全部", ...new Set(sentenceData.map(d => d.category))], []);
+      const saveTimerRef = useRef(null);
 
-            const checkMastery = (sentence, sIdx, answers) => {
-                const parts = sentence.text.split(/\[(.*?)\]/g);
-                let blankIdx = 0;
-                let allCorrect = true;
-                let hasInput = false;
-                parts.forEach((part, pIdx) => {
-                    if (pIdx % 2 === 1) {
-                        const input = answers[`${sIdx}-${blankIdx}`]?.toLowerCase().trim() || "";
-                        if (input !== "") hasInput = true;
-                        if (input !== part.toLowerCase()) allCorrect = false;
-                        blankIdx++;
-                    }
-                });
-                return hasInput && allCorrect;
-            };
+      useEffect(() => {
+        // 首次加载进度
+        setUserAnswers(safeLoadAnswers());
+      }, []);
 
-            const filteredData = useMemo(() => {
-                return sentences.filter((item) => {
-                    const originalIndex = sentences.indexOf(item);
-                    const isMastered = checkMastery(item, originalIndex, userAnswers);
-                    const matchesTab = activeTab === "全部" || item.category === activeTab;
-                    const matchesSearch = item.text.toLowerCase().includes(searchTerm.toLowerCase()) || item.category.toLowerCase().includes(searchTerm.toLowerCase());
-                    const matchesFilter = filterMode === "全部" || (filterMode === "已掌握" && isMastered) || (filterMode === "未掌握" && !isMastered);
-                    return matchesTab && matchesSearch && matchesFilter;
-                });
-            }, [activeTab, searchTerm, sentences, userAnswers, filterMode]);
+      const saveProgressDebounced = (newAnswers) => {
+        // 简单防抖，避免每个键入都同步写盘导致卡顿
+        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+        setIsSaving(true);
+        saveTimerRef.current = setTimeout(() => {
+          try {
+            safeSaveAnswers(newAnswers);
+          } finally {
+            setIsSaving(false);
+          }
+        }, 200);
+      };
 
-            const masteryStats = useMemo(() => {
-                const completed = sentences.filter((s, i) => checkMastery(s, i, userAnswers)).length;
-                return { completed, total: sentences.length };
-            }, [userAnswers, sentences]);
+      const categories = useMemo(() => ["全部", ...new Set(sentenceData.map(d => d.category))], []);
 
-            const handleInputChange = (sentenceIndex, blankIndex, value) => {
-                const newAnswers = { ...userAnswers, [`${sentenceIndex}-${blankIndex}`]: value };
-                setUserAnswers(newAnswers);
-                saveProgress(newAnswers);
-            };
+      const checkMastery = (sentence, sIdx, answers) => {
+        const parts = sentence.text.split(/\[(.*?)\]/g);
+        let blankIdx = 0;
+        let allCorrect = true;
+        let hasInput = false;
+        parts.forEach((part, pIdx) => {
+          if (pIdx % 2 === 1) {
+            const input = (answers[`${sIdx}-${blankIdx}`] || "").toLowerCase().trim();
+            if (input !== "") hasInput = true;
+            if (input !== part.toLowerCase()) allCorrect = false;
+            blankIdx++;
+          }
+        });
+        return hasInput && allCorrect;
+      };
 
-            const shuffleSentences = () => {
-                setSentences([...sentences].sort(() => Math.random() - 0.5));
-            };
+      const filteredData = useMemo(() => {
+        return sentences.filter((item) => {
+          const originalIndex = sentences.indexOf(item);
+          const isMastered = checkMastery(item, originalIndex, userAnswers);
+          const matchesTab = activeTab === "全部" || item.category === activeTab;
+          const matchesSearch =
+            item.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.category.toLowerCase().includes(searchTerm.toLowerCase());
+          const matchesFilter =
+            filterMode === "全部" ||
+            (filterMode === "已掌握" && isMastered) ||
+            (filterMode === "未掌握" && !isMastered);
+          return matchesTab && matchesSearch && matchesFilter;
+        });
+      }, [activeTab, searchTerm, sentences, userAnswers, filterMode]);
 
-            const resetProgress = () => {
-                if (window.confirm("确定要重置所有进度吗？")) {
-                    setUserAnswers({});
-                    saveProgress({});
-                }
-            };
+      const masteryStats = useMemo(() => {
+        const completed = sentences.filter((s, i) => checkMastery(s, i, userAnswers)).length;
+        return { completed, total: sentences.length };
+      }, [userAnswers, sentences]);
 
-            return (
-                <div className="min-h-screen p-4 md:p-8">
-                    <div className="max-w-4xl mx-auto">
-                        <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <h1 className="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-blue-500">
-                                        英语写作核心句型
-                                    </h1>
-                                    {isSaving && <Icon name="cloud" className="w-5 h-5 text-blue-400 animate-pulse" />}
-                                </div>
-                                <p className="text-slate-500 font-medium text-sm">云端实时同步 · 覆盖 19 类核心场景</p>
-                            </div>
-                            
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 min-w-[260px]">
-                                <div className={`p-2 rounded-xl ${masteryStats.completed === masteryStats.total ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'}`}>
-                                    <Icon name="trophy" className="w-6 h-6" />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
-                                        <span>总计掌握</span>
-                                        <span>{masteryStats.completed} / {masteryStats.total}</span>
-                                    </div>
-                                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                        <div 
-                                            className="bg-emerald-500 h-full transition-all duration-700"
-                                            style={{ width: `${(masteryStats.completed / masteryStats.total) * 100}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </header>
+      const handleInputChange = (sentenceIndex, blankIndex, value) => {
+        const newAnswers = { ...userAnswers, [`${sentenceIndex}-${blankIndex}`]: value };
+        setUserAnswers(newAnswers);
+        saveProgressDebounced(newAnswers);
+      };
 
-                        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 mb-6 space-y-5">
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <div className="relative flex-1">
-                                    <Icon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
-                                    <input
-                                        type="text"
-                                        placeholder="搜索场景、词汇或内容..."
-                                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition-all text-sm"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex bg-slate-100 p-1 rounded-2xl">
-                                    {["全部", "未掌握", "已掌握"].map(mode => (
-                                        <button
-                                            key={mode}
-                                            onClick={() => setFilterMode(mode)}
-                                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filterMode === mode ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
-                                        >
-                                            {mode}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            
-                            <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-50">
-                                {categories.map(cat => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setActiveTab(cat)}
-                                        className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border-2 ${activeTab === cat ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-100 text-slate-500 hover:border-slate-200"}`}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+      const shuffleSentences = () => {
+        setSentences([...sentences].sort(() => Math.random() - 0.5));
+      };
 
-                        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 px-2">
-                            <div className="flex items-center gap-3">
-                                <button onClick={shuffleSentences} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all shadow-sm">
-                                    <Icon name="shuffle" className="w-3.5 h-3.5 text-indigo-500" /> 乱序挑战
-                                </button>
-                                <button onClick={() => setShowAllHints(!showAllHints)} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all shadow-sm">
-                                    <Icon name={showAllHints ? "eyeOff" : "eye"} className={`w-3.5 h-3.5 ${showAllHints ? "text-rose-500" : "text-blue-500"}`} /> {showAllHints ? "隐藏提示" : "显示答案"}
-                                </button>
-                            </div>
-                            <button onClick={resetProgress} className="flex items-center gap-2 text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">
-                                <Icon name="refresh" className="w-3 h-3" /> 重置所有
-                            </button>
-                        </div>
+      const resetProgress = () => {
+        if (window.confirm("确定要重置所有进度吗？")) {
+          setUserAnswers({});
+          setIsSaving(true);
+          setTimeout(() => {
+            safeSaveAnswers({});
+            setIsSaving(false);
+          }, 50);
+        }
+      };
 
-                        <div className="grid grid-cols-1 gap-4 mb-20">
-                            {filteredData.map((item, fIdx) => {
-                                const originalIndex = sentences.indexOf(item);
-                                const isMastered = checkMastery(item, originalIndex, userAnswers);
-                                const parts = item.text.split(/\[(.*?)\]/g);
-                                let blankCounter = 0;
-
-                                return (
-                                    <div key={`${originalIndex}-${fIdx}`} className={`bg-white rounded-2xl border-2 p-6 transition-all duration-300 ${isMastered ? "border-emerald-500 bg-emerald-50/5 shadow-md" : "border-slate-100 hover:border-slate-200 shadow-sm"}`}>
-                                        <div className="flex items-center justify-between mb-4">
-                                            <span className="px-2 py-1 rounded bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-wider">{item.category}</span>
-                                            {isMastered && <Icon name="check" className="w-5 h-5 text-emerald-500" />}
-                                        </div>
-                                        
-                                        <div className="text-lg md:text-xl font-medium leading-relaxed text-slate-800">
-                                            {parts.map((part, pIdx) => {
-                                                if (pIdx % 2 === 1) {
-                                                    const bIdx = blankCounter++;
-                                                    const userInput = userAnswers[`${originalIndex}-${bIdx}`] || "";
-                                                    const isCorrect = userInput.toLowerCase().trim() === part.toLowerCase();
-                                                    
-                                                    return (
-                                                        <span key={pIdx} className="inline-block relative align-baseline mx-1">
-                                                            <input
-                                                                type="text"
-                                                                value={userInput}
-                                                                onChange={(e) => handleInputChange(originalIndex, bIdx, e.target.value)}
-                                                                placeholder={showAllHints ? part : "___"}
-                                                                style={{ width: `${Math.max(part.length + 0.5, 3)}ch` }}
-                                                                className={`px-1 py-0 text-center border-b-2 outline-none transition-all font-bold bg-transparent ${userInput.trim() === "" ? "border-slate-300" : (isCorrect ? "text-emerald-600 border-emerald-500" : "text-rose-600 border-rose-500")}`}
-                                                            />
-                                                        </span>
-                                                    );
-                                                }
-                                                return <span key={pIdx}>{part}</span>;
-                                            })}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
+      return (
+        <div className="min-h-screen p-4 md:p-8">
+          <div className="max-w-4xl mx-auto">
+            <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <h1 className="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-blue-500">
+                    英语写作核心句型
+                  </h1>
+                  {isSaving && <Icon name="cloud" className="w-5 h-5 text-blue-400 animate-pulse" />}
                 </div>
-            );
-        };
+                <p className="text-slate-500 font-medium text-sm">本地自动保存 · 覆盖 19 类核心场景</p>
+              </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 min-w-[260px]">
+                <div className={`p-2 rounded-xl ${masteryStats.completed === masteryStats.total ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                  <Icon name="trophy" className="w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
+                    <span>总计掌握</span>
+                    <span>{masteryStats.completed} / {masteryStats.total}</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-emerald-500 h-full transition-all duration-700"
+                      style={{ width: `${(masteryStats.completed / masteryStats.total) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 mb-6 space-y-5">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Icon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="搜索场景、词汇或内容..."
+                    className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition-all text-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="flex bg-slate-100 p-1 rounded-2xl">
+                  {["全部", "未掌握", "已掌握"].map(mode => (
+                    <button
+                      key={mode}
+                      onClick={() => setFilterMode(mode)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filterMode === mode ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
+                    >
+                      {mode}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-50">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveTab(cat)}
+                    className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border-2 ${activeTab === cat ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-100 text-slate-500 hover:border-slate-200"}`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6 px-2">
+              <div className="flex items-center gap-3">
+                <button onClick={shuffleSentences} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all shadow-sm">
+                  <Icon name="shuffle" className="w-3.5 h-3.5 text-indigo-500" /> 乱序挑战
+                </button>
+                <button onClick={() => setShowAllHints(!showAllHints)} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all shadow-sm">
+                  <Icon name={showAllHints ? "eyeOff" : "eye"} className={`w-3.5 h-3.5 ${showAllHints ? "text-rose-500" : "text-blue-500"}`} /> {showAllHints ? "隐藏提示" : "显示答案"}
+                </button>
+              </div>
+              <button onClick={resetProgress} className="flex items-center gap-2 text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">
+                <Icon name="refresh" className="w-3 h-3" /> 重置所有
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 mb-20">
+              {filteredData.map((item, fIdx) => {
+                const originalIndex = sentences.indexOf(item);
+                const isMastered = checkMastery(item, originalIndex, userAnswers);
+                const parts = item.text.split(/\[(.*?)\]/g);
+                let blankCounter = 0;
+
+                return (
+                  <div key={`${originalIndex}-${fIdx}`} className={`bg-white rounded-2xl border-2 p-6 transition-all duration-300 ${isMastered ? "border-emerald-500 bg-emerald-50/5 shadow-md" : "border-slate-100 hover:border-slate-200 shadow-sm"}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="px-2 py-1 rounded bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-wider">{item.category}</span>
+                      {isMastered && <Icon name="check" className="w-5 h-5 text-emerald-500" />}
+                    </div>
+
+                    <div className="text-lg md:text-xl font-medium leading-relaxed text-slate-800">
+                      {parts.map((part, pIdx) => {
+                        if (pIdx % 2 === 1) {
+                          const bIdx = blankCounter++;
+                          const userInput = userAnswers[`${originalIndex}-${bIdx}`] || "";
+                          const isCorrect = userInput.toLowerCase().trim() === part.toLowerCase();
+
+                          return (
+                            <span key={pIdx} className="inline-block relative align-baseline mx-1">
+                              <input
+                                type="text"
+                                value={userInput}
+                                onChange={(e) => handleInputChange(originalIndex, bIdx, e.target.value)}
+                                placeholder={showAllHints ? part : "___"}
+                                style={{ width: `${Math.max(part.length + 0.5, 3)}ch` }}
+                                className={`px-1 py-0 text-center border-b-2 outline-none transition-all font-bold bg-transparent ${userInput.trim() === "" ? "border-slate-300" : (isCorrect ? "text-emerald-600 border-emerald-500" : "text-rose-600 border-rose-500")}`}
+                              />
+                            </span>
+                          );
+                        }
+                        return <span key={pIdx}>{part}</span>;
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+
+  <!-- Cloudflare Insights (可选) -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+    integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
+    data-cf-beacon='{"version":"2024.11.0","token":"c20d4946738c4622bbe855fab402731f","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+    crossorigin="anonymous"></script>
 </body>
 </html>
