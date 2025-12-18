@@ -51,18 +51,21 @@
                   0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
   </style>
+</head>
 
+<body>
+  <div id="root"></div>
 
+  <script type="text/babel">
+    const { useState } = React;
 
-    <script type="text/babel">
-        const { useState } = React;
+    const FULL_DATABASE = {
+      "小作文 (信函/通知)": {
+        "万能总模板": [
+          {
+            title: "书信/通知通用总模板",
+            tags: ["必背", "通用框架"],
 
-        const FULL_DATABASE = {
-            "小作文 (信函/通知)": {
-                "万能总模板": [
-                    {
-                        title: "书信/通知通用总模板",
-                        tags: ["必背", "通用框架"],
                         content: `Dear [Recipient],
 I hope this letter/email finds you well and [everything goes smoothly]. I am very [glad] to hear that [key information]. I am writing this letter in order to [purpose] and provide further [details].
 
