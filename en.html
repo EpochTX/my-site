@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap');
         body { font-family: 'Plus Jakarta Sans', 'Noto Sans SC', sans-serif; background-color: #f8fafc; }
         
         .custom-scroll::-webkit-scrollbar { width: 6px; }
@@ -19,18 +19,18 @@
 
         .highlight-word {
             color: #4338ca;
-            font-weight: 800;
             background-color: #e0e7ff;
-            padding: 0 4px;
-            border-radius: 4px;
+            padding: 2px 6px;
+            border-radius: 6px;
             margin: 0 2px;
             display: inline-block;
+            font-weight: 800;
             border-bottom: 2px solid #818cf8;
-            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .highlight-word:hover {
-            background-color: #c7d2fe;
-            transform: translateY(-1px);
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
     </style>
 </head>
@@ -38,14 +38,14 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState } = React;
 
         const FULL_DATABASE = {
-            "小作文": {
-                "万能模板": [
+            "小作文 (信函/通知)": {
+                "万能总模板": [
                     {
                         title: "书信/通知通用总模板",
-                        tags: ["通用", "必背"],
+                        tags: ["必背", "通用框架"],
                         content: `Dear [Recipient],
 I hope this letter/email finds you well and [everything goes smoothly]. I am very [glad] to hear that [key information]. I am writing this letter in order to [purpose] and provide further [details].
 
@@ -88,9 +88,9 @@ Li Ming`
                         title: "2021: 线上会议邀请",
                         tags: ["2021", "邀请信"],
                         content: `Dear Jack,
-I hope this email finds you well. I am writing to [invite] you to participate in an online academic meeting on “Innovation and Cooperation in Education”, which will be held next Wednesday at 7:00 p.m. via Tencent Meeting.
+I hope this email finds you well. I am writing to [invite] you to participate in an online academic meeting on “Innovation and Cooperation in Education”, which will be held next Wednesday at 7:00 p.m. via [Tencent Meeting].
 
-The meeting aims to [share] creative ideas and [strengthen] communication among students from different cultural backgrounds. Several professors and student representatives will deliver short speeches, followed by a Q&A session for free discussion. It will be a [valuable] opportunity to [broaden] your horizons, [exchange] views, and gain new [inspiration].
+The meeting aims to [share] creative ideas and [strengthen] communication among students from different cultural backgrounds. Several professors and student representatives will deliver short speeches, followed by a Q&A session for free discussion. It will be a valuable opportunity to [broaden] your horizons, [exchange] views, and gain new [inspiration].
 
 We sincerely hope you can [join] us. Please [confirm] your attendance by replying to this email at your earliest convenience.
 
@@ -101,7 +101,7 @@ Li Ming`
                 "建议/推荐信": [
                     {
                         title: "2024: 老房保护调查建议",
-                        tags: ["2024", "建议信/计划"],
+                        tags: ["2024", "建议/计划"],
                         content: `Dear Jack,
 I hope this email finds you well. I am writing this letter in order to [put forward] my plan about our survey on the [protection] of old houses in the ancient town and ask for your valuable [opinion].
 
@@ -114,7 +114,7 @@ Li Ming`
                     },
                     {
                         title: "2023: 艺术展推荐",
-                        tags: ["2023", "建议信"],
+                        tags: ["2023", "建议/推荐"],
                         content: `Dear David,
 I hope this email finds you well. It is difficult to decide between the two shows. I am writing to [recommend] the art exhibition.
 
@@ -139,64 +139,8 @@ Yours sincerely,
 Li Ming`
                     },
                     {
-                        title: "2014: 留学生活建议",
-                        tags: ["2014", "咨询/建议"],
-                        content: `Dear John,
-I hope this email finds you well. I am writing this letter to [introduce] my living habits and ask for your valuable [advice] about living in your country.
-
-Generally speaking, I prefer a [quiet] and tidy living environment, so I usually go to bed before 11 p.m. and get up early in the morning. I enjoy reading and listening to light music in my spare time, and I often cook simple Chinese dishes by myself. Since I am not very [familiar] with the local customs, I would greatly appreciate it if you could [offer] some suggestions on shopping, commuting, and daily routines. Your advice will surely help me [adapt] to the new environment more smoothly.
-
-I am really looking forward to [living] with you and believe we will get along well. Thank you in advance for your help and kindness.
-
-Yours sincerely,
-Li Ming`
-                    }
-                ],
-                "介绍/导览信": [
-                    {
-                        title: "2020: 历史古迹导览",
-                        tags: ["2020", "介绍信"],
-                        content: `Dear International Students,
-I hope this email finds you well. I am writing this letter to [introduce] a tour of a historical site and give you some useful [advice] for the trip.
-
-The destination is the Great Wall, one of the most famous historical [sites] in China, which was built more than two thousand years ago and has long been a [symbol] of Chinese perseverance and wisdom. During the tour, you will have the chance to [enjoy] the magnificent scenery and learn about Chinese history and culture. The tour is [scheduled] for next Sunday, starting at 8:00 a.m. at the university gate. To make your journey comfortable, please [wear] suitable shoes, bring enough water, and [follow] the guide’s instructions.
-
-This trip will be [memorable] and rewarding, providing everyone with opportunities to broaden horizons and [appreciate] Chinese culture. I am looking forward to your participation and wish you a wonderful experience.
-
-Yours sincerely,
-Li Ming`
-                    },
-                    {
-                        title: "2017: 中国文化介绍回复",
-                        tags: ["2017", "回复/介绍"],
-                        content: `Dear Professor Williams,
-I hope this email finds you well. I am writing this letter to express my great honor to [accept] your invitation and to [share] my plan for the presentation on Chinese culture.
-
-The presentation is scheduled to be given next Wednesday afternoon in the lecture hall, and it will [focus] on three key aspects. Firstly, I will introduce the long [history] and unique philosophy of Chinese civilization. Secondly, I will explain traditional [festivals] and their cultural significance, such as the Spring Festival and Mid-Autumn Festival. Lastly, I will talk about modern China’s efforts in [promoting] cultural exchange with the rest of the world. I believe these topics will give foreign students a better understanding of China’s heritage and spirit.
-
-This event will be [meaningful] and rewarding, providing a valuable opportunity to [enhance] mutual understanding. I am looking forward to your comments on my proposal.
-
-Yours sincerely,
-Li Ming`
-                    }
-                ],
-                "感谢/道歉/祝贺/投诉": [
-                    {
-                        title: "2018: 取消访问道歉信",
-                        tags: ["2018", "道歉信"],
-                        content: `Dear Professor Smith,
-I hope this email finds you well. I am writing this letter to express my sincere [apology] for canceling my travel plan and to [explain] the reason for the change.
-
-I had planned to visit you this weekend, but an unexpected academic conference will be held in my university at the same time, and my [attendance] is required. Therefore, I am truly sorry for any [inconvenience] this may cause. Considering our shared interest in cultural studies, I sincerely hope we can [reschedule] the meeting for next month, when I will be free to discuss our research face to face. Your [guidance] and insights will surely be invaluable to my future studies.
-
-I once again apologize for the cancellation and sincerely hope for your [understanding]. I am looking forward to meeting you soon.
-
-Yours sincerely,
-Li Ming`
-                    },
-                    {
-                        title: "2016: 翻译比赛祝贺与建议",
-                        tags: ["2016", "祝贺/建议"],
+                        title: "2016: 翻译学习建议",
+                        tags: ["2016", "建议/祝贺"],
                         content: `Dear Jack,
 I hope this email finds you well. I am writing this letter to express my sincere [gratitude] for your congratulations and to share some [suggestions] on improving translation skills.
 
@@ -208,27 +152,83 @@ Yours sincerely,
 Li Ming`
                     },
                     {
+                        title: "2014: 留学生活建议",
+                        tags: ["2014", "咨询/建议"],
+                        content: `Dear John,
+I hope this email finds you well. I am writing this letter to [introduce] my living habits and ask for your valuable [advice] about living in your country.
+
+Generally speaking, I prefer a [quiet] and tidy living environment, so I usually go to bed before 11 p.m. and get up early in the morning. I enjoy [reading] and listening to light music in my spare time, and I often cook simple Chinese dishes by myself. Since I am not very familiar with the local customs, I would greatly appreciate it if you could [offer] some suggestions on shopping, commuting, and daily routines. Your advice will surely help me [adapt] to the new environment more smoothly.
+
+I am really looking forward to [living] with you and believe we will get along well. Thank you in advance for your help and kindness.
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2011: 考大学祝贺与建议",
+                        tags: ["2011", "祝贺/建议"],
+                        content: `Dear Li Ming,
+I hope this letter finds you well. I am writing this letter to offer my sincere [congratulations] on your admission to university and to share some [advice] on preparing for college life.
+
+First of all, you should [make] a reasonable study plan to adapt to the new learning environment efficiently. Secondly, it is advisable to [take part] in club activities and social events, which will help you make new friends and improve communication skills. In addition, remember to [maintain] a healthy lifestyle by balancing study and relaxation. I believe that with enthusiasm and confidence, you will enjoy a colorful and rewarding campus life.
+
+I sincerely wish you great success in your new journey. I am looking forward to hearing about your college experiences soon.
+
+Yours sincerely,
+Zhang Wei`
+                    }
+                ],
+                "介绍/导览信": [
+                    {
+                        title: "2020: 历史古迹导览",
+                        tags: ["2020", "介绍/导览"],
+                        content: `Dear International Students,
+I hope this email finds you well. I am writing this letter to [introduce] a tour of a historical site and give you some useful [advice] for the trip.
+
+The destination is [the Great Wall], one of the most famous historical sites in China, which was built more than two thousand years ago and has long been a symbol of Chinese perseverance and wisdom. During the tour, you will have the chance to [enjoy] the magnificent scenery and learn about Chinese history and culture. The tour is scheduled for [next Sunday], starting at 8:00 a.m. at the university gate. To make your journey comfortable, please [wear] suitable shoes, bring enough water, and [follow] the guide’s instructions.
+
+This trip will be [memorable] and rewarding, providing everyone with opportunities to [broaden] horizons and appreciate Chinese culture. I am looking forward to your participation and wish you a wonderful experience.
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2017: 中国文化介绍回复",
+                        tags: ["2017", "介绍/回复"],
+                        content: `Dear Professor Williams,
+I hope this email finds you well. I am writing this letter to express my great honor to [accept] your invitation and to [share] my plan for the presentation on Chinese culture.
+
+The presentation is scheduled to be given [next Wednesday afternoon] in the lecture hall, and it will focus on three key aspects. Firstly, I will introduce the [long history] and unique philosophy of Chinese civilization. Secondly, I will explain [traditional festivals] and their cultural significance, such as the Spring Festival and Mid-Autumn Festival. Lastly, I will talk about [modern] China’s efforts in promoting cultural exchange with the rest of the world. I believe these topics will give foreign students a better understanding of China’s heritage and spirit.
+
+This event will be [meaningful] and rewarding, providing a valuable opportunity to [enhance] mutual understanding. I am looking forward to your comments on my proposal.
+
+Yours sincerely,
+Li Ming`
+                    }
+                ],
+                "感谢/道歉/投诉": [
+                    {
+                        title: "2018: 取消访问道歉信",
+                        tags: ["2018", "道歉信"],
+                        content: `Dear Professor Smith,
+I hope this email finds you well. I am writing this letter to express my sincere [apology] for canceling my travel plan and to [explain] the reason for the change.
+
+I had planned to visit you this weekend, but an unexpected academic conference will be held in my university at the same time, and my [attendance] is required. Therefore, I am truly sorry for any [inconvenience] this may cause. Considering our shared interest in cultural studies, I sincerely hope we can [reschedule] the meeting for next month, when I will be free to discuss our research face to face. Your guidance and insights will surely be invaluable to my future studies.
+
+I once again apologize for the cancellation and sincerely hope for your [understanding]. I am looking forward to meeting you soon.
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
                         title: "2012: 电子词典投诉信",
                         tags: ["2012", "投诉信"],
                         content: `Dear Customer Service Manager,
-I hope this email finds you well. I am writing this letter to make a [complaint] about the electronic dictionary I bought from your online store and request a prompt [solution] to the problem.
+I hope this email finds you well. I am writing this letter to [make a complaint] about the electronic dictionary I bought from your online store and request a prompt [solution] to the problem.
 
 I placed my order last week, but after a few days of use I found that the screen often [freezes] and the battery runs out within two hours. Such defects have caused great [inconvenience] to my study. I would appreciate it if you could either [replace] the product with a new one or [refund] my payment as soon as possible. I have attached the purchase receipt and delivery information for your reference.
 
 I sincerely hope that this issue can be [settled] quickly. I am looking forward to your reply at your earliest convenience.
-
-Yours sincerely,
-Zhang Wei`
-                    },
-                    {
-                        title: "2011: 考大学祝贺信",
-                        tags: ["2011", "祝贺信"],
-                        content: `Dear Li Ming,
-I hope this letter finds you well. I am writing this letter to offer my sincere [congratulations] on your admission to university and to share some [advice] on preparing for college life.
-
-First of all, you should make a reasonable [study] plan to adapt to the new learning environment efficiently. Secondly, it is advisable to [take part] in club activities and social events, which will help you make new friends and improve communication skills. In addition, remember to [maintain] a healthy lifestyle by balancing study and relaxation. I believe that with enthusiasm and confidence, you will enjoy a colorful and rewarding campus life.
-
-I sincerely wish you great [success] in your new journey. I am looking forward to hearing about your college experiences soon.
 
 Yours sincerely,
 Zhang Wei`
@@ -248,7 +248,7 @@ Zhang Wei`
                     }
                 ],
                 "通知": [
-                     {
+                    {
                         title: "2015: 夏令营招募通知",
                         tags: ["2015", "通知"],
                         content: `Notice
@@ -262,24 +262,24 @@ The Students’ Union`
                     },
                     {
                         title: "2013: 慈善义卖通知",
-                        tags: ["2013", "通知/邮件"],
+                        tags: ["2013", "通知"],
                         content: `Dear Classmates,
 I hope this email finds you well. I am writing this letter to [inform] you of our upcoming charity sale and [encourage] everyone to take an active part in it.
 
-The charity sale is scheduled to be held this Saturday morning on the playground, aiming to [raise] funds for children in need of help. A variety of items such as books, stationery, handicrafts, and snacks will be [available] for sale. All participants are encouraged to [donate] or sell their unused items, and those who are good at organizing are welcome to help with the event arrangement. Your contribution, no matter big or small, will make a real [difference] to these children’s lives and bring them warmth and hope.
+The charity sale is scheduled to be held [this Saturday morning] on the playground, aiming to [raise funds] for children in need of help. A variety of items such as books, stationery, handicrafts, and snacks will be [available] for sale. All participants are encouraged to [donate] or sell their unused items, and those who are good at organizing are welcome to help with the event arrangement. Your contribution, no matter big or small, will make a real [difference] to these children’s lives and bring them warmth and hope.
 
-This activity will be meaningful and rewarding, providing us with opportunities to show love and develop [teamwork] skills. I am looking forward to your active participation.
+This activity will be meaningful and [rewarding], providing us with opportunities to [show love] and develop teamwork skills. I am looking forward to your active participation.
 
 Yours sincerely,
 Li Ming`
                     }
                 ]
             },
-            "大作文": {
+            "大作文 (图表分析)": {
                 "图表通用模板": [
-                     {
+                    {
                         title: "图表作文万能三段式",
-                        tags: ["通用", "模板"],
+                        tags: ["通用", "核心逻辑"],
                         content: `As can be seen from the [chart] above, [subject] among [group] has undergone a remarkable change from [time1] to [time2]. During this period, the figure for [itemA] [increased] from [data1] to [data2], while [itemB] showed an [opposite] trend. Obviously, this chart reflects a common social phenomenon — [topic sentence].
 
 Several primary factors can be summarized as follows. First and foremost, the [prosperity] of China's economy has laid a solid [foundation]. In addition, relevant [authorities] have attached great importance to this issue and introduced effective policies. Last but not least, with the [enhancement] of public awareness, more individuals have realized the importance of [topic].
@@ -291,16 +291,16 @@ Taking all the above factors into [consideration], it is reasonable to predict t
                     {
                         title: "2025: 老年人活动 (柱状图)",
                         tags: ["2025", "柱状图"],
-                        content: `According to the information depicted in the bar chart, the main leisure activities among the [elderly] in a certain community are clearly shown. [Watching] TV ranks first, accounting for 90.8%, followed by walking (68.3%), gardening (34.7%), reading (31.8%), and playing chess (18.4%). Obviously, the chart reveals that the elderly today are enjoying a more [active] and [diversified] life, showing that health and happiness have become their major concerns.
+                        content: `According to the information depicted in the [bar chart], the main leisure activities among the elderly in a certain community are clearly shown. [Watching TV] ranks first, accounting for 90.8%, followed by walking (68.3%), gardening (34.7%), reading (31.8%), and playing chess (18.4%). Obviously, the chart reveals that the elderly today are enjoying a more [active] and [diversified] life, showing that health and happiness have become their major concerns.
 
-Several primary factors can explain this trend. First, with the improvement of living [standards] and economic conditions, senior citizens have more [financial] security and free time. Besides, the [government] and communities have provided public facilities such as parks and gyms for elderly care. Finally, the growing awareness of [health] has encouraged them to pursue both physical and mental well-being.
+Several primary factors can explain this trend. First, with the improvement of [living standards] and economic conditions, senior citizens have more [financial] security and free time. Besides, the [government] and communities have provided public facilities such as parks and gyms for elderly care. Finally, the growing awareness of [health] has encouraged them to pursue both physical and mental well-being.
 
 Taking these factors into account, it can be predicted that the elderly in China will continue to enjoy a [healthier] and happier lifestyle in the future. After all, nothing is more [precious] than maintaining both vitality and peace of mind in one’s later years.`
                     },
                     {
                         title: "2024: 劳动教育收获 (柱状图)",
                         tags: ["2024", "柱状图"],
-                        content: `According to the information depicted in the bar chart, the main gains from labor education courses among college students are clearly presented. The percentage of [acquiring] relevant knowledge, raising labor abilities, feeling comfortable, and enhancing cooperation capacity accounts for 91.3%, 84.8%, 54.4%, and 32.6% respectively. Especially, acquiring relevant knowledge [ranks] first, followed by raising labor abilities. Obviously, the chart reveals that college students have attached growing importance to [practical] experience and personal development, reflecting their pursuit of balanced ability and knowledge.
+                        content: `According to the information depicted in the [bar chart], the main gains from labor education courses among college students are clearly presented. The percentage of [acquiring] relevant knowledge, raising labor abilities, feeling comfortable, and enhancing cooperation capacity accounts for 91.3%, 84.8%, 54.4%, and 32.6% respectively. Especially, acquiring relevant knowledge [ranks] first, followed by raising labor abilities. Obviously, the chart reveals that college students have attached growing importance to [practical] experience and personal development, reflecting their pursuit of balanced ability and knowledge.
 
 Several primary factors can explain this phenomenon. First and foremost, with the continuous [reform] of China’s educational system, more attention has been paid to [cultivating] students’ comprehensive abilities rather than pure academic performance. In addition, labor education helps students develop [teamwork] and problem-solving skills, which are essential in modern society. Last but not least, universities have provided more opportunities and platforms for students to [practice], enabling them to combine theory with practice effectively.
 
@@ -309,7 +309,7 @@ Taking all these factors into consideration, it can be expected that labor educa
                     {
                         title: "2022: 快递业务量 (柱状图)",
                         tags: ["2022", "柱状图"],
-                        content: `According to the information depicted in the bar chart, China’s express delivery volume experienced a [remarkable] increase from 2018 to 2020. Specifically, the overall number rose from 30 billion pieces in 2018 to 83 billion in 2020, showing a dramatic [upward] trend. Obviously, the chart highlights that China’s express industry has been developing rapidly in recent years, reflecting the [prosperity] of e-commerce and the improvement of logistics services across the country.
+                        content: `According to the information depicted in the [bar chart], China’s express delivery volume experienced a [remarkable] increase from 2018 to 2020. Specifically, the overall number rose from 30 billion pieces in 2018 to 83 billion in 2020, showing a dramatic [upward] trend. Obviously, the chart highlights that China’s express industry has been developing rapidly in recent years, reflecting the [prosperity] of e-commerce and the improvement of logistics services across the country.
 
 Several primary factors can explain this phenomenon. First and foremost, the booming online [shopping] industry has generated a growing demand for fast delivery services. In addition, the continuous improvement of [transportation] infrastructure and digital technologies has significantly enhanced delivery [efficiency]. Last but not least, government policies supporting logistics and [innovation] have further promoted the rapid expansion of the express delivery sector.
 
@@ -318,7 +318,7 @@ Taking all these factors into account, it can be expected that China’s express
                     {
                         title: "2021: 体育锻炼方式 (柱状图)",
                         tags: ["2021", "柱状图"],
-                        content: `According to the information depicted in the bar chart, the ways of physical exercise among urban residents [vary] significantly. Exercising alone accounts for over 50%, [ranking] the first among all types, while working out with friends or family members takes up a smaller proportion. Meanwhile, only a few people prefer group activities. Obviously, the chart reveals that [individual] exercise has become the dominant form of physical activity, showing that people are paying more attention to personal [fitness] and flexibility.
+                        content: `According to the information depicted in the [bar chart], the ways of physical exercise among urban residents [vary] significantly. Exercising alone accounts for over 50%, [ranking] the first among all types, while working out with friends or family members takes up a smaller proportion. Meanwhile, only a few people prefer group activities. Obviously, the chart reveals that [individual] exercise has become the dominant form of physical activity, showing that people are paying more attention to personal [fitness] and flexibility.
 
 Several primary factors can explain this trend. First and foremost, the fast [pace] of modern urban life leaves many people with limited time, making individual exercise more [convenient] and efficient. In addition, the improvement of living standards and [health] awareness encourages citizens to develop regular fitness habits. Last but not least, the availability of sports [facilities] such as gyms and parks provides residents with easier access to various exercise options.
 
@@ -327,7 +327,7 @@ Taking these factors into consideration, it can be predicted that more people wi
                     {
                         title: "2019: 毕业生去向 (柱状图)",
                         tags: ["2019", "柱状图"],
-                        content: `According to the information depicted in the bar chart, the destinations of college graduates in a certain university have undergone [noticeable] changes from 2013 to 2018. The percentage of graduates who chose [employment] decreased from 68.1% to 60.7%, while those who pursued further study [increased] from 26.3% to 34.0%. Meanwhile, the proportion of students starting their own business also rose slightly from 1.3% to 2.6%. Obviously, the chart reflects that more graduates are paying attention to self-improvement and [diversified] career paths, rather than entering the job market directly after graduation.
+                        content: `According to the information depicted in the [bar chart], the destinations of college graduates in a certain university have undergone [noticeable] changes from 2013 to 2018. The percentage of graduates who chose [employment] decreased from 68.1% to 60.7%, while those who pursued further study [increased] from 26.3% to 34.0%. Meanwhile, the proportion of students starting their own business also rose slightly from 1.3% to 2.6%. Obviously, the chart reflects that more graduates are paying attention to self-improvement and [diversified] career paths, rather than entering the job market directly after graduation.
 
 Several primary factors can explain this trend. First and foremost, the increasingly [competitive] job market drives more graduates to pursue higher degrees to enhance their [employability]. In addition, the government and universities have provided strong support for [innovation] and entrepreneurship, encouraging students to explore new opportunities. Last but not least, the change in young people’s [values] makes them prefer long-term career development to immediate employment.
 
@@ -336,7 +336,7 @@ Taking all these factors into consideration, it can be predicted that this trend
                     {
                         title: "2014: 城乡人口变化 (柱状图)",
                         tags: ["2014", "柱状图"],
-                        content: `As can be seen from the bar chart, the urban and rural populations in China underwent [enormous] changes from 1990 to 2010. During this period, the urban population [increased] dramatically from 300 million in 1990 to 458 million in 2000, and further to 666 million in 2010. In contrast, the rural population [declined] from 834 million to 807 million, and then dropped sharply to 674 million over the same years. Obviously, the chart reveals that China has been experiencing rapid [urbanization], with more people moving from rural areas to cities.
+                        content: `As can be seen from the [bar chart], the urban and rural populations in China underwent [enormous] changes from 1990 to 2010. During this period, the urban population [increased] dramatically from 300 million in 1990 to 458 million in 2000, and further to 666 million in 2010. In contrast, the rural population [declined] from 834 million to 807 million, and then dropped sharply to 674 million over the same years. Obviously, the chart reveals that China has been experiencing rapid [urbanization], with more people moving from rural areas to cities.
 
 Several primary factors can explain these changes. First and foremost, China’s rapid economic development and [industrialization] have created abundant job opportunities in cities, attracting a large number of rural laborers. In addition, the government has continuously invested in urban [infrastructure], such as transportation, housing, and public services, making city life more convenient and appealing. Last but not least, better education and healthcare [resources] in urban areas encourage families to relocate to cities in pursuit of improved living conditions and future development.
 
@@ -345,7 +345,7 @@ Taking all these factors into consideration, it can be predicted that the proces
                     {
                         title: "2013: 兼职情况 (柱状图)",
                         tags: ["2013", "柱状图"],
-                        content: `According to the information depicted in the bar chart, the percentage of college students engaging in part-time jobs [increases] steadily from freshman year to senior year. Specifically, 67.77% of freshmen, 71.13% of sophomores, and 71.93% of juniors take part in part-time work, while the proportion [rises] sharply to 88.24% among seniors. Obviously, the chart indicates that upper-grade students are more likely to participate in part-time jobs, reflecting their growing need for [practical] experience and career preparation.
+                        content: `According to the information depicted in the [bar chart], the percentage of college students engaging in part-time jobs [increases] steadily from freshman year to senior year. Specifically, 67.77% of freshmen, 71.13% of sophomores, and 71.93% of juniors take part in part-time work, while the proportion [rises] sharply to 88.24% among seniors. Obviously, the chart indicates that upper-grade students are more likely to participate in part-time jobs, reflecting their growing need for [practical] experience and career preparation.
 
 Several primary factors can explain this phenomenon. First and foremost, senior students are approaching [graduation], so they tend to seek internships and work experience to enhance their [employability]. In addition, as students advance through college, their academic pressure becomes more manageable, allowing them more [flexibility] to take part-time jobs. Last but not least, the rising cost of living and education motivates many students to work part-time to reduce [financial] burdens and gain independence.
 
@@ -354,7 +354,7 @@ Taking these factors into account, it can be predicted that the proportion of st
                     {
                         title: "2011: 汽车市场份额 (柱状图)",
                         tags: ["2011", "柱状图"],
-                        content: `As can be seen from the bar chart, the market shares of domestic, Japanese, and American car brands in China experienced [noticeable] changes between 2008 and 2009. In 2008, Japanese brands ranked first with about 35%, followed by domestic brands (around 25%), while American brands accounted for roughly 12%. In 2009, however, domestic brands [increased] to about 30%, [surpassing] Japanese brands, which dropped to around 25%, while American brands remained stable at about 12%. Obviously, the chart reveals that domestic automobile brands were rising rapidly, reflecting a shift in [consumer] preference and growing [confidence] in local products.
+                        content: `As can be seen from the [bar chart], the market shares of domestic, Japanese, and American car brands in China experienced [noticeable] changes between 2008 and 2009. In 2008, Japanese brands ranked first with about 35%, followed by domestic brands (around 25%), while American brands accounted for roughly 12%. In 2009, however, domestic brands [increased] to about 30%, [surpassing] Japanese brands, which dropped to around 25%, while American brands remained stable at about 12%. Obviously, the chart reveals that domestic automobile brands were rising rapidly, reflecting a shift in [consumer] preference and growing [confidence] in local products.
 
 Several primary factors can explain this phenomenon. First and foremost, the improvement in [quality], technology, and design of domestic cars has boosted consumers’ recognition and trust. In addition, competitive [pricing] and better after-sales services make domestic brands more attractive to price-sensitive buyers. Last but not least, strong government [support] for national automobile enterprises, including tax incentives and industrial policies, has further accelerated their development and expanded their market share.
 
@@ -365,7 +365,7 @@ Taking all these factors into account, it can be predicted that domestic car bra
                     {
                         title: "2023: 健康素养 (折线图)",
                         tags: ["2023", "折线图"],
-                        content: `According to the information depicted in the line chart, the health literacy level of Chinese residents [increased] steadily from 8.8% in 2012 to 25.4% in 2021. To be specific, the percentage rose gradually during the first few years and then climbed [remarkably] after 2016. Obviously, the chart indicates that people in China are paying much more attention to health and quality of life, which demonstrates the [improvement] of public awareness and the development of national [health] programs.
+                        content: `According to the information depicted in the [line chart], the health literacy level of Chinese residents [increased] steadily from 8.8% in 2012 to 25.4% in 2021. To be specific, the percentage rose gradually during the first few years and then climbed [remarkably] after 2016. Obviously, the chart indicates that people in China are paying much more attention to health and quality of life, which demonstrates the [improvement] of public awareness and the development of national [health] programs.
 
 Several primary factors can explain this trend. First and foremost, the steady growth of the economy and people’s [living] standards has laid a solid foundation for better health management. In addition, the government has promoted various health [campaigns] and improved medical services, which have greatly raised citizens’ health awareness. Last but not least, the popularity of the [Internet] and new media allows people to obtain reliable health information more conveniently than ever before.
 
@@ -374,7 +374,7 @@ Taking all these factors into consideration, it can be predicted that the health
                     {
                         title: "2017: 博物馆参观人数 (折线图)",
                         tags: ["2017", "折线图"],
-                        content: `As can be seen from the line chart, the number of museums and museum visitors in China experienced [steady] growth from 2013 to 2015. Specifically, the number of museums increased from about 4,000 in 2013 to over 4,500 in 2015, while the number of visitors [climbed] from roughly 60 million to nearly 80 million during the same period. Obviously, the chart indicates that public interest in [cultural] activities has been rising, and China’s cultural development has made remarkable progress.
+                        content: `As can be seen from the [line chart], the number of museums and museum visitors in China experienced [steady] growth from 2013 to 2015. Specifically, the number of museums increased from about 4,000 in 2013 to over 4,500 in 2015, while the number of visitors [climbed] from roughly 60 million to nearly 80 million during the same period. Obviously, the chart indicates that public interest in [cultural] activities has been rising, and China’s cultural development has made remarkable progress.
 
 Several primary factors can explain this trend. First and foremost, China’s rapid [economic] development has improved people’s living standards, enabling them to pursue cultural and educational experiences. In addition, government [investment] in museums, exhibitions, and cultural facilities has greatly enhanced accessibility. Last but not least, a growing awareness of cultural [heritage] and lifelong learning encourages more individuals, especially families and students, to visit museums for knowledge and inspiration.
 
@@ -385,7 +385,7 @@ Taking all these factors into consideration, it can be predicted that both the n
                     {
                         title: "2020: 手机阅读目的 (饼状图)",
                         tags: ["2020", "饼状图"],
-                        content: `According to the information depicted in the pie chart, the purposes of mobile phone reading among college students are clearly presented. The majority of students read mainly for [acquiring] knowledge, accounting for 59.5%, while 21.3% do it to kill time, and only a few (2.2%) read for other purposes. Obviously, the chart indicates that college students are increasingly using mobile phones as a tool for [learning], reflecting the growing trend of [digital] and fragmented reading in modern education.
+                        content: `According to the information depicted in the [pie chart], the purposes of mobile phone reading among college students are clearly presented. The majority of students read mainly for [acquiring] knowledge, accounting for 59.5%, while 21.3% do it to kill time, and only a few (2.2%) read for other purposes. Obviously, the chart indicates that college students are increasingly using mobile phones as a tool for [learning], reflecting the growing trend of [digital] and fragmented reading in modern education.
 
 Several primary factors can explain this phenomenon. First and foremost, the widespread use of smartphones and mobile Internet has made digital reading more [accessible] and convenient. In addition, educational apps and online resources provide [abundant] learning materials for students to study anytime and anywhere. Last but not least, the pressure of academic [competition] encourages students to use fragmented time to enrich their knowledge and improve efficiency.
 
@@ -394,7 +394,7 @@ Taking all these factors into consideration, it can be expected that mobile phon
                     {
                         title: "2018: 餐厅选择因素 (饼状图)",
                         tags: ["2018", "饼状图"],
-                        content: `According to the information depicted in the pie chart, the factors influencing consumers’ choice of restaurants are clearly presented. Service accounts for 36.3%, [ranking] first among all categories, followed by environment (26.8%) and price (23.8%). Meanwhile, features make up 8.4%, and other factors occupy the remaining 4.7%. Obviously, the chart reveals that people attach great importance to [service] quality and dining environment, reflecting their rising [expectations] for a pleasant and comfortable dining experience.
+                        content: `According to the information depicted in the [pie chart], the factors influencing consumers’ choice of restaurants are clearly presented. Service accounts for 36.3%, [ranking] first among all categories, followed by environment (26.8%) and price (23.8%). Meanwhile, features make up 8.4%, and other factors occupy the remaining 4.7%. Obviously, the chart reveals that people attach great importance to [service] quality and dining environment, reflecting their rising [expectations] for a pleasant and comfortable dining experience.
 
 Several primary factors can explain these preferences. First and foremost, improved living standards enable consumers to pursue better service and [atmosphere], rather than purely low prices. In addition, online [reviews] and social media make diners more sensitive to service quality, hygiene, and environment. Last but not least, with increasing [competition] in the catering industry, restaurants focus more on service and decoration to attract customers and enhance satisfaction.
 
@@ -403,7 +403,7 @@ Taking these factors into consideration, it can be expected that high-quality se
                     {
                         title: "2016: 旅游目的 (饼状图)",
                         tags: ["2016", "饼状图"],
-                        content: `According to the information depicted in the pie chart, the main purposes of traveling among college students are clearly presented. The largest group travels to [appreciate] the scenery, accounting for 37%, followed by relieving pressure (33%), making friends (9%), cultivating independence (6%), and others (15%). Obviously, the chart indicates that students attach great importance to [relaxation], enjoyment, and self-development, showing a [diversified] understanding of travel.
+                        content: `According to the information depicted in the [pie chart], the main purposes of traveling among college students are clearly presented. The largest group travels to [appreciate] the scenery, accounting for 37%, followed by relieving pressure (33%), making friends (9%), cultivating independence (6%), and others (15%). Obviously, the chart indicates that students attach great importance to [relaxation], enjoyment, and self-development, showing a [diversified] understanding of travel.
 
 Several primary factors can explain this phenomenon. First and foremost, heavy academic [pressure] drives many students to travel for mental relaxation and emotional release. In addition, beautiful scenic spots and convenient [transportation] encourage young people to explore new places. Last but not least, traveling enriches life experience, helping students broaden horizons, develop [independence], and build social networks, which aligns with their personal growth needs.
 
@@ -412,7 +412,7 @@ Taking these factors into consideration, it can be predicted that traveling will
                     {
                         title: "2015: 春节花销 (饼状图)",
                         tags: ["2015", "饼状图"],
-                        content: `According to the information depicted in the pie chart, the spending of residents during the Spring Festival is clearly divided into several categories. The largest portion goes to New Year [gifts], accounting for 40%, followed by transportation (20%), gathering meals (20%), and others (20%). Obviously, the chart reveals that gift-giving remains the most significant part of festival [consumption], reflecting the cultural emphasis on expressing blessings and maintaining [relationships] during the holiday.
+                        content: `According to the information depicted in the [pie chart], the spending of residents during the Spring Festival is clearly divided into several categories. The largest portion goes to New Year [gifts], accounting for 40%, followed by transportation (20%), gathering meals (20%), and others (20%). Obviously, the chart reveals that gift-giving remains the most significant part of festival [consumption], reflecting the cultural emphasis on expressing blessings and maintaining [relationships] during the holiday.
 
 Several primary factors can explain this spending pattern. First and foremost, exchanging gifts is a traditional [custom], symbolizing respect, affection, and good wishes among family and friends. In addition, the Spring Festival is a peak [travel] season, and many people return home, which naturally leads to high spending on transportation and reunion meals. Last but not least, the improvement of living standards encourages people to spend more freely on [celebrations], entertainment, and various festival activities.
 
@@ -423,7 +423,7 @@ Taking all these factors into consideration, it can be expected that festival sp
                     {
                         title: "2012: 工作满意度 (表格)",
                         tags: ["2012", "表格"],
-                        content: `According to the information depicted in the table, the job satisfaction levels of employees in a certain company [differ] significantly among three age groups. For employees under 40, 16.7% feel satisfied, 50.0% are uncertain, and 33.3% express dissatisfaction. Among those aged 41–50, 0% are satisfied, while 36.0% are uncertain and as high as 64.0% are dissatisfied. In contrast, employees over 50 show 40.0% satisfaction, 50.0% uncertainty, and only 10.0% dissatisfaction. Obviously, the chart reveals that [middle-aged] employees experience the lowest job satisfaction, reflecting different pressures and expectations at various career stages.
+                        content: `According to the information depicted in the [table], the job satisfaction levels of employees in a certain company [differ] significantly among three age groups. For employees under 40, 16.7% feel satisfied, 50.0% are uncertain, and 33.3% express dissatisfaction. Among those aged 41–50, 0% are satisfied, while 36.0% are uncertain and as high as 64.0% are dissatisfied. In contrast, employees over 50 show 40.0% satisfaction, 50.0% uncertainty, and only 10.0% dissatisfaction. Obviously, the chart reveals that [middle-aged] employees experience the lowest job satisfaction, reflecting different pressures and expectations at various career stages.
 
 Several primary factors can explain this pattern. First and foremost, employees aged 41–50 usually shoulder the heaviest [responsibilities] in both career advancement and family life, which may lead to higher stress and dissatisfaction. In addition, workplace [competition] often peaks during mid-career, making it harder for them to maintain a positive attitude toward their jobs. Last but not least, older employees tend to have more [stable] expectations and accumulated experience, enabling them to remain relatively satisfied and less stressed.
 
@@ -433,19 +433,9 @@ Taking all these factors into consideration, it can be predicted that job satisf
             }
         };
 
-        const Icon = ({ name, className = "w-5 h-5" }) => {
-            const icons = {
-                chevronDown: <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />,
-                chevronRight: <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />,
-                book: <path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />,
-                pencil: <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            };
-            return <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">{icons[name]}</svg>;
-        };
-
         const App = () => {
-            const [selectedCategory, setSelectedCategory] = useState("小作文");
-            const [selectedSubCategory, setSelectedSubCategory] = useState("万能模板");
+            const [selectedCategory, setSelectedCategory] = useState("小作文 (信函/通知)");
+            const [selectedSubCategory, setSelectedSubCategory] = useState("万能总模板");
             const [sidebarOpen, setSidebarOpen] = useState(true);
 
             const currentEssays = FULL_DATABASE[selectedCategory][selectedSubCategory];
@@ -453,50 +443,37 @@ Taking all these factors into consideration, it can be predicted that job satisf
             const renderContent = (text) => {
                 const regex = /\[(.*?)\]/g;
                 const parts = text.split(regex);
-                
                 return parts.map((part, index) => {
                     if (index % 2 === 0) {
-                        return <span key={`text-${index}`} className="whitespace-pre-wrap leading-8 text-slate-700 text-lg">{part}</span>;
+                        return <span key={index} className="text-slate-700 leading-relaxed">{part}</span>;
                     } else {
-                        return (
-                            <span key={`highlight-${index}`} className="highlight-word">
-                                {part}
-                            </span>
-                        );
+                        return <span key={index} className="highlight-word">{part}</span>;
                     }
                 });
             };
 
             return (
-                <div className="flex h-screen overflow-hidden bg-[#f8fafc]">
-                    <aside className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ${sidebarOpen ? 'w-80' : 'w-0 overflow-hidden'}`}>
-                        <div className="p-6 border-b border-slate-100 bg-slate-50 flex items-center gap-3 sticky top-0 z-10">
-                            <div className="p-2 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-200">
-                                <Icon name="book" className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">Writing Master</h1>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">2010-2025 全量背诵</p>
-                            </div>
+                <div className="flex h-screen overflow-hidden">
+                    <aside className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ${sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'}`}>
+                        <div className="p-6 border-b border-slate-100 bg-slate-50 sticky top-0 z-10">
+                            <h1 className="text-xl font-extrabold text-slate-900">Writing Master</h1>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">2010-2025 全量背诵</p>
                         </div>
-
-                        <div className="flex-1 overflow-y-auto custom-scroll p-4 space-y-6">
+                        <div className="flex-1 overflow-y-auto custom-scroll p-3 space-y-6">
                             {Object.keys(FULL_DATABASE).map(cat => (
                                 <div key={cat}>
-                                    <h3 className="px-3 text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                        {cat === "小作文" ? "📧" : "📊"} {cat}
-                                    </h3>
+                                    <h3 className="px-3 text-xs font-black text-slate-400 uppercase tracking-widest mb-2">{cat}</h3>
                                     <div className="space-y-1">
                                         {Object.keys(FULL_DATABASE[cat]).map(sub => (
                                             <button
                                                 key={sub}
                                                 onClick={() => { setSelectedCategory(cat); setSelectedSubCategory(sub); }}
-                                                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-between group
+                                                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-between
                                                     ${selectedCategory === cat && selectedSubCategory === sub 
-                                                        ? "bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-100" 
+                                                        ? "bg-indigo-50 text-indigo-700 shadow-sm" 
                                                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}
                                             >
-                                                <span>{sub}</span>
+                                                {sub}
                                                 {selectedCategory === cat && selectedSubCategory === sub && <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>}
                                             </button>
                                         ))}
@@ -506,51 +483,40 @@ Taking all these factors into consideration, it can be predicted that job satisf
                         </div>
                     </aside>
 
-                    <main className="flex-1 flex flex-col h-full relative">
-                        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-5 flex items-center justify-between sticky top-0 z-20 shadow-sm">
-                            <div className="flex items-center gap-4">
-                                <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
-                                </button>
-                                <div>
-                                    <h2 className="text-2xl font-black text-slate-800 flex items-center gap-3">
-                                        {selectedSubCategory}
-                                        <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full font-bold self-center shadow-sm">
-                                            {currentEssays.length} 篇
-                                        </span>
-                                    </h2>
-                                </div>
-                            </div>
+                    <main className="flex-1 flex flex-col h-full relative bg-[#f8fafc]">
+                        <header className="bg-white/90 backdrop-blur-md border-b border-slate-200 px-8 py-4 flex items-center gap-4 sticky top-0 z-20 shadow-sm">
+                            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            </button>
+                            <h2 className="text-xl font-black text-slate-800 flex items-center gap-3">
+                                {selectedSubCategory}
+                                <span className="px-2.5 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-bold">
+                                    {currentEssays.length} 篇
+                                </span>
+                            </h2>
                         </header>
 
-                        <div className="flex-1 overflow-y-auto custom-scroll p-6 md:p-10 bg-[#f8fafc]">
-                            <div className="max-w-4xl mx-auto space-y-10 pb-20">
+                        <div className="flex-1 overflow-y-auto custom-scroll p-6 md:p-10">
+                            <div className="max-w-4xl mx-auto space-y-8 pb-20">
                                 {currentEssays.map((essay, idx) => (
-                                    <div key={idx} className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 md:p-12 relative overflow-hidden transition-transform hover:scale-[1.01] duration-300">
-                                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                                        
-                                        <div className="mb-6 flex items-start justify-between">
+                                    <div key={idx} className="bg-white rounded-[2rem] shadow-sm hover:shadow-md border border-slate-200/60 p-8 transition-all duration-300">
+                                        <div className="mb-4 pb-4 border-b border-slate-100 flex items-start justify-between">
                                             <div>
                                                 <div className="flex gap-2 mb-2">
                                                     {essay.tags.map(tag => (
-                                                        <span key={tag} className="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-100 text-slate-500 uppercase tracking-wider">{tag}</span>
+                                                        <span key={tag} className="text-[10px] font-bold px-2 py-1 rounded bg-slate-100 text-slate-500 uppercase tracking-wider">{tag}</span>
                                                     ))}
                                                 </div>
-                                                <h3 className="text-2xl font-black text-slate-800">{essay.title}</h3>
-                                            </div>
-                                            <div className="hidden md:block text-indigo-200">
-                                                <Icon name="pencil" className="w-8 h-8" />
+                                                <h3 className="text-xl font-bold text-slate-900">{essay.title}</h3>
                                             </div>
                                         </div>
-
-                                        <div className="prose prose-slate max-w-none prose-lg">
+                                        <div className="text-base md:text-lg whitespace-pre-wrap font-medium text-slate-600 leading-8">
                                             {renderContent(essay.content)}
                                         </div>
                                     </div>
                                 ))}
-                                
                                 <div className="text-center pt-8">
-                                     <p className="text-xs font-bold text-slate-300 uppercase tracking-[0.2em]">End of List</p>
+                                     <p className="text-xs font-bold text-slate-300 uppercase tracking-[0.2em]">— 已显示全部内容 —</p>
                                 </div>
                             </div>
                         </div>
