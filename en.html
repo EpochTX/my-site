@@ -1,737 +1,667 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>英语写作核心句型练习器</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>考研英语二写作终极全能库 (2010-2025)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', 'Noto Sans SC', sans-serif; background-color: #f1f5f9; }
+        
+        /* 自定义滚动条 */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; border: 2px solid transparent; background-clip: content-box; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
 
-  <!-- Simple Analytics (可选) -->
-  <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-  <noscript>
-    <img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade" />
-  </noscript>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- React & Babel Standalone -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    input::placeholder { color: #cbd5e1; font-weight: 400; font-size: 0.8em; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-  </style>
-</head>
-
-<body class="bg-slate-50 text-slate-900">
-  <div id="root"></div>
-
-  <script type="text/babel">
-    const { useState, useMemo, useEffect, useRef } = React;
-
-    // --------------------------
-    // 1) 句型数据（你原来的）
-    // --------------------------
-    const sentenceData = [
-      // 一、通用开头
-      { category: "通用开头", text: "I am writing with [sincerity] and [eagerness] to inform you of sth.", answers: ["sincerity", "eagerness"] },
-      { category: "通用开头", text: "I am writing with great [pleasure] to express my views on sth.", answers: ["pleasure"] },
-      { category: "通用开头", text: "I am writing with [specific] purpose to seek your assistance in sth.", answers: ["specific"] },
-      { category: "通用开头", text: "I am writing in response to [advertisement] posted / published on [media].", answers: ["advertisement", "media"] },
-      { category: "通用开头", text: "I am writing to you concerning the matter of [complaint].", answers: ["complaint"] },
-      { category: "通用开头", text: "I am writing on behalf of [organization] to extend our sincere [apology].", answers: ["organization", "apology"] },
-      { category: "通用开头", text: "I am writing to convey my [views] regarding the issue of environmental protection.", answers: ["views"] },
-
-      // 二、求职申请
-      { category: "求职/申请信", text: "I am writing with sincerity and eagerness to [apply] for the position of [volunteer].", answers: ["apply", "volunteer"] },
-      { category: "求职/申请信", text: "I am writing to apply for the volunteer/internship position advertised on [Internet].", answers: ["Internet"] },
-      { category: "求职/申请信", text: "I am greatly interested in the position of manager, as it perfectly matches my [expectations].", answers: ["expectations"] },
-      { category: "求职/申请信", text: "Having learned that your company is recruiting [tutors], I am writing to submit my application.", answers: ["tutors"] },
-      { category: "求职/申请信", text: "I would like to take this opportunity to apply for [scholarship] offered by your organization.", answers: ["scholarship"] },
-
-      // 三、建议信
-      { category: "建议信", text: "I am writing with sincerity and integrity to present my [suggestions] regarding the service.", answers: ["suggestions"] },
-      { category: "建议信", text: "I am writing to offer several [constructive] proposals concerning the campus life.", answers: ["constructive"] },
-      { category: "建议信", text: "I am writing in the hope that my suggestions may [contribute] to the improvement of the facility.", answers: ["contribute"] },
-      { category: "建议信", text: "[Delighted] to hear from you, I am writing with honor to give you some suggestions on learning English.", answers: ["Delighted"] },
-      { category: "建议信", text: "Knowing that you are [troubled] by loneliness, I would like to share some advice with you.", answers: ["troubled"] },
-
-      // 四、投诉信
-      { category: "投诉信", text: "I am writing to express my strong [dissatisfaction] with the products I bought.", answers: ["dissatisfaction"] },
-      { category: "投诉信", text: "I regret to inform you that I have [encountered] an unpleasant experience concerning the tour.", answers: ["encountered"] },
-      { category: "投诉信", text: "I feel [compelled] to write to complain about the poor service I received on June 1st.", answers: ["compelled"] },
-      { category: "投诉信", text: "Much to my disappointment, the service provided failed to meet my reasonable [expectations].", answers: ["expectations"] },
-
-      // 五、招聘/告示
-      { category: "招聘/告示", text: "With sincerity, we are [looking] for the appropriate students serving as volunteers.", answers: ["looking"] },
-      { category: "招聘/告示", text: "With enthusiasm, we are now [recruiting] members to participate in the club.", answers: ["recruiting"] },
-      { category: "招聘/告示", text: "To ensure the smooth [progress] of the activity, the following information is announced.", answers: ["progress"] },
-      { category: "招聘/告示", text: "This notice is intended to [inform] all graduates of the upcoming ceremony.", answers: ["inform"] },
-
-      // 六、邀请信
-      { category: "邀请信", text: "With sincerity, we are [cordially] inviting you to attend the art festival.", answers: ["cordially"] },
-      { category: "邀请信", text: "We are [honored] to invite you to participate in the seminar.", answers: ["honored"] },
-      { category: "邀请信", text: "It is our great [pleasure] to extend an invitation to you for the party.", answers: ["pleasure"] },
-      { category: "邀请信", text: "On [behalf] of the Student Union, I would like to invite you to the lecture.", answers: ["behalf"] },
-
-      // 七、通用结尾
-      { category: "通用结尾", text: "I will be available for further discussion at your [convenience].", answers: ["convenience"] },
-      { category: "通用结尾", text: "I will appreciate it if you take it into careful [consideration].", answers: ["consideration"] },
-      { category: "通用结尾", text: "I would be grateful if you could give this matter your due [attention].", answers: ["attention"] },
-      { category: "通用结尾", text: "I look forward to your favorable [reply].", answers: ["reply"] },
-
-      // 八、朋友间结尾
-      { category: "朋友间结尾", text: "Looking forward to hearing from [you] soon.", answers: ["you"] },
-      { category: "朋友间结尾", text: "I sincerely hope my suggestions will be of some [help].", answers: ["help"] },
-      { category: "朋友间结尾", text: "Wish you every [success] in your future career.", answers: ["success"] },
-
-      // 九、告示/邀请结尾
-      { category: "告示/邀请结尾", text: "Should you have any questions, please don’t [hesitate] to contact me.", answers: ["hesitate"] },
-      { category: "告示/邀请结尾", text: "For further information, feel free to contact us at [anytime].", answers: ["anytime"] },
-      { category: "告示/邀请结尾", text: "We are looking forward to your active [participation].", answers: ["participation"] },
-
-      // 十、求职高分
-      { category: "求职高分", text: "The demands for this position perfectly [align] with my rich experience and professional proficiency.", answers: ["align"] },
-      { category: "求职高分", text: "Holding a Bachelor's degree in [Economics], I possess a thorough [understanding] of the entire project life-cycle.", answers: ["Economics", "understanding"] },
-      { category: "求职高分", text: "I gained precious professional experience by actively [participating] in volunteer work and internships.", answers: ["participating"] },
-      { category: "求职高分", text: "[Enclosed] herewith is the properly filled job application together with all relevant certificates.", answers: ["Enclosed"] },
-      { category: "求职高分", text: "I am confident that my qualifications will meet your [specific] requirements.", answers: ["specific"] },
-      { category: "求职高分", text: "The recognition of my consistent devotion is expected to be duly [granted].", answers: ["granted"] },
-
-      // 十一、投诉核心
-      { category: "投诉核心", text: "Feeling [cheated], I asked about alternative solutions to this matter.", answers: ["cheated"] },
-      { category: "投诉核心", text: "...only to receive the reply of \"no one available\" and an unfriendly [order] to \"leave\".", answers: ["order"] },
-      { category: "投诉核心", text: "Therefore, I kindly demand that you offer a formal [apology] to me.", answers: ["apology"] },
-      { category: "投诉核心", text: "I sincerely hope that immediate actions will be taken to [rectify] this situation.", answers: ["rectify"] },
-      { category: "投诉核心", text: "I trust that your company will handle this matter with due [urgency].", answers: ["urgency"] },
-
-      // 十二、建议核心
-      { category: "建议核心", text: "It is an [undeniable] fact that modern technology has brought us numerous benefits.", answers: ["undeniable"] },
-      { category: "建议核心", text: "However, we inevitably face the problem that its current [design] fails to satisfy our demands.", answers: ["design"] },
-      { category: "建议核心", text: "To improve this situation, it is recommended to adopt the following [effective] measures.", answers: ["effective"] },
-      { category: "建议核心", text: "Relevant personnel should receive stricter training in [skills] before [operating].", answers: ["skills", "operating"] },
-      { category: "建议核心", text: "A complete reward and punishment mechanism must be [set] up to ensure efficiency.", answers: ["set"] },
-
-      // 十三、请假信
-      { category: "请假信", text: "This condition makes me unable to carry out any [daily] activities.", answers: ["daily"] },
-      { category: "请假信", text: "After consulting my doctor, I was advised to [stay] in bed.", answers: ["stay"] },
-      { category: "请假信", text: "Thus, I regret to inform you that I cannot [attend] as scheduled.", answers: ["attend"] },
-      { category: "请假信", text: "Attached herewith is the medical certificate for your [reference].", answers: ["reference"] },
-      { category: "请假信", text: "I sincerely ask for your kind approval to [grant] me another opportunity.", answers: ["grant"] },
-
-      // 十四、不能赴约
-      { category: "不能赴约", text: "I will be fully [occupied] then for an important exam scheduled the day after tomorrow.", answers: ["occupied"] },
-      { category: "不能赴约", text: "This makes me deeply regret missing the chance of such a [joyful] gathering.", answers: ["joyful"] },
-      { category: "不能赴约", text: "I have asked my colleague [Susan] to attend on my [behalf].", answers: ["Susan", "behalf"] },
-      { category: "不能赴约", text: "Could we arrange a [face-to-face] meeting afterwards?", answers: ["face-to-face"] },
-      { category: "不能赴约", text: "I really look forward to having a [heart-to-heart] talk with you.", answers: ["heart-to-heart"] },
-
-      // 十五、损坏物品
-      { category: "损坏物品", text: "Frankly speaking, I have felt [guilty] for delaying my apology.", answers: ["guilty"] },
-      { category: "损坏物品", text: "I must take full [responsibility] for accidentally damaging the [book].", answers: ["responsibility", "book"] },
-      { category: "损坏物品", text: "The item has great [sentimental] value as a family heirloom of yours.", answers: ["sentimental"] },
-      { category: "损坏物品", text: "Please rest [assured] that it will be restored to its original state.", answers: ["assured"] },
-
-      // 十六、活动会议
-      { category: "活动会议", text: "The following is the [arrangement] of this presentation.", answers: ["arrangement"] },
-      { category: "活动会议", text: "Our respected president will give a detailed [speech] on the current situation.", answers: ["speech"] },
-      { category: "活动会议", text: "Distinguished guests will [award] several outstanding employees.", answers: ["award"] },
-      { category: "活动会议", text: "Participants are required to complete online [registration] by May 1st.", answers: ["registration"] },
-      { category: "活动会议", text: "[Attached] herewith is our official invitation.", answers: ["Attached"] },
-
-      // 十七、介绍美食
-      { category: "介绍美食", text: "My father is [willing] to share his stories about traditional Chinese culture.", answers: ["willing"] },
-      { category: "介绍美食", text: "Before warmly [inviting] you to have dinner with our family.", answers: ["inviting"] },
-      { category: "介绍美食", text: "You can taste a variety of [authentic] Chinese food.", answers: ["authentic"] },
-      { category: "介绍美食", text: "Dumplings [embody] the essence of Chinese cuisine.", answers: ["embody"] },
-      { category: "介绍美食", text: "This experience will arouse a strong sense of national [pride].", answers: ["pride"] },
-
-      // 十八、比赛邀请
-      { category: "比赛邀请", text: "To ensure the smooth [progress] of the contest, please read the contents carefully.", answers: ["progress"] },
-      { category: "比赛邀请", text: "Late [registration] will not be allowed.", answers: ["registration"] },
-      { category: "比赛邀请", text: "Works are required to be [submitted] on time without extension.", answers: ["submitted"] },
-      { category: "比赛邀请", text: "The discussion topic aims to solve the [dilemma] of the housing issue.", answers: ["dilemma"] },
-      { category: "比赛邀请", text: "It may bring us additional [psychological] pressure in the recession.", answers: ["psychological"] },
-
-      // 十九、中国文化
-      { category: "中国文化", text: "Chinese architecture originated at the [dawn] of Chinese civilization.", answers: ["dawn"] },
-      { category: "中国文化", text: "The Great Wall is a [masterpiece] of Chinese architecture.", answers: ["masterpiece"] },
-      { category: "中国文化", text: "Its beauty [originates] from its inherent spirit.", answers: ["originates"] },
-      { category: "中国文化", text: "It reflects the [unyielding] spirit of the Chinese people.", answers: ["unyielding"] },
-      { category: "中国文化", text: "Conveying profound national [pride].", answers: ["pride"] }
-    ];
-
-    // --------------------------
-    // 2) 每个题材 1 篇三段式范文（带填空）
-    //    说明：用 [ ] 标记可填空词；显示答案时用 placeholder 提示
-    // --------------------------
-    const categoryEssays = {
-      "通用开头": {
-        title: "通用书信（目的清晰）",
-        paragraphs: [
-          "I am writing with [sincerity] and [eagerness] to inform you of a matter that I believe deserves your attention.",
-          "To be specific, I would like to share the key details in an organized way. First, the background is that [background] has recently occurred, which directly affects [impact]. Second, I have already taken [action] to handle it responsibly, yet I still need your guidance on [request]. If possible, please let me know the proper procedure and any documents I should prepare.",
-          "I would appreciate it if you could give this matter your due [attention]. I look forward to your favorable [reply] at your convenience."
-        ]
-      },
-      "求职/申请信": {
-        title: "志愿者/实习申请信",
-        paragraphs: [
-          "I am writing with sincerity and eagerness to [apply] for the position of [volunteer] advertised on your website.",
-          "This role perfectly matches my background and expectations. I have gained relevant experience by actively participating in [experience] and completing several tasks such as [task]. In addition, I am good at [skill], which helps me communicate efficiently and work well in a team. If selected, I would be fully committed to [contribution], and I can start from [startDate] with a flexible schedule.",
-          "Thank you for considering my application. I would be grateful for an interview opportunity and look forward to your favorable [reply]."
-        ]
-      },
-      "建议信": {
-        title: "给学校/机构的建议信",
-        paragraphs: [
-          "Delighted to hear from you, I am writing to present my [suggestions] regarding the improvement of [topic].",
-          "It is an undeniable fact that the current arrangement brings convenience; however, some issues still remain. For example, [problem1] often leads to [result1], and [problem2] may discourage students from [result2]. To improve this situation, it is recommended to adopt the following effective measures: first, set up [measure1] to ensure [goal1]; second, provide [measure2] so that participants can [goal2]. I believe these steps are practical and cost-effective.",
-          "I sincerely hope my suggestions will be of some [help]. I would appreciate it if you could take them into careful [consideration]."
-        ]
-      },
-      "投诉信": {
-        title: "服务投诉信（要求解决）",
-        paragraphs: [
-          "I am writing to express my strong [dissatisfaction] with the service I received on [date].",
-          "Much to my disappointment, the service failed to meet my reasonable expectations. Specifically, I encountered [issue1] when I tried to [action1], and the staff even gave an unfriendly [order] to “leave”. As a result, I suffered both inconvenience and frustration, which seriously affected my schedule. Therefore, I kindly demand that you offer a formal [apology] and provide a clear solution, such as [solution]. I sincerely hope immediate actions will be taken to rectify this situation.",
-          "Thank you for your attention. I look forward to your prompt [reply] and a satisfactory resolution."
-        ]
-      },
-      "招聘/告示": {
-        title: "校园活动招募告示",
-        paragraphs: [
-          "To ensure the smooth [progress] of our upcoming activity, we are now recruiting students to serve as [role].",
-          "The activity will be held on [date] at [place]. Applicants are expected to be responsible, cooperative, and available for [duty] such as guiding guests, maintaining order, and assisting with registration. Prior experience in [experience] is a plus, but not required. If you are interested, please send your name, class, and contact information to [email] before [deadline]. Selected members will receive [benefit], and outstanding volunteers will be awarded certificates.",
-          "Should you have any questions, please don’t [hesitate] to contact us. We are looking forward to your active [participation]."
-        ]
-      },
-      "邀请信": {
-        title: "正式邀请信（讲座/活动）",
-        paragraphs: [
-          "On behalf of the Student Union, I am honored to invite you to attend our [event] on [date].",
-          "The event will take place at [place] from [timeStart] to [timeEnd]. During the session, you will be warmly welcomed by our host, and we will arrange a short introduction, followed by your keynote speech on [topic]. After that, a Q&A segment will be held so that students can interact with you directly. We believe your insights will greatly inspire participants and enrich their understanding of [field].",
-          "It would be our great [pleasure] if you could accept this invitation. We look forward to seeing you and hearing from you soon."
-        ]
-      },
-      "通用结尾": {
-        title: "通用结尾段练习",
-        paragraphs: [
-          "I am writing to make sure the key information is clearly delivered and properly understood.",
-          "If there is any additional material needed, please let me know. I will be available for further discussion at your [convenience], and I am willing to provide extra details or supporting documents whenever necessary.",
-          "I would appreciate it if you could give this matter your due [attention]. I look forward to your favorable [reply]."
-        ]
-      },
-      "朋友间结尾": {
-        title: "给朋友的建议与祝福",
-        paragraphs: [
-          "I’m writing to share my thoughts and support after hearing about your recent situation.",
-          "To be honest, it is normal to feel stressed at times. What matters is that you take small but steady steps. You can start by setting a realistic plan for [goal], and try to practice [habit] every day. Also, don’t hesitate to talk to people you trust, because a friendly conversation can make a big difference. If you need, I can help you review [task] or practice together.",
-          "I sincerely hope my suggestions will be of some [help]. Wish you every [success] in your future career."
-        ]
-      },
-      "告示/邀请结尾": {
-        title: "告示/邀请结尾模板",
-        paragraphs: [
-          "This notice is intended to inform you of the key arrangement and how to participate smoothly.",
-          "To avoid any confusion, please make sure you complete [registration] before [deadline] and bring [item] with you. If you cannot attend as planned, kindly inform us in advance. We truly hope everyone can follow the schedule so that the whole event can run efficiently and pleasantly.",
-          "Should you have any questions, please don’t [hesitate] to contact me. We are looking forward to your active [participation]."
-        ]
-      },
-      "求职高分": {
-        title: "高分求职段（能力匹配）",
-        paragraphs: [
-          "I am writing to apply for the position of [position], as it perfectly aligns with my experience and career plan.",
-          "Holding a Bachelor’s degree in [Economics] and having completed projects related to [project], I possess a solid understanding of the entire workflow. In previous internships, I actively participated in [participating] in teamwork, communicated with stakeholders, and delivered measurable outcomes such as [result]. Moreover, I am proficient in [tool] and have a strong sense of responsibility, which enables me to handle tasks efficiently under pressure.",
-          "Enclosed herewith is my resume for your reference. I would appreciate an interview opportunity and look forward to your [reply]."
-        ]
-      },
-      "投诉核心": {
-        title: "投诉信核心段强化",
-        paragraphs: [
-          "I am writing to complain about an unpleasant experience that occurred during [service] on [date].",
-          "Feeling [cheated], I asked for alternative solutions, only to receive the reply of “no one available” and an unfriendly [order] to “leave”. This behavior is unacceptable and has caused me significant inconvenience, including [loss]. Therefore, I kindly demand that you offer a formal [apology] and take immediate actions to [rectify] the situation. A reasonable compensation plan such as [compensation] would also be appreciated.",
-          "I trust that your company will handle this matter with due [urgency]. I look forward to your prompt response."
-        ]
-      },
-      "建议核心": {
-        title: "建议信核心段强化",
-        paragraphs: [
-          "I am writing to offer several constructive proposals concerning [topic] in our community/school.",
-          "It is an [undeniable] fact that the current system has benefits; however, we still face the problem that its present [design] fails to satisfy users’ demands. To improve this situation, it is recommended to adopt the following effective measures. First, relevant personnel should receive stricter training in [skills] before [operating]. Second, a complete reward and punishment mechanism must be [set] up to ensure efficiency and accountability. These measures can be implemented step by step with clear indicators.",
-          "I sincerely hope my suggestions will contribute to real improvement. Thank you for your consideration."
-        ]
-      },
-      "请假信": {
-        title: "请假信（理由充分）",
-        paragraphs: [
-          "I am writing to ask for leave due to a health condition that prevents me from attending [class/event] as scheduled.",
-          "Recently, I have been suffering from [symptom], and this condition makes me unable to carry out any [daily] activities normally. After consulting my doctor, I was advised to [stay] in bed for [days] days and avoid strenuous work. Therefore, I regret to inform you that I cannot [attend] the class/meeting on [date]. Attached herewith is the medical certificate for your [reference].",
-          "I sincerely hope you can grant my request. Thank you for your understanding, and I look forward to returning as soon as possible."
-        ]
-      },
-      "不能赴约": {
-        title: "无法赴约（礼貌改期）",
-        paragraphs: [
-          "I am writing to express my regret that I cannot attend the gathering on [date] as planned.",
-          "Unfortunately, I will be fully [occupied] then due to an important exam scheduled the day after tomorrow, which requires careful preparation. This makes me deeply regret missing the chance of such a [joyful] get-together. To show my respect, I have asked my colleague [Susan] to attend on my [behalf] and deliver my greetings. If it works for you, could we arrange a [face-to-face] meeting afterwards? I truly value our friendship and communication.",
-          "I really look forward to having a [heart-to-heart] talk with you soon. Thanks for your understanding."
-        ]
-      },
-      "损坏物品": {
-        title: "损坏物品道歉信（承担责任）",
-        paragraphs: [
-          "I am writing to offer my sincere apology for accidentally damaging your [book] yesterday.",
-          "Frankly speaking, I have felt [guilty] for delaying my apology. I must take full [responsibility] for what happened, because it was my carelessness that caused the damage. I understand the item has great [sentimental] value to you, and I truly regret any inconvenience and disappointment this may have brought. Please rest [assured] that I will either repair it professionally or replace it with a new one, according to your preference.",
-          "Again, I am sorry for my mistake. I hope you can accept my apology, and I will be more careful in the future."
-        ]
-      },
-      "活动会议": {
-        title: "会议/活动通知（流程清楚）",
-        paragraphs: [
-          "I am writing to inform you of the arrangement of our upcoming [presentation/meeting] on [date].",
-          "The following is the [arrangement] of this event. First, our host will give a brief opening at [time]. Then, our respected president will deliver a detailed [speech] on [topic]. After that, distinguished guests will [award] several outstanding employees. Participants are required to complete online [registration] by [deadline] to confirm attendance. Attached herewith is our official invitation and a simple agenda for your reference.",
-          "We would appreciate your punctual participation. Should you have any questions, please contact us anytime."
-        ]
-      },
-      "介绍美食": {
-        title: "介绍美食与文化（细节丰富）",
-        paragraphs: [
-          "I am writing to introduce a special dining experience that can help you understand Chinese culture better.",
-          "My father is [willing] to share his stories about traditional Chinese culture before warmly [inviting] you to have dinner with our family. You can taste a variety of [authentic] Chinese food, especially dumplings, which [embody] the essence of Chinese cuisine. We will also show you how dumplings are made, from mixing fillings to wrapping them neatly. I believe this hands-on experience will be enjoyable and meaningful.",
-          "This visit may arouse a strong sense of national [pride] and cultural appreciation. I sincerely hope you can join us and have a wonderful time."
-        ]
-      },
-      "比赛邀请": {
-        title: "比赛通知/邀请（规则明确）",
-        paragraphs: [
-          "I am writing to invite you to take part in our contest and to share key information for your preparation.",
-          "To ensure the smooth [progress] of the contest, please read the contents carefully. Participants should complete [registration] before [deadline], and late registration will not be allowed. Works are required to be [submitted] on time without extension. This year’s discussion topic aims to solve the [dilemma] of the housing issue, which may bring additional [psychological] pressure in a recession, so we encourage you to propose practical and creative solutions supported by evidence.",
-          "We look forward to your active participation and outstanding work. Feel free to contact us if you need further information."
-        ]
-      },
-      "中国文化": {
-        title: "中国文化介绍（建筑主题）",
-        paragraphs: [
-          "I am writing to introduce a representative aspect of Chinese culture—traditional architecture—and to share why it is worth appreciating.",
-          "Chinese architecture originated at the [dawn] of Chinese civilization and developed into a unique system emphasizing harmony and balance. The Great Wall is a [masterpiece] of Chinese architecture, not only because of its scale but also because of the spirit behind it. Its beauty [originates] from its inherent cultural meaning and practical wisdom. More importantly, it reflects the [unyielding] spirit of the Chinese people through history.",
-          "I hope this brief introduction can convey profound national [pride] and spark your interest. If you’d like, I can recommend more places to explore."
-        ]
-      }
-    };
-
-    // --------------------------
-    // 3) SVG 图标（你原来的）
-    // --------------------------
-    const Icon = ({ name, className }) => {
-      const icons = {
-        search: <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />,
-        check: <path d="M5 13l4 4L19 7" />,
-        shuffle: <path d="M16 3h5v5M4 20L21 3m0 11v5h-5M4 4l5 5" />,
-        eye: <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 15a3 3 0 100-6 3 3 0 000 6z" />,
-        eyeOff: <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" />,
-        cloud: <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" />,
-        trophy: <path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7c0 3.31 2.69 6 6 6s6-2.69 6-6V2z" />,
-        refresh: <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />,
-        book: <path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
-      };
-      return (
-        <svg className={className || "w-5 h-5"} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-          {icons[name] || <circle cx="12" cy="12" r="10" />}
-        </svg>
-      );
-    };
-
-    // --------------------------
-    // 4) localStorage（句型答案 + 范文答案）
-    // --------------------------
-    const STORAGE_KEY_SENTENCES = "english-writing-progress-v1";
-    const STORAGE_KEY_ESSAYS = "english-writing-essay-progress-v1";
-
-    function safeLoad(key) {
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return {};
-        const parsed = JSON.parse(raw);
-        return parsed && typeof parsed === "object" ? parsed : {};
-      } catch (e) {
-        console.warn("Failed to load:", key, e);
-        return {};
-      }
-    }
-
-    function safeSave(key, obj) {
-      localStorage.setItem(key, JSON.stringify(obj));
-    }
-
-    // 通用：把一段文字按 [blank] 切分成可渲染 parts
-    function splitByBlanks(text) {
-      return text.split(/\[(.*?)\]/g);
-    }
-
-    // --------------------------
-    // 5) 范文卡片组件（可填空/可显示答案）
-    // --------------------------
-    const EssayCard = ({
-      category,
-      essay,
-      showAllHints,
-      essayAnswers,
-      onChange
-    }) => {
-      if (!essay) return null;
-
-      // 计数每篇范文的 blank index（跨三段累计）
-      let globalBlankCounter = 0;
-
-      const renderParagraph = (paraText, pIdx) => {
-        const parts = splitByBlanks(paraText);
-        let localBlankCounter = 0; // 只是为了可读性，实际 key 用 global
-
-        return (
-          <p key={pIdx} className="text-[15px] md:text-base leading-relaxed text-slate-800">
-            {parts.map((part, idx) => {
-              if (idx % 2 === 1) {
-                const blankId = globalBlankCounter++;
-                localBlankCounter++;
-
-                const key = `${category}-${blankId}`;
-                const userInput = essayAnswers[key] || "";
-                const isCorrect = userInput.toLowerCase().trim() === part.toLowerCase();
-
-                return (
-                  <span key={idx} className="inline-block relative align-baseline mx-1">
-                    <input
-                      type="text"
-                      value={userInput}
-                      onChange={(e) => onChange(category, blankId, e.target.value)}
-                      placeholder={showAllHints ? part : "___"}
-                      style={{ width: `${Math.max(part.length + 0.5, 3)}ch` }}
-                      className={`px-1 py-0 text-center border-b-2 outline-none transition-all font-bold bg-transparent
-                        ${userInput.trim() === "" ? "border-slate-300" : (isCorrect ? "text-emerald-600 border-emerald-500" : "text-rose-600 border-rose-500")}
-                      `}
-                    />
-                  </span>
-                );
-              }
-              return <span key={idx}>{part}</span>;
-            })}
-          </p>
-        );
-      };
-
-      return (
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 mb-6">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-2xl bg-indigo-50 text-indigo-600">
-                  <Icon name="book" className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-lg md:text-xl font-black text-slate-900">
-                    {category} · 范文填空
-                  </h2>
-                  <p className="text-slate-500 text-xs font-semibold mt-1">
-                    {essay.title} · 三段式（目的 / 细节 / 结尾）
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <span className="px-2 py-1 rounded-xl bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-wider">
-              Sample
-            </span>
-          </div>
-
-          <div className="space-y-4">
-            {essay.paragraphs.map((p, i) => (
-              <div key={i} className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-black tracking-wider uppercase text-slate-400">
-                    Paragraph {i + 1}
-                  </span>
-                  <span className="text-[10px] font-bold text-slate-400">
-                    {i === 0 ? "Purpose" : i === 1 ? "Details" : "Closing"}
-                  </span>
-                </div>
-                {renderParagraph(p, i)}
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 text-[11px] text-slate-400 font-semibold">
-            小提示：答案用 <span className="font-black">[ ]</span> 标记；点“显示答案”可直接看到每空提示。
-          </div>
-        </div>
-      );
-    };
-
-    // --------------------------
-    // 6) 主应用
-    // --------------------------
-    const App = () => {
-      const [sentences, setSentences] = useState(sentenceData);
-      const [activeTab, setActiveTab] = useState("全部");
-      const [filterMode, setFilterMode] = useState("全部");
-      const [searchTerm, setSearchTerm] = useState("");
-      const [userAnswers, setUserAnswers] = useState({});
-      const [essayAnswers, setEssayAnswers] = useState({});
-      const [showAllHints, setShowAllHints] = useState(false);
-      const [isSaving, setIsSaving] = useState(false);
-
-      const saveTimerRef = useRef(null);
-      const saveEssayTimerRef = useRef(null);
-
-      useEffect(() => {
-        setUserAnswers(safeLoad(STORAGE_KEY_SENTENCES));
-        setEssayAnswers(safeLoad(STORAGE_KEY_ESSAYS));
-      }, []);
-
-      const saveProgressDebounced = (key, obj, timerRef) => {
-        if (timerRef.current) clearTimeout(timerRef.current);
-        setIsSaving(true);
-        timerRef.current = setTimeout(() => {
-          try {
-            safeSave(key, obj);
-          } finally {
-            setIsSaving(false);
-          }
-        }, 200);
-      };
-
-      const categories = useMemo(() => ["全部", ...new Set(sentenceData.map(d => d.category))], []);
-
-      const checkMastery = (sentence, sIdx, answers) => {
-        const parts = sentence.text.split(/\[(.*?)\]/g);
-        let blankIdx = 0;
-        let allCorrect = true;
-        let hasInput = false;
-        parts.forEach((part, pIdx) => {
-          if (pIdx % 2 === 1) {
-            const input = (answers[`${sIdx}-${blankIdx}`] || "").toLowerCase().trim();
-            if (input !== "") hasInput = true;
-            if (input !== part.toLowerCase()) allCorrect = false;
-            blankIdx++;
-          }
-        });
-        return hasInput && allCorrect;
-      };
-
-      const filteredData = useMemo(() => {
-        return sentences.filter((item) => {
-          const originalIndex = sentences.indexOf(item);
-          const isMastered = checkMastery(item, originalIndex, userAnswers);
-          const matchesTab = activeTab === "全部" || item.category === activeTab;
-          const matchesSearch =
-            item.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.category.toLowerCase().includes(searchTerm.toLowerCase());
-          const matchesFilter =
-            filterMode === "全部" ||
-            (filterMode === "已掌握" && isMastered) ||
-            (filterMode === "未掌握" && !isMastered);
-          return matchesTab && matchesSearch && matchesFilter;
-        });
-      }, [activeTab, searchTerm, sentences, userAnswers, filterMode]);
-
-      const masteryStats = useMemo(() => {
-        const completed = sentences.filter((s, i) => checkMastery(s, i, userAnswers)).length;
-        return { completed, total: sentences.length };
-      }, [userAnswers, sentences]);
-
-      const handleInputChange = (sentenceIndex, blankIndex, value) => {
-        const newAnswers = { ...userAnswers, [`${sentenceIndex}-${blankIndex}`]: value };
-        setUserAnswers(newAnswers);
-        saveProgressDebounced(STORAGE_KEY_SENTENCES, newAnswers, saveTimerRef);
-      };
-
-      const handleEssayChange = (category, blankId, value) => {
-        const key = `${category}-${blankId}`;
-        const newAnswers = { ...essayAnswers, [key]: value };
-        setEssayAnswers(newAnswers);
-        saveProgressDebounced(STORAGE_KEY_ESSAYS, newAnswers, saveEssayTimerRef);
-      };
-
-      const shuffleSentences = () => {
-        setSentences([...sentences].sort(() => Math.random() - 0.5));
-      };
-
-      const resetProgress = () => {
-        if (window.confirm("确定要重置所有进度吗？（句型+范文都会清空）")) {
-          setIsSaving(true);
-          setUserAnswers({});
-          setEssayAnswers({});
-          setTimeout(() => {
-            safeSave(STORAGE_KEY_SENTENCES, {});
-            safeSave(STORAGE_KEY_ESSAYS, {});
-            setIsSaving(false);
-          }, 80);
+        /* 输入框动效 */
+        .input-blank {
+            display: inline-block;
+            min-width: 60px;
+            text-align: center;
+            border-bottom: 2px solid #cbd5e1;
+            color: #4f46e5;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            background: rgba(255,255,255,0.5);
+            padding: 0 4px;
+            margin: 0 2px;
         }
-      };
+        .input-blank:focus {
+            border-bottom-color: #4f46e5;
+            background: #eef2ff;
+            outline: none;
+            transform: translateY(-1px);
+        }
+        .input-correct { color: #10b981; border-bottom-color: #10b981; background: #ecfdf5; }
+        .input-error { color: #ef4444; border-bottom-color: #ef4444; background: #fef2f2; }
 
-      const currentEssay = activeTab !== "全部" ? categoryEssays[activeTab] : null;
+        /* 侧边栏选中态 */
+        .nav-item-active {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            border-right: 3px solid #4338ca;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-      return (
-        <div className="min-h-screen p-4 md:p-8">
-          <div className="max-w-4xl mx-auto">
-            <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <h1 className="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-blue-500">
-                    英语写作核心句型
-                  </h1>
-                  {isSaving && <Icon name="cloud" className="w-5 h-5 text-blue-400 animate-pulse" />}
-                </div>
-                <p className="text-slate-500 font-medium text-sm">
-                  本地自动保存 · 句型填空 + 每题材 1 篇三段式范文
-                </p>
-              </div>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
 
-              <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 min-w-[260px]">
-                <div className={`p-2 rounded-xl ${masteryStats.completed === masteryStats.total ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'}`}>
-                  <Icon name="trophy" className="w-6 h-6" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
-                    <span>句型掌握</span>
-                    <span>{masteryStats.completed} / {masteryStats.total}</span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div
-                      className="bg-emerald-500 h-full transition-all duration-700"
-                      style={{ width: `${(masteryStats.completed / masteryStats.total) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </header>
+        // --- 核心全量数据 (2010-2025 全文收录) ---
+        // 为了方便练习，我已将部分关键词用 [] 标记，程序会自动渲染为填空框
+        const FULL_DATABASE = {
+            "小作文": {
+                "万能模板": [
+                    {
+                        title: "书信/通知通用总模板",
+                        tags: ["通用", "必背"],
+                        content: `Dear [Recipient],
+I hope this letter/email finds you well and [everything goes smoothly]. I am very [glad] to hear that [key information]. I am writing this letter in order to [purpose] and provide further [details].
 
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 mb-6 space-y-5">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Icon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
-                  <input
-                    type="text"
-                    placeholder="搜索场景、词汇或内容..."
-                    className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition-all text-sm"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className="flex bg-slate-100 p-1 rounded-2xl">
-                  {["全部", "未掌握", "已掌握"].map(mode => (
-                    <button
-                      key={mode}
-                      onClick={() => setFilterMode(mode)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filterMode === mode ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
-                    >
-                      {mode}
-                    </button>
-                  ))}
-                </div>
-              </div>
+Firstly, the [event] is scheduled to be held in [location] at [time]. The purpose of this activity is to [promote] [goal]. Secondly, [participants] are expected to [attend] actively, and all students are [welcome] to participate. In addition, the event will commence with [an opening ceremony], followed by [activities], and conclude with [summary]. In the end, the experience will be [memorable] and provide opportunities to [broaden horizons].
 
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-50">
-                {categories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveTab(cat)}
-                    className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border-2 ${activeTab === cat ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-100 text-slate-500 hover:border-slate-200"}`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
+We would appreciate it very much if you could [accept our invitation]. Your [participation] will surely make this event more successful. I am looking forward to [hearing] from you soon.
 
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6 px-2">
-              <div className="flex items-center gap-3">
-                <button onClick={shuffleSentences} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all shadow-sm">
-                  <Icon name="shuffle" className="w-3.5 h-3.5 text-indigo-500" /> 乱序挑战
-                </button>
-                <button onClick={() => setShowAllHints(!showAllHints)} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-[10px] font-bold hover:bg-slate-50 transition-all shadow-sm">
-                  <Icon name={showAllHints ? "eyeOff" : "eye"} className={`w-3.5 h-3.5 ${showAllHints ? "text-rose-500" : "text-blue-500"}`} />
-                  {showAllHints ? "隐藏提示" : "显示答案"}
-                </button>
-              </div>
-              <button onClick={resetProgress} className="flex items-center gap-2 text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">
-                <Icon name="refresh" className="w-3 h-3" /> 重置所有
-              </button>
-            </div>
+Yours sincerely,
+Li Ming`
+                    }
+                ],
+                "邀请信": [
+                    {
+                        title: "2025: 邀请参演短剧",
+                        tags: ["2025", "邀请信"],
+                        content: `Dear John,
+I hope this letter finds you well and everything goes smoothly with your study. I am very glad to hear that you are interested in the short play based on a classic Chinese novel. It is my honor to [invite] you to take part in it, and I am writing this letter in order to [provide] further details about the plan.
 
-            {/* ✅ 新增：当前题材的范文填空（只有在选中某个题材时出现） */}
-            {activeTab !== "全部" && (
-              <EssayCard
-                category={activeTab}
-                essay={currentEssay}
-                showAllHints={showAllHints}
-                essayAnswers={essayAnswers}
-                onChange={handleEssayChange}
-              />
-            )}
+Firstly, the play is [adapted] from Journey to the West, one of China’s Four Great Classical Novels. The purpose of this activity is to [promote] traditional Chinese culture and [encourage] creativity among students. Secondly, the play will be held in the student activity center on weekends starting next month, and rehearsals are [scheduled] to take place every Saturday afternoon. In the end, the experience will be [memorable] and provide all participants with valuable opportunities to improve their performance and [teamwork] skills.
 
-            {/* 句型卡片列表 */}
-            <div className="grid grid-cols-1 gap-4 mb-20">
-              {filteredData.map((item, fIdx) => {
-                const originalIndex = sentences.indexOf(item);
-                const isMastered = checkMastery(item, originalIndex, userAnswers);
-                const parts = item.text.split(/\[(.*?)\]/g);
-                let blankCounter = 0;
+We would appreciate it very much if you could [accept] our invitation. Your participation will surely make this event more successful and [enjoyable]. I am looking forward to your reply at your earliest [convenience].
 
-                return (
-                  <div key={`${originalIndex}-${fIdx}`} className={`bg-white rounded-2xl border-2 p-6 transition-all duration-300 ${isMastered ? "border-emerald-500 bg-emerald-50/5 shadow-md" : "border-slate-100 hover:border-slate-200 shadow-sm"}`}>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="px-2 py-1 rounded bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-wider">{item.category}</span>
-                      {isMastered && <Icon name="check" className="w-5 h-5 text-emerald-500" />}
-                    </div>
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2022: 校园美食节邀请",
+                        tags: ["2022", "邀请信"],
+                        content: `Dear international students,
+I hope this email finds you well. I am delighted to [inform] you that a campus food festival will be held next Friday evening on the playground, aiming to [promote] cultural exchange and [enrich] our campus life.
 
-                    <div className="text-lg md:text-xl font-medium leading-relaxed text-slate-800">
-                      {parts.map((part, pIdx) => {
-                        if (pIdx % 2 === 1) {
-                          const bIdx = blankCounter++;
-                          const userInput = userAnswers[`${originalIndex}-${bIdx}`] || "";
-                          const isCorrect = userInput.toLowerCase().trim() === part.toLowerCase();
+A variety of traditional [dishes] and snacks from different countries will be [presented], together with cooking shows and interactive activities where you can share your own food culture. This festival will be a wonderful opportunity to [taste] global flavors, make new [friends], and experience cultural [diversity].
 
-                          return (
-                            <span key={pIdx} className="inline-block relative align-baseline mx-1">
-                              <input
+We sincerely [invite] you to participate in this exciting event and bring your favorite homemade dishes. Please email us at 123456@qq.com to sign up.
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2021: 线上会议邀请",
+                        tags: ["2021", "邀请信"],
+                        content: `Dear Jack,
+I hope this email finds you well. I am writing to [invite] you to participate in an online academic meeting on “Innovation and Cooperation in Education”, which will be held next Wednesday at 7:00 p.m. via Tencent Meeting.
+
+The meeting aims to [share] creative ideas and [strengthen] communication among students from different cultural backgrounds. Several professors and student representatives will deliver short speeches, followed by a Q&A session for free discussion. It will be a [valuable] opportunity to [broaden] your horizons, [exchange] views, and gain new [inspiration].
+
+We sincerely hope you can [join] us. Please [confirm] your attendance by replying to this email at your earliest convenience.
+
+Yours sincerely,
+Li Ming`
+                    }
+                ],
+                "建议/推荐信": [
+                    {
+                        title: "2024: 老房保护调查建议",
+                        tags: ["2024", "建议信/计划"],
+                        content: `Dear Jack,
+I hope this email finds you well. I am writing this letter in order to [put forward] my plan about our survey on the [protection] of old houses in the ancient town and ask for your valuable [opinion].
+
+In the first place, we are badly in need of doing some [research] to gather detailed information, which can help us [acquire] official data and policies. After that, I am confident that [interviewing] the local residents will not only give us the opportunity to understand the needs and challenges of preserving ancient buildings, but also allow us to obtain valuable [insights]. I wonder if you could share your [ideas] about the schedule and division of work so that we can make full preparation in advance.
+
+I would appreciate it if you could [reply] at your earliest convenience. Looking forward to your [advice].
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2023: 艺术展推荐",
+                        tags: ["2023", "建议信"],
+                        content: `Dear David,
+I hope this email finds you well. It is difficult to decide between the two shows. I am writing to [recommend] the art exhibition.
+
+What makes the art exhibition highly [recommendable] is the unique [experience] it offers, which includes an art [performance] and a creative display of masterpieces. Moreover, the exhibition provides a valuable opportunity to [explore] yourself with creativity and to [appreciate] different cultures and aesthetics. Finally, it will surely [broaden] your horizons and bring you great pleasure.
+
+I hope my [suggestion] will be helpful, and I’m looking forward to hearing your feedback.
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2019: 交通辩论话题建议",
+                        tags: ["2019", "建议信"],
+                        content: `Dear Professor Smith,
+I hope this email finds you well. I am writing this letter to [suggest] a specific topic for our debate on city traffic and [inform] you of the relevant arrangements.
+
+I would like to [recommend] the topic “Should private cars be [restricted] in big cities?”, since it is closely related to citizens’ daily life and helps raise public [awareness] of environmental protection. The debate is scheduled to be held in the school [auditorium] at 7:00 p.m. next Friday, and each team will [consist] of three students. I have also invited a transportation expert to serve as the judge, which will make the event more professional and [inspiring].
+
+This debate will be valuable and [enlightening], providing students with opportunities to [exchange] ideas and improve critical thinking. I am looking forward to your confirmation and further suggestions.
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2014: 留学生活建议",
+                        tags: ["2014", "咨询/建议"],
+                        content: `Dear John,
+I hope this email finds you well. I am writing this letter to [introduce] my living habits and ask for your valuable [advice] about living in your country.
+
+Generally speaking, I prefer a [quiet] and tidy living environment, so I usually go to bed before 11 p.m. and get up early in the morning. I enjoy reading and listening to light music in my spare time, and I often cook simple Chinese dishes by myself. Since I am not very [familiar] with the local customs, I would greatly appreciate it if you could [offer] some suggestions on shopping, commuting, and daily routines. Your advice will surely help me [adapt] to the new environment more smoothly.
+
+I am really looking forward to [living] with you and believe we will get along well. Thank you in advance for your help and kindness.
+
+Yours sincerely,
+Li Ming`
+                    }
+                ],
+                "介绍/导览信": [
+                    {
+                        title: "2020: 历史古迹导览",
+                        tags: ["2020", "介绍信"],
+                        content: `Dear International Students,
+I hope this email finds you well. I am writing this letter to [introduce] a tour of a historical site and give you some useful [advice] for the trip.
+
+The destination is the Great Wall, one of the most famous historical [sites] in China, which was built more than two thousand years ago and has long been a [symbol] of Chinese perseverance and wisdom. During the tour, you will have the chance to [enjoy] the magnificent scenery and learn about Chinese history and culture. The tour is [scheduled] for next Sunday, starting at 8:00 a.m. at the university gate. To make your journey comfortable, please [wear] suitable shoes, bring enough water, and [follow] the guide’s instructions.
+
+This trip will be [memorable] and rewarding, providing everyone with opportunities to broaden horizons and [appreciate] Chinese culture. I am looking forward to your participation and wish you a wonderful experience.
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2017: 中国文化介绍回复",
+                        tags: ["2017", "回复/介绍"],
+                        content: `Dear Professor Williams,
+I hope this email finds you well. I am writing this letter to express my great honor to [accept] your invitation and to [share] my plan for the presentation on Chinese culture.
+
+The presentation is scheduled to be given next Wednesday afternoon in the lecture hall, and it will [focus] on three key aspects. Firstly, I will introduce the long [history] and unique philosophy of Chinese civilization. Secondly, I will explain traditional [festivals] and their cultural significance, such as the Spring Festival and Mid-Autumn Festival. Lastly, I will talk about modern China’s efforts in [promoting] cultural exchange with the rest of the world. I believe these topics will give foreign students a better understanding of China’s heritage and spirit.
+
+This event will be [meaningful] and rewarding, providing a valuable opportunity to [enhance] mutual understanding. I am looking forward to your comments on my proposal.
+
+Yours sincerely,
+Li Ming`
+                    }
+                ],
+                "感谢/道歉/祝贺/投诉": [
+                    {
+                        title: "2018: 取消访问道歉信",
+                        tags: ["2018", "道歉信"],
+                        content: `Dear Professor Smith,
+I hope this email finds you well. I am writing this letter to express my sincere [apology] for canceling my travel plan and to [explain] the reason for the change.
+
+I had planned to visit you this weekend, but an unexpected academic conference will be held in my university at the same time, and my [attendance] is required. Therefore, I am truly sorry for any [inconvenience] this may cause. Considering our shared interest in cultural studies, I sincerely hope we can [reschedule] the meeting for next month, when I will be free to discuss our research face to face. Your [guidance] and insights will surely be invaluable to my future studies.
+
+I once again apologize for the cancellation and sincerely hope for your [understanding]. I am looking forward to meeting you soon.
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2016: 翻译比赛祝贺与建议",
+                        tags: ["2016", "祝贺/建议"],
+                        content: `Dear Jack,
+I hope this email finds you well. I am writing this letter to express my sincere [gratitude] for your congratulations and to share some [suggestions] on improving translation skills.
+
+In my opinion, the most important step is to [read] widely and build a solid foundation of both Chinese and English, especially by [comparing] different versions of classic works. Secondly, it is advisable to [practice] translation every day, starting with short passages and gradually moving to longer ones. In addition, you may take notes on useful [expressions] and sentence patterns, which will greatly enhance accuracy and fluency. If possible, joining an online translation workshop will also help improve your ability through communication with others.
+
+I hope my advice will be [helpful] and inspiring. I am looking forward to hearing about your [progress] soon.
+
+Yours sincerely,
+Li Ming`
+                    },
+                    {
+                        title: "2012: 电子词典投诉信",
+                        tags: ["2012", "投诉信"],
+                        content: `Dear Customer Service Manager,
+I hope this email finds you well. I am writing this letter to make a [complaint] about the electronic dictionary I bought from your online store and request a prompt [solution] to the problem.
+
+I placed my order last week, but after a few days of use I found that the screen often [freezes] and the battery runs out within two hours. Such defects have caused great [inconvenience] to my study. I would appreciate it if you could either [replace] the product with a new one or [refund] my payment as soon as possible. I have attached the purchase receipt and delivery information for your reference.
+
+I sincerely hope that this issue can be [settled] quickly. I am looking forward to your reply at your earliest convenience.
+
+Yours sincerely,
+Zhang Wei`
+                    },
+                    {
+                        title: "2011: 考大学祝贺信",
+                        tags: ["2011", "祝贺信"],
+                        content: `Dear Li Ming,
+I hope this letter finds you well. I am writing this letter to offer my sincere [congratulations] on your admission to university and to share some [advice] on preparing for college life.
+
+First of all, you should make a reasonable [study] plan to adapt to the new learning environment efficiently. Secondly, it is advisable to [take part] in club activities and social events, which will help you make new friends and improve communication skills. In addition, remember to [maintain] a healthy lifestyle by balancing study and relaxation. I believe that with enthusiasm and confidence, you will enjoy a colorful and rewarding campus life.
+
+I sincerely wish you great [success] in your new journey. I am looking forward to hearing about your college experiences soon.
+
+Yours sincerely,
+Zhang Wei`
+                    },
+                    {
+                        title: "2010: 感谢接待信",
+                        tags: ["2010", "感谢信"],
+                        content: `Dear Mr. Johnson,
+I hope this letter finds you well. I am writing this letter to express my heartfelt [gratitude] for your warm reception during my stay in the United States and to [invite] you to visit China at your convenience.
+
+The days we spent together were truly [unforgettable], and your thoughtful arrangements gave me a deeper understanding of American culture. I would be more than happy to [return] your kindness by showing you around some famous Chinese cities, such as Beijing and Xi’an, where you can experience our unique [traditions] and taste authentic local food. Your visit will surely [strengthen] the friendship between us and promote mutual cultural exchange.
+
+I sincerely hope you can come to China soon. I am looking forward to meeting you again in the near future.
+
+Yours sincerely,
+Zhang Wei`
+                    }
+                ],
+                "通知": [
+                     {
+                        title: "2015: 夏令营招募通知",
+                        tags: ["2015", "通知"],
+                        content: `Notice
+I am delighted to [announce] that a Summer Camp for High School Students will be held soon, aiming to [promote] communication and mutual learning between college and high school students.
+
+The camp is scheduled to [take place] from July 10th to July 20th on our university campus. Various [activities] will be arranged, including academic lectures, cultural workshops, sports games, and talent shows, which will help participants experience campus life and broaden their [horizons]. We are now looking for [enthusiastic] and responsible volunteers to assist in event organization, guidance, and translation. All students are [welcome] to sign up by sending an email to camp@edu.cn before June 30th.
+
+This program will be meaningful and [rewarding], providing everyone with opportunities to gain experience and develop [teamwork] skills. We sincerely hope more students will join us.
+
+The Students’ Union`
+                    },
+                    {
+                        title: "2013: 慈善义卖通知",
+                        tags: ["2013", "通知/邮件"],
+                        content: `Dear Classmates,
+I hope this email finds you well. I am writing this letter to [inform] you of our upcoming charity sale and [encourage] everyone to take an active part in it.
+
+The charity sale is scheduled to be held this Saturday morning on the playground, aiming to [raise] funds for children in need of help. A variety of items such as books, stationery, handicrafts, and snacks will be [available] for sale. All participants are encouraged to [donate] or sell their unused items, and those who are good at organizing are welcome to help with the event arrangement. Your contribution, no matter big or small, will make a real [difference] to these children’s lives and bring them warmth and hope.
+
+This activity will be meaningful and rewarding, providing us with opportunities to show love and develop [teamwork] skills. I am looking forward to your active participation.
+
+Yours sincerely,
+Li Ming`
+                    }
+                ]
+            },
+            "大作文": {
+                "图表通用模板": [
+                     {
+                        title: "图表作文万能三段式",
+                        tags: ["通用", "模板"],
+                        content: `As can be seen from the [chart] above, [subject] among [group] has undergone a remarkable change from [time1] to [time2]. During this period, the figure for [itemA] [increased] from [data1] to [data2], while [itemB] showed an [opposite] trend. Obviously, this chart reflects a common social phenomenon — [topic sentence].
+
+Several primary factors can be summarized as follows. First and foremost, the [prosperity] of China's economy has laid a solid [foundation]. In addition, relevant [authorities] have attached great importance to this issue and introduced effective policies. Last but not least, with the [enhancement] of public awareness, more individuals have realized the importance of [topic].
+
+Taking all the above factors into [consideration], it is reasonable to predict that [trend] will continue in the future. Only by [attaching] importance can we enjoy a better life.`
+                    }
+                ],
+                "柱状图/条形图": [
+                    {
+                        title: "2025: 老年人活动 (柱状图)",
+                        tags: ["2025", "柱状图"],
+                        content: `According to the information depicted in the bar chart, the main leisure activities among the [elderly] in a certain community are clearly shown. [Watching] TV ranks first, accounting for 90.8%, followed by walking (68.3%), gardening (34.7%), reading (31.8%), and playing chess (18.4%). Obviously, the chart reveals that the elderly today are enjoying a more [active] and [diversified] life, showing that health and happiness have become their major concerns.
+
+Several primary factors can explain this trend. First, with the improvement of living [standards] and economic conditions, senior citizens have more [financial] security and free time. Besides, the [government] and communities have provided public facilities such as parks and gyms for elderly care. Finally, the growing awareness of [health] has encouraged them to pursue both physical and mental well-being.
+
+Taking these factors into account, it can be predicted that the elderly in China will continue to enjoy a [healthier] and happier lifestyle in the future. After all, nothing is more [precious] than maintaining both vitality and peace of mind in one’s later years.`
+                    },
+                    {
+                        title: "2024: 劳动教育收获 (柱状图)",
+                        tags: ["2024", "柱状图"],
+                        content: `According to the information depicted in the bar chart, the main gains from labor education courses among college students are clearly presented. The percentage of [acquiring] relevant knowledge, raising labor abilities, feeling comfortable, and enhancing cooperation capacity accounts for 91.3%, 84.8%, 54.4%, and 32.6% respectively. Especially, acquiring relevant knowledge [ranks] first, followed by raising labor abilities. Obviously, the chart reveals that college students have attached growing importance to [practical] experience and personal development, reflecting their pursuit of balanced ability and knowledge.
+
+Several primary factors can explain this phenomenon. First and foremost, with the continuous [reform] of China’s educational system, more attention has been paid to [cultivating] students’ comprehensive abilities rather than pure academic performance. In addition, labor education helps students develop [teamwork] and problem-solving skills, which are essential in modern society. Last but not least, universities have provided more opportunities and platforms for students to [practice], enabling them to combine theory with practice effectively.
+
+Taking all these factors into consideration, it can be expected that labor education will continue to play a [vital] role in college life in the future. After all, only by participating in meaningful practical work can students truly [improve] themselves and contribute to society as a whole.`
+                    },
+                    {
+                        title: "2022: 快递业务量 (柱状图)",
+                        tags: ["2022", "柱状图"],
+                        content: `According to the information depicted in the bar chart, China’s express delivery volume experienced a [remarkable] increase from 2018 to 2020. Specifically, the overall number rose from 30 billion pieces in 2018 to 83 billion in 2020, showing a dramatic [upward] trend. Obviously, the chart highlights that China’s express industry has been developing rapidly in recent years, reflecting the [prosperity] of e-commerce and the improvement of logistics services across the country.
+
+Several primary factors can explain this phenomenon. First and foremost, the booming online [shopping] industry has generated a growing demand for fast delivery services. In addition, the continuous improvement of [transportation] infrastructure and digital technologies has significantly enhanced delivery [efficiency]. Last but not least, government policies supporting logistics and [innovation] have further promoted the rapid expansion of the express delivery sector.
+
+Taking all these factors into account, it can be expected that China’s express delivery business will maintain its [fast] growth in the near future. After all, the convenience of express service not only facilitates people’s daily life but also fuels the [sustainable] development of the national economy.`
+                    },
+                    {
+                        title: "2021: 体育锻炼方式 (柱状图)",
+                        tags: ["2021", "柱状图"],
+                        content: `According to the information depicted in the bar chart, the ways of physical exercise among urban residents [vary] significantly. Exercising alone accounts for over 50%, [ranking] the first among all types, while working out with friends or family members takes up a smaller proportion. Meanwhile, only a few people prefer group activities. Obviously, the chart reveals that [individual] exercise has become the dominant form of physical activity, showing that people are paying more attention to personal [fitness] and flexibility.
+
+Several primary factors can explain this trend. First and foremost, the fast [pace] of modern urban life leaves many people with limited time, making individual exercise more [convenient] and efficient. In addition, the improvement of living standards and [health] awareness encourages citizens to develop regular fitness habits. Last but not least, the availability of sports [facilities] such as gyms and parks provides residents with easier access to various exercise options.
+
+Taking these factors into consideration, it can be predicted that more people will continue to choose [individual] exercise in the coming years. After all, keeping a good [balance] between work and health is essential for a happy and productive life.`
+                    },
+                    {
+                        title: "2019: 毕业生去向 (柱状图)",
+                        tags: ["2019", "柱状图"],
+                        content: `According to the information depicted in the bar chart, the destinations of college graduates in a certain university have undergone [noticeable] changes from 2013 to 2018. The percentage of graduates who chose [employment] decreased from 68.1% to 60.7%, while those who pursued further study [increased] from 26.3% to 34.0%. Meanwhile, the proportion of students starting their own business also rose slightly from 1.3% to 2.6%. Obviously, the chart reflects that more graduates are paying attention to self-improvement and [diversified] career paths, rather than entering the job market directly after graduation.
+
+Several primary factors can explain this trend. First and foremost, the increasingly [competitive] job market drives more graduates to pursue higher degrees to enhance their [employability]. In addition, the government and universities have provided strong support for [innovation] and entrepreneurship, encouraging students to explore new opportunities. Last but not least, the change in young people’s [values] makes them prefer long-term career development to immediate employment.
+
+Taking all these factors into consideration, it can be predicted that this trend of pursuing further education and innovation will [continue] in the future. After all, continuous learning and self-improvement are the [keys] to success in an era of rapid social and technological change.`
+                    },
+                    {
+                        title: "2014: 城乡人口变化 (柱状图)",
+                        tags: ["2014", "柱状图"],
+                        content: `As can be seen from the bar chart, the urban and rural populations in China underwent [enormous] changes from 1990 to 2010. During this period, the urban population [increased] dramatically from 300 million in 1990 to 458 million in 2000, and further to 666 million in 2010. In contrast, the rural population [declined] from 834 million to 807 million, and then dropped sharply to 674 million over the same years. Obviously, the chart reveals that China has been experiencing rapid [urbanization], with more people moving from rural areas to cities.
+
+Several primary factors can explain these changes. First and foremost, China’s rapid economic development and [industrialization] have created abundant job opportunities in cities, attracting a large number of rural laborers. In addition, the government has continuously invested in urban [infrastructure], such as transportation, housing, and public services, making city life more convenient and appealing. Last but not least, better education and healthcare [resources] in urban areas encourage families to relocate to cities in pursuit of improved living conditions and future development.
+
+Taking all these factors into consideration, it can be predicted that the process of urbanization in China will [continue] in the coming years. After all, promoting [balanced] development between urban and rural areas is essential for the nation’s long-term progress and social stability.`
+                    },
+                    {
+                        title: "2013: 兼职情况 (柱状图)",
+                        tags: ["2013", "柱状图"],
+                        content: `According to the information depicted in the bar chart, the percentage of college students engaging in part-time jobs [increases] steadily from freshman year to senior year. Specifically, 67.77% of freshmen, 71.13% of sophomores, and 71.93% of juniors take part in part-time work, while the proportion [rises] sharply to 88.24% among seniors. Obviously, the chart indicates that upper-grade students are more likely to participate in part-time jobs, reflecting their growing need for [practical] experience and career preparation.
+
+Several primary factors can explain this phenomenon. First and foremost, senior students are approaching [graduation], so they tend to seek internships and work experience to enhance their [employability]. In addition, as students advance through college, their academic pressure becomes more manageable, allowing them more [flexibility] to take part-time jobs. Last but not least, the rising cost of living and education motivates many students to work part-time to reduce [financial] burdens and gain independence.
+
+Taking these factors into account, it can be predicted that the proportion of students participating in part-time jobs will continue to [grow]. After all, early [exposure] to society not only improves practical skills but also plays a crucial role in shaping students’ future career development.`
+                    },
+                    {
+                        title: "2011: 汽车市场份额 (柱状图)",
+                        tags: ["2011", "柱状图"],
+                        content: `As can be seen from the bar chart, the market shares of domestic, Japanese, and American car brands in China experienced [noticeable] changes between 2008 and 2009. In 2008, Japanese brands ranked first with about 35%, followed by domestic brands (around 25%), while American brands accounted for roughly 12%. In 2009, however, domestic brands [increased] to about 30%, [surpassing] Japanese brands, which dropped to around 25%, while American brands remained stable at about 12%. Obviously, the chart reveals that domestic automobile brands were rising rapidly, reflecting a shift in [consumer] preference and growing [confidence] in local products.
+
+Several primary factors can explain this phenomenon. First and foremost, the improvement in [quality], technology, and design of domestic cars has boosted consumers’ recognition and trust. In addition, competitive [pricing] and better after-sales services make domestic brands more attractive to price-sensitive buyers. Last but not least, strong government [support] for national automobile enterprises, including tax incentives and industrial policies, has further accelerated their development and expanded their market share.
+
+Taking all these factors into account, it can be predicted that domestic car brands will continue to [grow] steadily in the future. After all, only companies that keep improving quality and [innovation] can secure a firm position in the increasingly competitive automobile market.`
+                    }
+                ],
+                "折线图": [
+                    {
+                        title: "2023: 健康素养 (折线图)",
+                        tags: ["2023", "折线图"],
+                        content: `According to the information depicted in the line chart, the health literacy level of Chinese residents [increased] steadily from 8.8% in 2012 to 25.4% in 2021. To be specific, the percentage rose gradually during the first few years and then climbed [remarkably] after 2016. Obviously, the chart indicates that people in China are paying much more attention to health and quality of life, which demonstrates the [improvement] of public awareness and the development of national [health] programs.
+
+Several primary factors can explain this trend. First and foremost, the steady growth of the economy and people’s [living] standards has laid a solid foundation for better health management. In addition, the government has promoted various health [campaigns] and improved medical services, which have greatly raised citizens’ health awareness. Last but not least, the popularity of the [Internet] and new media allows people to obtain reliable health information more conveniently than ever before.
+
+Taking all these factors into consideration, it can be predicted that the health literacy of Chinese residents will keep [rising] in the coming years. After all, nothing is more important than health, and a well-informed public will lay the [cornerstone] for a healthier and more prosperous nation.`
+                    },
+                    {
+                        title: "2017: 博物馆参观人数 (折线图)",
+                        tags: ["2017", "折线图"],
+                        content: `As can be seen from the line chart, the number of museums and museum visitors in China experienced [steady] growth from 2013 to 2015. Specifically, the number of museums increased from about 4,000 in 2013 to over 4,500 in 2015, while the number of visitors [climbed] from roughly 60 million to nearly 80 million during the same period. Obviously, the chart indicates that public interest in [cultural] activities has been rising, and China’s cultural development has made remarkable progress.
+
+Several primary factors can explain this trend. First and foremost, China’s rapid [economic] development has improved people’s living standards, enabling them to pursue cultural and educational experiences. In addition, government [investment] in museums, exhibitions, and cultural facilities has greatly enhanced accessibility. Last but not least, a growing awareness of cultural [heritage] and lifelong learning encourages more individuals, especially families and students, to visit museums for knowledge and inspiration.
+
+Taking all these factors into consideration, it can be predicted that both the number of museums and visitors will continue to [grow] in the future. After all, a society that values culture and learning is more likely to achieve [sustainable] progress and national confidence.`
+                    }
+                ],
+                "饼状图": [
+                    {
+                        title: "2020: 手机阅读目的 (饼状图)",
+                        tags: ["2020", "饼状图"],
+                        content: `According to the information depicted in the pie chart, the purposes of mobile phone reading among college students are clearly presented. The majority of students read mainly for [acquiring] knowledge, accounting for 59.5%, while 21.3% do it to kill time, and only a few (2.2%) read for other purposes. Obviously, the chart indicates that college students are increasingly using mobile phones as a tool for [learning], reflecting the growing trend of [digital] and fragmented reading in modern education.
+
+Several primary factors can explain this phenomenon. First and foremost, the widespread use of smartphones and mobile Internet has made digital reading more [accessible] and convenient. In addition, educational apps and online resources provide [abundant] learning materials for students to study anytime and anywhere. Last but not least, the pressure of academic [competition] encourages students to use fragmented time to enrich their knowledge and improve efficiency.
+
+Taking all these factors into consideration, it can be expected that mobile phone reading will remain [popular] among college students in the future. After all, making full use of mobile technology for learning contributes greatly to both personal [growth] and educational innovation.`
+                    },
+                    {
+                        title: "2018: 餐厅选择因素 (饼状图)",
+                        tags: ["2018", "饼状图"],
+                        content: `According to the information depicted in the pie chart, the factors influencing consumers’ choice of restaurants are clearly presented. Service accounts for 36.3%, [ranking] first among all categories, followed by environment (26.8%) and price (23.8%). Meanwhile, features make up 8.4%, and other factors occupy the remaining 4.7%. Obviously, the chart reveals that people attach great importance to [service] quality and dining environment, reflecting their rising [expectations] for a pleasant and comfortable dining experience.
+
+Several primary factors can explain these preferences. First and foremost, improved living standards enable consumers to pursue better service and [atmosphere], rather than purely low prices. In addition, online [reviews] and social media make diners more sensitive to service quality, hygiene, and environment. Last but not least, with increasing [competition] in the catering industry, restaurants focus more on service and decoration to attract customers and enhance satisfaction.
+
+Taking these factors into consideration, it can be expected that high-quality service and environment will remain the [core] of consumers’ choices. After all, only by providing excellent service and a comfortable atmosphere can restaurants build long-term [trust] and competitiveness.`
+                    },
+                    {
+                        title: "2016: 旅游目的 (饼状图)",
+                        tags: ["2016", "饼状图"],
+                        content: `According to the information depicted in the pie chart, the main purposes of traveling among college students are clearly presented. The largest group travels to [appreciate] the scenery, accounting for 37%, followed by relieving pressure (33%), making friends (9%), cultivating independence (6%), and others (15%). Obviously, the chart indicates that students attach great importance to [relaxation], enjoyment, and self-development, showing a [diversified] understanding of travel.
+
+Several primary factors can explain this phenomenon. First and foremost, heavy academic [pressure] drives many students to travel for mental relaxation and emotional release. In addition, beautiful scenic spots and convenient [transportation] encourage young people to explore new places. Last but not least, traveling enriches life experience, helping students broaden horizons, develop [independence], and build social networks, which aligns with their personal growth needs.
+
+Taking these factors into consideration, it can be predicted that traveling will remain one of the most [popular] activities among college students. After all, experiencing the world and understanding oneself are essential parts of [youth] and personal development.`
+                    },
+                    {
+                        title: "2015: 春节花销 (饼状图)",
+                        tags: ["2015", "饼状图"],
+                        content: `According to the information depicted in the pie chart, the spending of residents during the Spring Festival is clearly divided into several categories. The largest portion goes to New Year [gifts], accounting for 40%, followed by transportation (20%), gathering meals (20%), and others (20%). Obviously, the chart reveals that gift-giving remains the most significant part of festival [consumption], reflecting the cultural emphasis on expressing blessings and maintaining [relationships] during the holiday.
+
+Several primary factors can explain this spending pattern. First and foremost, exchanging gifts is a traditional [custom], symbolizing respect, affection, and good wishes among family and friends. In addition, the Spring Festival is a peak [travel] season, and many people return home, which naturally leads to high spending on transportation and reunion meals. Last but not least, the improvement of living standards encourages people to spend more freely on [celebrations], entertainment, and various festival activities.
+
+Taking all these factors into consideration, it can be expected that festival spending will remain [high] in the future, especially on items related to gifts and family gatherings. After all, celebrating [reunion] and maintaining emotional bonds are essential parts of Chinese culture.`
+                    }
+                ],
+                "表格": [
+                    {
+                        title: "2012: 工作满意度 (表格)",
+                        tags: ["2012", "表格"],
+                        content: `According to the information depicted in the table, the job satisfaction levels of employees in a certain company [differ] significantly among three age groups. For employees under 40, 16.7% feel satisfied, 50.0% are uncertain, and 33.3% express dissatisfaction. Among those aged 41–50, 0% are satisfied, while 36.0% are uncertain and as high as 64.0% are dissatisfied. In contrast, employees over 50 show 40.0% satisfaction, 50.0% uncertainty, and only 10.0% dissatisfaction. Obviously, the chart reveals that [middle-aged] employees experience the lowest job satisfaction, reflecting different pressures and expectations at various career stages.
+
+Several primary factors can explain this pattern. First and foremost, employees aged 41–50 usually shoulder the heaviest [responsibilities] in both career advancement and family life, which may lead to higher stress and dissatisfaction. In addition, workplace [competition] often peaks during mid-career, making it harder for them to maintain a positive attitude toward their jobs. Last but not least, older employees tend to have more [stable] expectations and accumulated experience, enabling them to remain relatively satisfied and less stressed.
+
+Taking all these factors into consideration, it can be predicted that job satisfaction will continue to [vary] across different age groups. After all, a [supportive] environment and age-sensitive management measures are essential for improving overall employee satisfaction.`
+                    }
+                ]
+            }
+        };
+
+        const Icon = ({ name, className = "w-5 h-5" }) => {
+            const icons = {
+                chevronDown: <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />,
+                chevronRight: <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />,
+                book: <path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />,
+                pencil: <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />,
+                eye: <path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />,
+                eyeOff: <path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+            };
+            return <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">{icons[name]}</svg>;
+        };
+
+        const App = () => {
+            const [selectedCategory, setSelectedCategory] = useState("小作文");
+            const [selectedSubCategory, setSelectedSubCategory] = useState("万能模板");
+            const [selectedEssayIndex, setSelectedEssayIndex] = useState(0);
+            const [userInputs, setUserInputs] = useState({});
+            const [showAnswers, setShowAnswers] = useState(false);
+            const [sidebarOpen, setSidebarOpen] = useState(true);
+
+            // Load saved progress
+            useEffect(() => {
+                const saved = localStorage.getItem('english-writing-pro-v1');
+                if (saved) setUserInputs(JSON.parse(saved));
+            }, []);
+
+            // Save progress
+            const handleInputChange = (id, value) => {
+                const newInputs = { ...userInputs, [id]: value };
+                setUserInputs(newInputs);
+                localStorage.setItem('english-writing-pro-v1', JSON.stringify(newInputs));
+            };
+
+            const currentEssays = FULL_DATABASE[selectedCategory][selectedSubCategory];
+            const currentEssay = currentEssays[selectedEssayIndex];
+
+            // Auto-select first essay when sub-category changes
+            useEffect(() => {
+                setSelectedEssayIndex(0);
+            }, [selectedSubCategory, selectedCategory]);
+
+            // Parser to turn [word] into input
+            const renderContent = (text, essayId) => {
+                // Split by regex with capturing group to include the content inside brackets in the result array
+                const regex = /\[(.*?)\]/g;
+                const parts = text.split(regex);
+                
+                return parts.map((part, index) => {
+                    // Even indices are the text surrounding the brackets
+                    if (index % 2 === 0) {
+                        return <span key={`text-${index}`} className="whitespace-pre-wrap leading-8 text-slate-700 text-lg">{part}</span>;
+                    } 
+                    // Odd indices are the captured content inside brackets (the answer)
+                    else {
+                        const answer = part;
+                        // Use Math.floor(index / 2) to get a sequential ID for inputs (0, 1, 2...)
+                        const inputId = `${essayId}-${Math.floor(index / 2)}`;
+                        const userValue = userInputs[inputId] || "";
+                        const isCorrect = userValue.trim().toLowerCase() === answer.toLowerCase();
+                        
+                        return (
+                            <input
+                                key={`input-${inputId}`}
                                 type="text"
-                                value={userInput}
-                                onChange={(e) => handleInputChange(originalIndex, bIdx, e.target.value)}
-                                placeholder={showAllHints ? part : "___"}
-                                style={{ width: `${Math.max(part.length + 0.5, 3)}ch` }}
-                                className={`px-1 py-0 text-center border-b-2 outline-none transition-all font-bold bg-transparent ${userInput.trim() === "" ? "border-slate-300" : (isCorrect ? "text-emerald-600 border-emerald-500" : "text-rose-600 border-rose-500")}`}
-                              />
-                            </span>
-                          );
-                        }
-                        return <span key={pIdx}>{part}</span>;
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                                value={userValue}
+                                placeholder={showAnswers ? answer : ""}
+                                onChange={(e) => handleInputChange(inputId, e.target.value)}
+                                className={`input-blank ${userValue && !isCorrect ? 'input-error' : userValue && isCorrect ? 'input-correct' : ''}`}
+                                style={{ width: `${Math.max(answer.length * 12, 60)}px` }}
+                            />
+                        );
+                    }
+                });
+            };
 
-          </div>
-        </div>
-      );
-    };
+            return (
+                <div className="flex h-screen overflow-hidden bg-[#f8fafc]">
+                    {/* Sidebar Navigation */}
+                    <aside className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ${sidebarOpen ? 'w-80' : 'w-0 overflow-hidden'}`}>
+                        <div className="p-6 border-b border-slate-100 bg-slate-50 flex items-center gap-3 sticky top-0 z-10">
+                            <div className="p-2 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-200">
+                                <Icon name="book" className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">Writing Master</h1>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">2010-2025 全量收录</p>
+                            </div>
+                        </div>
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
+                        <div className="flex-1 overflow-y-auto custom-scroll p-4 space-y-6">
+                            {Object.keys(FULL_DATABASE).map(cat => (
+                                <div key={cat}>
+                                    <h3 className="px-3 text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        {cat === "小作文" ? "📧" : "📊"} {cat}
+                                    </h3>
+                                    <div className="space-y-1">
+                                        {Object.keys(FULL_DATABASE[cat]).map(sub => (
+                                            <button
+                                                key={sub}
+                                                onClick={() => { setSelectedCategory(cat); setSelectedSubCategory(sub); }}
+                                                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-between group
+                                                    ${selectedCategory === cat && selectedSubCategory === sub 
+                                                        ? "bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-100" 
+                                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}
+                                            >
+                                                <span>{sub}</span>
+                                                {selectedCategory === cat && selectedSubCategory === sub && <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </aside>
 
-  <!-- Cloudflare Insights (可选) -->
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
-    integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
-    data-cf-beacon='{"version":"2024.11.0","token":"c20d4946738c4622bbe855fab402731f","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
-    crossorigin="anonymous"></script>
+                    {/* Main Content */}
+                    <main className="flex-1 flex flex-col h-full relative">
+                        {/* Header */}
+                        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-5 flex items-center justify-between sticky top-0 z-20">
+                            <div className="flex items-center gap-4">
+                                <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                                </button>
+                                <div>
+                                    <h2 className="text-2xl font-black text-slate-800 flex items-center gap-3">
+                                        {selectedSubCategory}
+                                        <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full font-bold self-center shadow-sm">
+                                            {currentEssays.length} 篇
+                                        </span>
+                                    </h2>
+                                </div>
+                            </div>
+                            
+                            <button 
+                                onClick={() => setShowAnswers(!showAnswers)}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm
+                                    ${showAnswers 
+                                        ? "bg-amber-100 text-amber-700 hover:bg-amber-200" 
+                                        : "bg-white border border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600"}`}
+                            >
+                                <Icon name={showAnswers ? "eyeOff" : "eye"} className="w-4 h-4" />
+                                {showAnswers ? "隐藏答案" : "显示答案"}
+                            </button>
+                        </header>
+
+                        {/* Essay List & Viewer */}
+                        <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
+                            {/* List of Essays in current category */}
+                            <div className="w-full md:w-72 bg-slate-50 border-r border-slate-200 overflow-y-auto custom-scroll p-4 space-y-3">
+                                {currentEssays.map((essay, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setSelectedEssayIndex(idx)}
+                                        className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 group
+                                            ${selectedEssayIndex === idx 
+                                                ? "bg-white border-indigo-500 shadow-md ring-1 ring-indigo-500/20" 
+                                                : "bg-white border-slate-200 hover:border-indigo-300 hover:shadow-sm"}`}
+                                    >
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                            {essay.tags.map(tag => (
+                                                <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider
+                                                    ${selectedEssayIndex === idx ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600'}`}>
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <h4 className={`font-bold text-sm leading-snug ${selectedEssayIndex === idx ? 'text-slate-900' : 'text-slate-600 group-hover:text-slate-900'}`}>
+                                            {essay.title}
+                                        </h4>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Essay Viewer */}
+                            <div className="flex-1 overflow-y-auto custom-scroll p-6 md:p-10 bg-[#f8fafc]">
+                                <div className="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 md:p-12 relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                                    
+                                    <div className="mb-8 pb-6 border-b border-slate-100 flex items-start justify-between">
+                                        <div>
+                                            <h1 className="text-3xl font-black text-slate-800 mb-2">{currentEssay.title}</h1>
+                                            <p className="text-slate-400 font-medium text-sm flex items-center gap-2">
+                                                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                                全文背诵与填空练习
+                                            </p>
+                                        </div>
+                                        <div className="hidden md:block">
+                                             <div className="p-3 bg-slate-50 rounded-2xl">
+                                                <Icon name="pencil" className="w-6 h-6 text-indigo-400" />
+                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="prose prose-slate max-w-none prose-lg">
+                                        <div className="space-y-6">
+                                            {renderContent(currentEssay.content, `${selectedCategory}-${selectedSubCategory}-${selectedEssayIndex}`)}
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-12 pt-8 border-t border-slate-50 flex justify-center">
+                                         <p className="text-xs font-bold text-slate-300 uppercase tracking-[0.2em]">Practice makes perfect</p>
+                                    </div>
+                                </div>
+                                <div className="h-20"></div> {/* Bottom spacer */}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
