@@ -15,6 +15,21 @@ const FALLBACK_WALLPAPERS = [
   { title: 'Midnight Prism', css: 'radial-gradient(circle at 45% 25%, rgba(223,253,252,.14), transparent 34%), radial-gradient(circle at 12% 42%, rgba(154,247,240,.10), transparent 34%), linear-gradient(145deg, #010507, #071c1f 48%, #02090a)' }
 ];
 
+
+const WALLPAPER_LIBRARY = [
+  { title: 'Antarctic Arch', url: 'https://cn.bing.com/th?id=OHR.AntarcticArch_ZH-CN1622701432_1920x1080.jpg' },
+  { title: 'Bison Springs', url: 'https://cn.bing.com/th?id=OHR.BisonSprings_ZH-CN4419733534_1920x1080.jpg' },
+  { title: 'Yosemite Clark', url: 'https://cn.bing.com/th?id=OHR.YosemiteClark_ZH-CN7179533292_1920x1080.jpg' },
+  { title: 'Field Kaiserstuhl', url: 'https://cn.bing.com/th?id=OHR.FieldKaiserstuhl_ZH-CN0467488834_1920x1080.jpg' },
+  { title: 'Lapland Owl', url: 'https://cn.bing.com/th?id=OHR.LaplandOwl_ZH-CN6070251232_1920x1080.jpg' },
+  { title: 'Canada Day Fogo', url: 'https://cn.bing.com/th?id=OHR.CanadaDayFogo_ZH-CN2593963748_1920x1080.jpg' },
+  { title: 'Grande Terre Reef', url: 'https://cn.bing.com/th?id=OHR.GrandeTerreReef_ZH-CN7463701309_1920x1080.jpg' },
+  { title: 'Pink Plumeria', url: 'https://cn.bing.com/th?id=OHR.PinkPlumeria_ZH-CN3890147555_1920x1080.jpg' },
+  { title: 'Tican Frog', url: 'https://cn.bing.com/th?id=OHR.TicanFrog_ZH-CN8949758487_1920x1080.jpg' },
+  { title: 'Maligne Lake Jasper', url: 'https://cn.bing.com/th?id=OHR.MaligneLakeJasper_ZH-CN2664289451_1920x1080.jpg' },
+  { title: 'Festung Konigstein', url: 'https://cn.bing.com/th?id=OHR.FestungKonigsteinElbsandsteingebirge_ZH-CN2192655745_1920x1080.jpg' },
+  { title: 'Polar Bear Swim', url: 'https://cn.bing.com/th?id=OHR.PolarBearSwim_ZH-CN1000349057_1920x1080.jpg' }
+];
 function escapeHTML(value) {
   return String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
 }
@@ -93,33 +108,67 @@ function initOrbParallax() {
 function initWallpaper() {
   const layer = $('#wallpaper-layer') || $('.wallpaper-layer');
   const title = $('#wallpaper-title');
-  const buttons = $$('[data-action="change-wallpaper"]');
+  const changeButtons = $$('[data-action="change-wallpaper"]');
+  const downloadButtons = $$('[data-wallpaper-download]');
   if (!layer) return;
   const dayStamp = new Date().toISOString().slice(0, 10);
-  const randSize = innerWidth < 680 ? 'rand_m.php' : 'rand.php';
-  const dailySource = { title: 'Bing Daily UHD', url: `https://bing.img.run/uhd.php?d=${dayStamp}` };
-  const randomEndpoints = [
-    { title: 'Bing Random UHD', path: 'rand_uhd.php' },
-    { title: 'Bing Random', path: randSize }
-  ];
+  const dailySource = WALLPAPER_LIBRARY[0] || { title: 'Bing Daily UHD', url: `https://bing.img.run/uhd.php?d=${dayStamp}` };
   const fallback = FALLBACK_WALLPAPERS.map((item) => ({ ...item, fallback: true }));
-  const cacheKey = 'epochtx.wallpaper.choice.v6';
+  const cacheKey = 'epochtx.wallpaper.choice.v7';
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(cacheKey) || 'null'); } catch {}
   let fallbackIndex = 0;
-  let randomIndex = 0;
+  let randomIndex = Math.floor(Math.random() * Math.max(1, WALLPAPER_LIBRARY.length));
   let requestId = 0;
+  let currentWallpaper = null;
   const label = (item) => {
     if (title) title.textContent = `Wallpaper · ${item?.title || 'Fallback'}`;
   };
+  const downloadName = (item) => {
+    const slug = (item?.title || 'epochtx-wallpaper')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'epochtx-wallpaper';
+    return `${slug}-${dayStamp}.jpg`;
+  };
+  const updateDownload = (item) => {
+    currentWallpaper = item?.url ? item : null;
+    const enabled = Boolean(currentWallpaper);
+    downloadButtons.forEach((button) => {
+      button.disabled = !enabled;
+      button.dataset.wallpaperUrl = enabled ? currentWallpaper.url : '';
+      button.setAttribute('aria-disabled', String(!enabled));
+      button.title = enabled ? `下载当前壁纸：${item.title || 'Wallpaper'}` : '当前壁纸暂不支持下载';
+    });
+  };
+  const triggerDownload = (button) => {
+    if (!currentWallpaper?.url) return;
+    const anchor = document.createElement('a');
+    anchor.href = currentWallpaper.url;
+    anchor.download = downloadName(currentWallpaper);
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    const oldText = button?.textContent || '下载壁纸';
+    if (button) {
+      button.textContent = '已打开';
+      setTimeout(() => { button.textContent = oldText; }, 900);
+    }
+  };
   const cacheBust = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const randomSource = () => {
-    const endpoint = randomEndpoints[randomIndex % randomEndpoints.length];
-    randomIndex += 1;
-    return {
-      title: endpoint.title,
-      url: `https://bing.img.run/${endpoint.path}?t=${cacheBust()}`
-    };
+    if (!WALLPAPER_LIBRARY.length) {
+      return { title: 'Bing Random UHD', url: `https://bing.img.run/rand_uhd.php?t=${cacheBust()}` };
+    }
+    let item = WALLPAPER_LIBRARY[randomIndex % WALLPAPER_LIBRARY.length];
+    if (WALLPAPER_LIBRARY.length > 1 && currentWallpaper?.url === item.url) {
+      randomIndex += 1;
+      item = WALLPAPER_LIBRARY[randomIndex % WALLPAPER_LIBRARY.length];
+    }
+    randomIndex += 1 + Math.floor(Math.random() * Math.max(1, WALLPAPER_LIBRARY.length - 1));
+    return item;
   };
   const setFallback = (token) => {
     if (token !== requestId) return;
@@ -127,6 +176,7 @@ function initWallpaper() {
     fallbackIndex += 1;
     layer.style.backgroundImage = item.css;
     label(item);
+    updateDownload(item);
     layer.classList.remove('is-changing');
   };
   const apply = (item) => {
@@ -136,6 +186,7 @@ function initWallpaper() {
     if (item.css) {
       layer.style.backgroundImage = item.css;
       label(item);
+      updateDownload(item);
       setTimeout(() => layer.classList.remove('is-changing'), 90);
       return;
     }
@@ -148,6 +199,7 @@ function initWallpaper() {
       if (token !== requestId) return;
       layer.style.backgroundImage = `url("${item.url}")`;
       label(item);
+      updateDownload(item);
       try { localStorage.setItem(cacheKey, JSON.stringify({ date: dayStamp, ...item })); } catch {}
       setTimeout(() => layer.classList.remove('is-changing'), 90);
     };
@@ -160,7 +212,8 @@ function initWallpaper() {
   const next = () => {
     apply(randomSource());
   };
-  buttons.forEach((button) => button.addEventListener('click', next));
+  changeButtons.forEach((button) => button.addEventListener('click', next));
+  downloadButtons.forEach((button) => button.addEventListener('click', () => triggerDownload(button)));
   window.EpochTXChangeWallpaper = next;
   apply(saved?.date === dayStamp && saved?.url ? saved : dailySource);
 }
