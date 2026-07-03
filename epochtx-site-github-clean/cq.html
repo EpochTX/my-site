@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#02090a" />
+  <title>幸运抽签站 cq - EpochTX</title>
+  <link rel="stylesheet" href="assets/site.css" />
+</head>
+<body class="tool-page">
+  <div id="wallpaper-layer" class="wallpaper-layer" aria-hidden="true"></div>
+  <div class="wallpaper-overlay" aria-hidden="true"></div>
+  <div class="noise-layer" aria-hidden="true"></div>
+  <nav id="site-nav" class="site-nav" aria-label="主导航">
+    <div class="nav-shell">
+      <a class="brand" href="index.html" aria-label="EpochTX HomePage"><span class="brand-text solo">EpochTX</span></a>
+      <div class="nav-links" aria-label="桌面导航">
+        <a href="index.html#projects">项目</a>
+        <a href="index.html#stack">技术栈</a>
+        <a href="index.html#contact">联系</a>
+        <a href="tools.html">实验室</a>
+        <a class="external" href="https://github.com/epochtx" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="external" href="https://t.me/despairbad" target="_blank" rel="noopener noreferrer">Telegram</a>
+        <button type="button" data-action="change-wallpaper">换一张</button>
+      </div>
+      <div class="nav-actions"><button id="open-palette" class="icon-btn" type="button" title="Ctrl + K">⌘K</button><button id="menu-toggle" class="menu-btn" type="button" aria-label="打开菜单" aria-expanded="false">☰</button></div>
+    </div>
+    <div id="mobile-panel" class="mobile-panel">
+      <a href="index.html">首页</a>
+      <a href="index.html#projects">项目</a>
+      <a href="index.html#stack">技术栈</a>
+      <a href="index.html#contact">联系</a>
+      <a href="tools.html">实验室</a>
+      <a href="ip.html">IP 查询</a>
+      <a href="chouqian.html">幸运抽签</a>
+      <button type="button" data-action="change-wallpaper">换一张壁纸</button>
+    </div>
+  </nav>
+  <main>
+    <section class="tool-hero wide-container">
+      <p class="eyebrow">幸运抽签 / 决策实验室</p>
+      <h1 class="tool-title">幸运抽签站</h1>
+      <p class="tool-desc">列表、数字、是 / 否、权重与历史记录。</p>
+    </section>
+    <section id="draw-tool" class="wide-container draw-shell">
+      <div class="glass-card draw-panel">
+        <div class="draw-tabs" role="tablist">
+          <button class="draw-tab active" type="button" data-mode="list">列表抽签</button>
+          <button class="draw-tab" type="button" data-mode="number">数字范围</button>
+          <button class="draw-tab" type="button" data-mode="yesno">是 / 否</button>
+          <button class="draw-tab" type="button" data-mode="weight">权重抽签</button>
+        </div>
+        <div class="draw-mode active" data-mode="list">
+          <label class="section-kicker" for="draw-items">每行一个选项</label>
+          <textarea id="draw-items">火锅
+烤肉
+麦当劳
+兰州拉面
+便利店饭团
+麻辣烫</textarea>
+          <div class="switch-row"><label><input id="dedupe-items" type="checkbox" checked /> 去重</label><button class="btn sample-btn" type="button" data-sample="写代码|打游戏|整理桌面|复盘项目|出门散步|看一集番">事项模板</button><button class="btn sample-btn" type="button" data-sample="火锅|烧烤|米线|麻辣烫|汉堡|便利店">吃饭模板</button></div>
+        </div>
+        <div class="draw-mode" data-mode="number">
+          <label class="section-kicker">数字范围</label>
+          <div class="option-row"><input id="num-min" class="input" type="number" value="1" /><input id="num-max" class="input" type="number" value="100" /></div>
+          
+        </div>
+        <div class="draw-mode" data-mode="yesno">
+          
+          <div class="tags"><span class="tag">是</span><span class="tag">否</span><span class="tag">再想想</span></div>
+        </div>
+        <div class="draw-mode" data-mode="weight">
+          <label class="section-kicker" for="weight-items">格式：选项 | 权重</label>
+          <textarea id="weight-items">高优先级任务 | 5
+普通任务 | 2
+摸鱼五分钟 | 1</textarea>
+          
+        </div>
+        <div class="action-row"><button id="draw-start" class="btn primary" type="button">开始抽签</button><button id="draw-reset" class="btn" type="button">重置动画</button><button id="draw-copy" class="btn" type="button">复制结果</button></div>
+      </div>
+      <div class="glass-card draw-stage">
+        <div id="draw-output" class="draw-output" aria-live="polite">准备开始</div>
+        <div class="mini-grid"><div class="stat-card"><strong id="draw-count">0</strong><span>历史次数</span></div><div class="stat-card"><strong id="draw-unique">0</strong><span>不同结果</span></div></div>
+        <div class="history-box"><h3>最近结果</h3><div id="draw-history" class="tags"><span class="tag">暂无历史</span></div><button id="history-clear" class="btn" type="button">清空历史</button></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="wide-container footer-inner"><p>© 2026 EpochTX.</p><p><a href="tools.html">实验室</a></p></div></footer>
+  <div id="palette-backdrop" class="palette-backdrop" aria-hidden="true">
+    <div class="command-palette glass-card" role="dialog" aria-label="Command Palette">
+      <div class="palette-head"><span>Command Palette</span><kbd>Esc</kbd></div>
+      <div class="command-list">
+        <button class="command" data-command="github"><span>Open GitHub</span><span>external</span></button>
+        <button class="command" data-command="telegram"><span>Open Telegram</span><span>external</span></button>
+        <button class="command" data-command="projects"><span>View Projects</span><span>home</span></button>
+        <button class="command" data-command="wallpaper"><span>Change Wallpaper</span><span>imgRun</span></button>
+        <button class="command" data-command="stack"><span>Scroll to Stack</span><span>home</span></button>
+        <button class="command" data-command="labs"><span>Open Labs</span><span>route</span></button>
+        <button class="command" data-command="ip"><span>Open IP Lookup</span><span>route</span></button>
+        <button class="command" data-command="draw"><span>Open Lucky Draw</span><span>route</span></button>
+      </div>
+    </div>
+  </div>
+  <script src="assets/site.js" defer></script>
+</body>
+</html>
