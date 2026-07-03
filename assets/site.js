@@ -97,30 +97,41 @@ function initWallpaper() {
   if (!layer) return;
   const dayStamp = new Date().toISOString().slice(0, 10);
   const randSize = innerWidth < 680 ? 'rand_m.php' : 'rand.php';
-  const sources = [
-    { title: 'Bing Daily UHD', url: `https://bing.img.run/uhd.php?d=${dayStamp}` },
-    { title: 'Bing Daily 1920', url: `https://bing.img.run/1920x1080.php?d=${dayStamp}` },
-    { title: 'Bing Random UHD', url: `https://bing.img.run/rand_uhd.php?t=${Date.now()}` },
-    { title: 'Bing Random', url: `https://bing.img.run/${randSize}?t=${Date.now()}` }
+  const dailySource = { title: 'Bing Daily UHD', url: `https://bing.img.run/uhd.php?d=${dayStamp}` };
+  const randomEndpoints = [
+    { title: 'Bing Random UHD', path: 'rand_uhd.php' },
+    { title: 'Bing Random', path: randSize }
   ];
   const fallback = FALLBACK_WALLPAPERS.map((item) => ({ ...item, fallback: true }));
-  const cacheKey = 'epochtx.wallpaper.choice.v5';
+  const cacheKey = 'epochtx.wallpaper.choice.v6';
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(cacheKey) || 'null'); } catch {}
-  let index = saved?.date === dayStamp ? Number(saved.index || 0) : 0;
-  let active = sources;
+  let fallbackIndex = 0;
+  let randomIndex = 0;
+  let requestId = 0;
   const label = (item) => {
     if (title) title.textContent = `Wallpaper · ${item?.title || 'Fallback'}`;
   };
-  const setFallback = () => {
-    active = fallback;
-    const item = active[index % active.length];
+  const cacheBust = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const randomSource = () => {
+    const endpoint = randomEndpoints[randomIndex % randomEndpoints.length];
+    randomIndex += 1;
+    return {
+      title: endpoint.title,
+      url: `https://bing.img.run/${endpoint.path}?t=${cacheBust()}`
+    };
+  };
+  const setFallback = (token) => {
+    if (token !== requestId) return;
+    const item = fallback[fallbackIndex % fallback.length];
+    fallbackIndex += 1;
     layer.style.backgroundImage = item.css;
     label(item);
     layer.classList.remove('is-changing');
   };
   const apply = (item) => {
     if (!item) return;
+    const token = ++requestId;
     layer.classList.add('is-changing');
     if (item.css) {
       layer.style.backgroundImage = item.css;
@@ -129,28 +140,29 @@ function initWallpaper() {
       return;
     }
     const image = new Image();
+    const failTimer = setTimeout(() => setFallback(token), 8000);
     image.decoding = 'async';
     image.referrerPolicy = 'no-referrer';
     image.onload = () => {
+      clearTimeout(failTimer);
+      if (token !== requestId) return;
       layer.style.backgroundImage = `url("${item.url}")`;
       label(item);
+      try { localStorage.setItem(cacheKey, JSON.stringify({ date: dayStamp, ...item })); } catch {}
       setTimeout(() => layer.classList.remove('is-changing'), 90);
     };
-    image.onerror = () => setFallback();
+    image.onerror = () => {
+      clearTimeout(failTimer);
+      setFallback(token);
+    };
     image.src = item.url;
   };
   const next = () => {
-    if (active === sources) {
-      sources[2].url = `https://bing.img.run/rand_uhd.php?t=${Date.now()}`;
-      sources[3].url = `https://bing.img.run/${randSize}?t=${Date.now()}`;
-    }
-    index = (index + 1) % active.length;
-    try { localStorage.setItem(cacheKey, JSON.stringify({ date: dayStamp, index })); } catch {}
-    apply(active[index]);
+    apply(randomSource());
   };
   buttons.forEach((button) => button.addEventListener('click', next));
   window.EpochTXChangeWallpaper = next;
-  apply(active[index % active.length]);
+  apply(saved?.date === dayStamp && saved?.url ? saved : dailySource);
 }
 
 function scrollToId(id) {
