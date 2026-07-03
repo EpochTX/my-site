@@ -1878,3 +1878,58 @@ select:focus {
     backdrop-filter: none;
   }
 }
+/* Targeted desktop fixes: brand wordmark, menu visibility, stable code tabs. */
+
+.menu-btn {
+  display: none;
+}
+@media (min-width: 821px) {
+  .nav-shell {
+    position: relative;
+    justify-content: center;
+  }
+
+  .nav-links {
+    justify-content: center;
+  }
+
+  .nav-actions {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+  }
+}
+
+.code-dots {
+  flex: 0 0 auto;
+}
+
+.code-tabs {
+  position: relative;
+  z-index: 2;
+  min-height: 38px;
+}
+
+.code-tab-btn,
+.code-tab-btn:hover,
+.code-tab-btn.active,
+.code-tab-btn:active {
+  transform: none;
+}
+
+.code-tab-btn {
+  min-height: 34px;
+  overflow: hidden;
+}
+
+.code-tab-btn:hover::after,
+.code-tab-btn:focus-visible::after {
+  transform: none;
+}
+
+@media (max-width: 820px) {
+  .menu-btn {
+    display: inline-grid;
+  }
+}

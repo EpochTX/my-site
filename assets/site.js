@@ -568,12 +568,22 @@ function initCodeWindow() {
     let raf = 0;
     let rx = 0;
     let ry = 0;
+    const resetTilt = () => {
+      rx = 0;
+      ry = 0;
+      panel.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+      panel.classList.remove('is-tilting');
+    };
     const apply = () => {
       panel.style.transform = `perspective(1200px) rotateX(${rx}deg) rotateY(${ry}deg)`;
       panel.classList.add('is-tilting');
       raf = 0;
     };
     stage.addEventListener('pointermove', (event) => {
+      if (event.target instanceof Element && event.target.closest('.code-window-head')) {
+        resetTilt();
+        return;
+      }
       const rect = stage.getBoundingClientRect();
       const px = (event.clientX - rect.left) / rect.width - 0.5;
       const py = (event.clientY - rect.top) / rect.height - 0.5;
@@ -581,11 +591,7 @@ function initCodeWindow() {
       ry = px * 7;
       if (!raf) raf = requestAnimationFrame(apply);
     }, { passive: true });
-    stage.addEventListener('pointerleave', () => {
-      rx = 0; ry = 0;
-      panel.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
-      panel.classList.remove('is-tilting');
-    });
+    stage.addEventListener('pointerleave', resetTilt);
   }
 }
 
