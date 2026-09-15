@@ -1,29 +1,22 @@
-# EpochTX 的个人主页
+# EpochTX 的个人空间
 
-这里放的是我的个人站点：[epochtx.tech](https://epochtx.tech/)。
+网站：<https://epochtxhub.com>（GitHub Pages 仓库：`EpochTX/my-site`）
 
-## 本地打开
+静态 HTML / CSS / JavaScript，无需构建或安装依赖。首页包括个人介绍、生活相册、小工具入口和联系信息，支持移动端与深浅模式。
 
-这个站点没有复杂构建流程，直接打开 `index.html` 就能看。
-
-如果想用本地服务跑，也可以在仓库目录里执行：
+## 本地预览
 
 ```bash
 python -m http.server 8000
 ```
 
-然后访问：
+访问 http://localhost:8000 。
 
-```text
-http://localhost:8000
-```
+## 修改内容
 
+- 首页文字与链接：`index.html`
+- 首页样式：`assets/home.css`
+- 生活照片：上传到 `assets/photos/`，在 `assets/photos.js` 登记。详见 `assets/photos/README.md`。
+- 联系邮箱：`admin@epochtxhub.com`
 
-## 之后可能会加
-
-- 更完整的项目展示
-- 博客或笔记入口
-- 更多实用小工具
-- 更细一点的移动端体验
-
-
+旧版首页完整保留在 `classic.html`，底部可访问。原工具页及其 `assets/site.css`、`assets/site.js` 保留，首页使用独立样式避免影响工具功能。`CNAME` 保留原自定义域名。
