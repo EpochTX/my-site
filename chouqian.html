@@ -1,41 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#02090a" />
-  <title>幸运抽签 - EpochTX</title>
-  <link rel="stylesheet" href="assets/site.css?v=20260703-sharp" />
-</head>
-<body class="tool-page">
-  <div id="wallpaper-layer" class="wallpaper-layer" aria-hidden="true"></div>
-  <div class="wallpaper-overlay" aria-hidden="true"></div>
-  <div class="noise-layer" aria-hidden="true"></div>
-  <nav id="site-nav" class="site-nav" aria-label="主导航">
-    <div class="nav-shell">
-      <div class="nav-links" aria-label="桌面导航">
-        <a href="index.html#projects">项目</a>
-        <a href="index.html#stack">技术栈</a>
-        <a href="index.html#contact">联系</a>
-        <a href="tools.html">实验室</a>
-        <a class="external" href="https://github.com/epochtx" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="external" href="https://t.me/despairbad" target="_blank" rel="noopener noreferrer">Telegram</a>
-        <button type="button" data-action="change-wallpaper">换一张</button>
-      </div>
-      <div class="nav-actions"><button id="open-palette" class="icon-btn" type="button" title="Ctrl + K">⌘K</button><button id="menu-toggle" class="menu-btn" type="button" aria-label="打开菜单" aria-expanded="false">☰</button></div>
-    </div>
-    <div id="mobile-panel" class="mobile-panel">
-      <a href="index.html">首页</a>
-      <a href="index.html#projects">项目</a>
-      <a href="index.html#stack">技术栈</a>
-      <a href="index.html#contact">联系</a>
-      <a href="tools.html">实验室</a>
-      <a href="ip.html">IP 查询</a>
-      <a href="chouqian.html">幸运抽签</a>
-      <button type="button" data-action="change-wallpaper">换一张壁纸</button>
-    </div>
-  </nav>
-  <main>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#edeae2"><meta name="description" data-zh="EpochTX 的个人主页：项目、小工具与生活切片。" data-en="EpochTX — personal projects, useful tools, and little moments of life." content="EpochTX 的个人主页：项目、小工具与生活切片。"><title data-zh="幸运抽签 · EpochTX" data-en="Lucky draw · EpochTX">幸运抽签 · EpochTX</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/home.css?v=20260916"><script src="assets/home.js?v=20260916" defer></script><script src="assets/tool-language.js?v=20260916" defer></script><script src="assets/tool-runtime.js?v=20260916" defer></script></head><body><div class="atmosphere" aria-hidden="true"><i></i><i></i></div><a class="skip" href="#main"><span data-zh="跳到正文" data-en="Skip to content">跳到正文</span></a><header class="site-header"><a class="brand" href="index.html" aria-label="EpochTX"><img src="assets/logo.svg" width="177" height="40" alt="EpochTX"></a><nav aria-label="Main navigation"><a href="index.html#about"><span data-zh="关于" data-en="About">关于</span></a><details class="nav-group"><summary><span data-zh="项目与工具" data-en="Projects">项目与工具</span><span aria-hidden="true">⌄</span></summary><div class="dropdown"><a href="projects.html" class="drop-overview"><span data-zh="全部项目" data-en="All projects">全部项目</span><span aria-hidden="true">↗</span></a><a href="https://weather.epochtxhub.com" class=""><span data-zh="观天 · 天气对比" data-en="Guantian · Weather">观天 · 天气对比</span><span aria-hidden="true">↗</span></a><a href="ip.html" class=""><span data-zh="IP 查询 · NET SIGHT" data-en="IP lookup · NET SIGHT">IP 查询 · NET SIGHT</span><span aria-hidden="true">↗</span></a><a href="chouqian.html" class=""><span data-zh="幸运抽签" data-en="Lucky draw">幸运抽签</span><span aria-hidden="true">↗</span></a><a href="tools.html" class=""><span data-zh="工具目录" data-en="Tool directory">工具目录</span><span aria-hidden="true">↗</span></a></div></details><a href="life.html"><span data-zh="生活" data-en="Life">生活</span></a><a href="index.html#contact"><span data-zh="联系" data-en="Contact">联系</span></a></nav><div class="header-actions"><button id="lang-toggle" class="lang-toggle" type="button" aria-label="Switch language"><span data-lang-option="zh">中</span><span data-lang-option="en">EN</span></button><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle color theme">◐</button></div></header><main id="main" class="wrap">
     <section class="tool-hero wide-container">
       <p class="eyebrow">幸运抽签 / 决策实验室</p>
       <h1 class="tool-title">幸运抽签站</h1>
@@ -43,7 +6,7 @@
     </section>
     <section id="draw-tool" class="wide-container draw-shell">
       <div class="glass-card draw-panel">
-        <div class="draw-tabs" role="tablist">
+        <div class="draw-tabs" role="group" aria-label="Draw mode">
           <button class="draw-tab active" type="button" data-mode="list">列表抽签</button>
           <button class="draw-tab" type="button" data-mode="number">数字范围</button>
           <button class="draw-tab" type="button" data-mode="yesno">是 / 否</button>
@@ -61,7 +24,7 @@
         </div>
         <div class="draw-mode" data-mode="number">
           <label class="section-kicker">数字范围</label>
-          <div class="option-row"><input id="num-min" class="input" type="number" value="1" /><input id="num-max" class="input" type="number" value="100" /></div>
+          <div class="option-row"><input aria-label="Minimum number" id="num-min" class="input" type="number" value="1" /><input aria-label="Maximum number" id="num-max" class="input" type="number" value="100" /></div>
           
         </div>
         <div class="draw-mode" data-mode="yesno">
@@ -83,23 +46,4 @@
         <div class="history-box"><h3>最近结果</h3><div id="draw-history" class="tags"><span class="tag">暂无历史</span></div><button id="history-clear" class="btn" type="button">清空历史</button></div>
       </div>
     </section>
-  </main>
-  <footer class="site-footer"><div class="wide-container footer-inner"><p>© 2026 EpochTX.</p><p><a href="tools.html">实验室</a></p></div></footer>
-  <div id="palette-backdrop" class="palette-backdrop" aria-hidden="true">
-    <div class="command-palette glass-card" role="dialog" aria-label="Command Palette">
-      <div class="palette-head"><span>Command Palette</span><kbd>Esc</kbd></div>
-      <div class="command-list">
-        <button class="command" data-command="github"><span>Open GitHub</span><span>external</span></button>
-        <button class="command" data-command="telegram"><span>Open Telegram</span><span>external</span></button>
-        <button class="command" data-command="projects"><span>View Projects</span><span>home</span></button>
-        <button class="command" data-command="wallpaper"><span>Change Wallpaper</span><span>imgRun</span></button>
-        <button class="command" data-command="stack"><span>Scroll to Stack</span><span>home</span></button>
-        <button class="command" data-command="labs"><span>Open Labs</span><span>route</span></button>
-        <button class="command" data-command="ip"><span>Open IP Lookup</span><span>route</span></button>
-        <button class="command" data-command="draw"><span>Open Lucky Draw</span><span>route</span></button>
-      </div>
-    </div>
-  </div>
-  <script src="assets/site.js?v=20260703-sharp" defer></script>
-</body>
-</html>
+  </main><footer class="footer wrap"><span>© <span id="year">2026</span> EpochTX</span><span data-zh="保持好奇，慢慢积累。" data-en="Stay curious. Keep growing.">保持好奇，慢慢积累。</span><a href="classic.html"><span data-zh="旧版主页" data-en="Classic homepage">旧版主页</span> ↗</a><a href="#main"><span data-zh="回到顶部" data-en="Back to top">回到顶部</span> ↑</a></footer></body></html>
