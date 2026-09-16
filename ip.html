@@ -1,5 +1,39 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="#edeae2" name="theme-color"/><meta content="EpochTX 的个人主页：项目、小工具与生活切片。" data-en="EpochTX — personal projects, useful tools, and little moments of life." data-zh="EpochTX 的个人主页：项目、小工具与生活切片。" name="description"/><title data-en="IP lookup · EpochTX" data-zh="IP 查询 · EpochTX">IP 查询 · EpochTX</title><link href="assets/mark.svg" rel="icon" type="image/svg+xml"/><link href="assets/home.css?v=20260916" rel="stylesheet"/><script defer="" src="assets/home.js?v=20260916"></script><script defer="" src="assets/tool-language.js?v=20260916"></script><script defer="" src="assets/tool-runtime.js?v=20260916"></script></head><body><div aria-hidden="true" class="atmosphere"><i></i><i></i></div><a class="skip" href="#main"><span data-en="Skip to content" data-zh="跳到正文">跳到正文</span></a><header class="site-header"><a aria-label="EpochTX" class="brand" href="index.html"><img alt="EpochTX" height="40" src="assets/logo.svg" width="177"/></a><nav aria-label="Main navigation"><a href="index.html#about"><span data-en="About" data-zh="关于">关于</span></a><details class="nav-group"><summary><span data-en="Projects" data-zh="项目与工具">项目与工具</span><span aria-hidden="true">⌄</span></summary><div class="dropdown"><a class="drop-overview" href="projects.html"><span data-en="All projects" data-zh="全部项目">全部项目</span><span aria-hidden="true">↗</span></a><a class="" href="https://weather.epochtxhub.com"><span data-en="Guantian · Weather" data-zh="观天 · 天气对比">观天 · 天气对比</span><span aria-hidden="true">↗</span></a><a class="" href="ip.html"><span data-en="IP lookup · NET SIGHT" data-zh="IP 查询 · NET SIGHT">IP 查询 · NET SIGHT</span><span aria-hidden="true">↗</span></a><a class="" href="chouqian.html"><span data-en="Lucky draw" data-zh="幸运抽签">幸运抽签</span><span aria-hidden="true">↗</span></a><a class="" href="tools.html"><span data-en="Tool directory" data-zh="工具目录">工具目录</span><span aria-hidden="true">↗</span></a></div></details><a href="life.html"><span data-en="Life" data-zh="生活">生活</span></a><a href="index.html#contact"><span data-en="Contact" data-zh="联系">联系</span></a></nav><div class="header-actions"><button aria-label="Switch language" class="lang-toggle" id="lang-toggle" type="button"><span data-lang-option="zh">中</span><span data-lang-option="en">EN</span></button><button aria-label="Toggle color theme" class="theme-toggle" id="theme-toggle" type="button">◐</button></div></header><main class="wrap" id="main">
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>IP lookup | EpochTX</title>
+<link href="styles.css?v=template-20260916" rel="stylesheet"/>
+<script defer="" src="assets/template-icons.js"></script>
+<script defer="" src="script.js?v=template-20260916"></script>
+<link href="assets/template-integration.css?v=20260916" rel="stylesheet"/><link href="assets/mark.svg" rel="icon" type="image/svg+xml"/><script defer="" src="assets/tool-language.js?v=template-20260916"></script><script defer="" src="assets/tool-runtime.js?v=template-20260916"></script></head>
+<body id="top">
+<div aria-hidden="true" class="atmosphere">
+<span class="dune dune-one"></span>
+<span class="dune dune-two"></span>
+<span class="dune dune-three"></span>
+</div>
+<header class="site-header">
+<a aria-label="EpochTX homepage" class="brand" href="index.html"><span class="brand-mark photo-mark"><img alt="" src="assets/mark.svg"/></span><span><strong>EpochTX</strong><small data-i18n="brand.subtitle">Personal website</small></span></a>
+<nav aria-label="Main navigation" class="site-nav">
+<a data-i18n="nav.experience" href="index.html#experience">About</a>
+<a data-i18n="nav.skillkit" href="index.html#skillkit">Explore</a>
+<a data-i18n="nav.education" href="tools.html">Tools</a>
+<details class="template-project-menu"><summary><span data-i18n="nav.projects">Projects</span></summary><div class="template-submenu"><a data-i18n="submenu.0" href="projects.html">All projects</a><a data-i18n="submenu.1" href="https://weather.epochtxhub.com">Guantian · Weather</a><a data-i18n="submenu.2" href="ip.html">IP lookup</a><a data-i18n="submenu.3" href="chouqian.html">Lucky draw</a><a data-i18n="submenu.4" href="tools.html">Tool directory</a></div></details>
+<a data-i18n="nav.leadership" href="index.html#contact">Contact</a>
+<a data-i18n="nav.highlights" href="life.html">Life</a>
+</nav>
+<button class="lang-switch" data-lang-toggle="" type="button">
+<span data-lang-option="en">EN</span>
+<span data-lang-option="zh">中</span>
+</button>
+<a aria-label="Contact EpochTX" class="nav-cta" href="index.html#contact">
+<i data-lucide="send"></i>
+</a>
+</header>
+<main class="detail-page tool-surface">
 <section class="tool-hero wide-container">
 <p class="eyebrow">NET SIGHT / IP 信息</p>
 <h1 class="tool-title">本地与出口 IP</h1>
@@ -14,7 +48,6 @@
 <button class="btn" id="clear-ip" type="button">清空</button>
 </form>
 <p class="tool-desc" id="ip-status">准备查询...</p>
-
 <details class="query-details"><summary>查询结果</summary><div class="query-columns"><div class="ip-result" id="query-ip-result"><div class="info-row"><span>状态</span><strong>等待查询</strong></div></div><iframe class="map-frame" id="query-map" loading="lazy" referrerpolicy="no-referrer" src="about:blank" title="查询结果地图"></iframe></div></details></div><section class="wide-container ip-layout"><div class="glass-card ip-card">
 <h2>本地 / 直连 IP</h2>
 <p class="meta">my.ip.cn 接口</p>
@@ -24,4 +57,7 @@
 <p class="meta">公网出口</p>
 <div class="ip-result" id="exit-ip-result"><div class="info-row"><span>状态</span><strong>正在查询</strong></div></div>
 <iframe class="map-frame" id="exit-map" loading="lazy" referrerpolicy="no-referrer" src="about:blank" title="出口 IP 地图"></iframe></div></section>
-</main><footer class="footer wrap"><span>© <span id="year">2026</span> EpochTX</span><span data-en="Stay curious. Keep growing." data-zh="保持好奇，慢慢积累。">保持好奇，慢慢积累。</span><a href="classic.html"><span data-en="Classic homepage" data-zh="旧版主页">旧版主页</span> ↗</a><a href="#main"><span data-en="Back to top" data-zh="回到顶部">回到顶部</span> ↑</a></footer></body></html>
+</main>
+<footer class="site-footer"><span data-i18n="footer.text">EpochTX · Stay curious.</span><a data-i18n="footer.classic" href="classic.html">Classic homepage</a><a data-i18n="footer.top" href="#top">Back to top</a></footer>
+</body>
+</html>

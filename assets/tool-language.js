@@ -88,6 +88,7 @@ window.TOOL_TRANSLATIONS = {
   "正在查询 ": "Looking up "
 };
 (() => {
+ try{window.Site.lang=localStorage.getItem('siteLanguage')||localStorage.getItem('epochtx-lang')||'zh';}catch(_){}
  const map=window.TOOL_TRANSLATIONS, sources=new WeakMap();
  const terms=Object.keys(map).sort((a,b)=>b.length-a.length);
  window.toolText = text => {

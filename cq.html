@@ -1,49 +1,84 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#edeae2"><meta name="description" data-zh="EpochTX 的个人主页：项目、小工具与生活切片。" data-en="EpochTX — personal projects, useful tools, and little moments of life." content="EpochTX 的个人主页：项目、小工具与生活切片。"><title data-zh="幸运抽签 · EpochTX" data-en="Lucky draw · EpochTX">幸运抽签 · EpochTX</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/home.css?v=20260916"><script src="assets/home.js?v=20260916" defer></script><script src="assets/tool-language.js?v=20260916" defer></script><script src="assets/tool-runtime.js?v=20260916" defer></script></head><body><div class="atmosphere" aria-hidden="true"><i></i><i></i></div><a class="skip" href="#main"><span data-zh="跳到正文" data-en="Skip to content">跳到正文</span></a><header class="site-header"><a class="brand" href="index.html" aria-label="EpochTX"><img src="assets/logo.svg" width="177" height="40" alt="EpochTX"></a><nav aria-label="Main navigation"><a href="index.html#about"><span data-zh="关于" data-en="About">关于</span></a><details class="nav-group"><summary><span data-zh="项目与工具" data-en="Projects">项目与工具</span><span aria-hidden="true">⌄</span></summary><div class="dropdown"><a href="projects.html" class="drop-overview"><span data-zh="全部项目" data-en="All projects">全部项目</span><span aria-hidden="true">↗</span></a><a href="https://weather.epochtxhub.com" class=""><span data-zh="观天 · 天气对比" data-en="Guantian · Weather">观天 · 天气对比</span><span aria-hidden="true">↗</span></a><a href="ip.html" class=""><span data-zh="IP 查询 · NET SIGHT" data-en="IP lookup · NET SIGHT">IP 查询 · NET SIGHT</span><span aria-hidden="true">↗</span></a><a href="chouqian.html" class=""><span data-zh="幸运抽签" data-en="Lucky draw">幸运抽签</span><span aria-hidden="true">↗</span></a><a href="tools.html" class=""><span data-zh="工具目录" data-en="Tool directory">工具目录</span><span aria-hidden="true">↗</span></a></div></details><a href="life.html"><span data-zh="生活" data-en="Life">生活</span></a><a href="index.html#contact"><span data-zh="联系" data-en="Contact">联系</span></a></nav><div class="header-actions"><button id="lang-toggle" class="lang-toggle" type="button" aria-label="Switch language"><span data-lang-option="zh">中</span><span data-lang-option="en">EN</span></button><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle color theme">◐</button></div></header><main id="main" class="wrap">
-    <section class="tool-hero wide-container">
-      <p class="eyebrow">幸运抽签 / 决策实验室</p>
-      <h1 class="tool-title">幸运抽签站</h1>
-      <p class="tool-desc">列表、数字、是 / 否、权重与历史记录。</p>
-    </section>
-    <section id="draw-tool" class="wide-container draw-shell">
-      <div class="glass-card draw-panel">
-        <div class="draw-tabs" role="group" aria-label="Draw mode">
-          <button class="draw-tab active" type="button" data-mode="list">列表抽签</button>
-          <button class="draw-tab" type="button" data-mode="number">数字范围</button>
-          <button class="draw-tab" type="button" data-mode="yesno">是 / 否</button>
-          <button class="draw-tab" type="button" data-mode="weight">权重抽签</button>
-        </div>
-        <div class="draw-mode active" data-mode="list">
-          <label class="section-kicker" for="draw-items">每行一个选项</label>
-          <textarea id="draw-items">火锅
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Lucky draw | EpochTX</title>
+<link href="styles.css?v=template-20260916" rel="stylesheet"/>
+<script defer="" src="assets/template-icons.js"></script>
+<script defer="" src="script.js?v=template-20260916"></script>
+<link href="assets/template-integration.css?v=20260916" rel="stylesheet"/><link href="assets/mark.svg" rel="icon" type="image/svg+xml"/><script defer="" src="assets/tool-language.js?v=template-20260916"></script><script defer="" src="assets/tool-runtime.js?v=template-20260916"></script></head>
+<body id="top">
+<div aria-hidden="true" class="atmosphere">
+<span class="dune dune-one"></span>
+<span class="dune dune-two"></span>
+<span class="dune dune-three"></span>
+</div>
+<header class="site-header">
+<a aria-label="EpochTX homepage" class="brand" href="index.html"><span class="brand-mark photo-mark"><img alt="" src="assets/mark.svg"/></span><span><strong>EpochTX</strong><small data-i18n="brand.subtitle">Personal website</small></span></a>
+<nav aria-label="Main navigation" class="site-nav">
+<a data-i18n="nav.experience" href="index.html#experience">About</a>
+<a data-i18n="nav.skillkit" href="index.html#skillkit">Explore</a>
+<a data-i18n="nav.education" href="tools.html">Tools</a>
+<details class="template-project-menu"><summary><span data-i18n="nav.projects">Projects</span></summary><div class="template-submenu"><a data-i18n="submenu.0" href="projects.html">All projects</a><a data-i18n="submenu.1" href="https://weather.epochtxhub.com">Guantian · Weather</a><a data-i18n="submenu.2" href="ip.html">IP lookup</a><a data-i18n="submenu.3" href="chouqian.html">Lucky draw</a><a data-i18n="submenu.4" href="tools.html">Tool directory</a></div></details>
+<a data-i18n="nav.leadership" href="index.html#contact">Contact</a>
+<a data-i18n="nav.highlights" href="life.html">Life</a>
+</nav>
+<button class="lang-switch" data-lang-toggle="" type="button">
+<span data-lang-option="en">EN</span>
+<span data-lang-option="zh">中</span>
+</button>
+<a aria-label="Contact EpochTX" class="nav-cta" href="index.html#contact">
+<i data-lucide="send"></i>
+</a>
+</header>
+<main class="detail-page tool-surface">
+<section class="tool-hero wide-container">
+<p class="eyebrow">幸运抽签 / 决策实验室</p>
+<h1 class="tool-title">幸运抽签站</h1>
+<p class="tool-desc">列表、数字、是 / 否、权重与历史记录。</p>
+</section>
+<section class="wide-container draw-shell" id="draw-tool">
+<div class="glass-card draw-panel">
+<div aria-label="Draw mode" class="draw-tabs" role="group">
+<button class="draw-tab active" data-mode="list" type="button">列表抽签</button>
+<button class="draw-tab" data-mode="number" type="button">数字范围</button>
+<button class="draw-tab" data-mode="yesno" type="button">是 / 否</button>
+<button class="draw-tab" data-mode="weight" type="button">权重抽签</button>
+</div>
+<div class="draw-mode active" data-mode="list">
+<label class="section-kicker" for="draw-items">每行一个选项</label>
+<textarea id="draw-items">火锅
 烤肉
 麦当劳
 兰州拉面
 便利店饭团
 麻辣烫</textarea>
-          <div class="switch-row"><label><input id="dedupe-items" type="checkbox" checked /> 去重</label><button class="btn sample-btn" type="button" data-sample="写代码|打游戏|整理桌面|复盘项目|出门散步|看一集番">事项模板</button><button class="btn sample-btn" type="button" data-sample="火锅|烧烤|米线|麻辣烫|汉堡|便利店">吃饭模板</button></div>
-        </div>
-        <div class="draw-mode" data-mode="number">
-          <label class="section-kicker">数字范围</label>
-          <div class="option-row"><input aria-label="Minimum number" id="num-min" class="input" type="number" value="1" /><input aria-label="Maximum number" id="num-max" class="input" type="number" value="100" /></div>
-          
-        </div>
-        <div class="draw-mode" data-mode="yesno">
-          
-          <div class="tags"><span class="tag">是</span><span class="tag">否</span><span class="tag">再想想</span></div>
-        </div>
-        <div class="draw-mode" data-mode="weight">
-          <label class="section-kicker" for="weight-items">格式：选项 | 权重</label>
-          <textarea id="weight-items">高优先级任务 | 5
+<div class="switch-row"><label><input checked="" id="dedupe-items" type="checkbox"/> 去重</label><button class="btn sample-btn" data-sample="写代码|打游戏|整理桌面|复盘项目|出门散步|看一集番" type="button">事项模板</button><button class="btn sample-btn" data-sample="火锅|烧烤|米线|麻辣烫|汉堡|便利店" type="button">吃饭模板</button></div>
+</div>
+<div class="draw-mode" data-mode="number">
+<label class="section-kicker">数字范围</label>
+<div class="option-row"><input aria-label="Minimum number" class="input" id="num-min" type="number" value="1"/><input aria-label="Maximum number" class="input" id="num-max" type="number" value="100"/></div>
+</div>
+<div class="draw-mode" data-mode="yesno">
+<div class="tags"><span class="tag">是</span><span class="tag">否</span><span class="tag">再想想</span></div>
+</div>
+<div class="draw-mode" data-mode="weight">
+<label class="section-kicker" for="weight-items">格式：选项 | 权重</label>
+<textarea id="weight-items">高优先级任务 | 5
 普通任务 | 2
 摸鱼五分钟 | 1</textarea>
-          
-        </div>
-        <div class="action-row"><button id="draw-start" class="btn primary" type="button">开始抽签</button><button id="draw-reset" class="btn" type="button">重置动画</button><button id="draw-copy" class="btn" type="button">复制结果</button></div>
-      </div>
-      <div class="glass-card draw-stage">
-        <div id="draw-output" class="draw-output" aria-live="polite">准备开始</div>
-        <div class="mini-grid"><div class="stat-card"><strong id="draw-count">0</strong><span>历史次数</span></div><div class="stat-card"><strong id="draw-unique">0</strong><span>不同结果</span></div></div>
-        <div class="history-box"><h3>最近结果</h3><div id="draw-history" class="tags"><span class="tag">暂无历史</span></div><button id="history-clear" class="btn" type="button">清空历史</button></div>
-      </div>
-    </section>
-  </main><footer class="footer wrap"><span>© <span id="year">2026</span> EpochTX</span><span data-zh="保持好奇，慢慢积累。" data-en="Stay curious. Keep growing.">保持好奇，慢慢积累。</span><a href="classic.html"><span data-zh="旧版主页" data-en="Classic homepage">旧版主页</span> ↗</a><a href="#main"><span data-zh="回到顶部" data-en="Back to top">回到顶部</span> ↑</a></footer></body></html>
+</div>
+<div class="action-row"><button class="btn primary" id="draw-start" type="button">开始抽签</button><button class="btn" id="draw-reset" type="button">重置动画</button><button class="btn" id="draw-copy" type="button">复制结果</button></div>
+</div>
+<div class="glass-card draw-stage">
+<div aria-live="polite" class="draw-output" id="draw-output">准备开始</div>
+<div class="mini-grid"><div class="stat-card"><strong id="draw-count">0</strong><span>历史次数</span></div><div class="stat-card"><strong id="draw-unique">0</strong><span>不同结果</span></div></div>
+<div class="history-box"><h3>最近结果</h3><div class="tags" id="draw-history"><span class="tag">暂无历史</span></div><button class="btn" id="history-clear" type="button">清空历史</button></div>
+</div>
+</section>
+</main>
+<footer class="site-footer"><span data-i18n="footer.text">EpochTX · Stay curious.</span><a data-i18n="footer.classic" href="classic.html">Classic homepage</a><a data-i18n="footer.top" href="#top">Back to top</a></footer>
+</body>
+</html>

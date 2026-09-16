@@ -1,4 +1,4 @@
-(() => {
+document.addEventListener('DOMContentLoaded', () => {
   const grid = document.querySelector('#photo-grid');
   const photos = Array.isArray(window.LIFE_PHOTOS) ? window.LIFE_PHOTOS.filter(p => p && typeof p.src === 'string' && p.src.trim()) : [];
   if (!photos.length) return;
@@ -30,4 +30,4 @@
   refreshLabels();document.addEventListener('site:language',refreshLabels);
   dialog.querySelector('button').addEventListener('click',()=>dialog.close());
   dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
-})();
+});
