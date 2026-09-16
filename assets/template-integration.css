@@ -17,3 +17,20 @@
 .personal-mascot .portrait-caption { background: rgba(28, 62, 78, .88); }
 .contact-actions .button:has([data-i18n="contact.address"]) { flex-basis: 100%; }
 .contact-actions [data-i18n="contact.address"] { overflow-wrap: anywhere; min-width: 0; }
+
+/* Sky blue into mint: a soft backdrop for the globe-cat identity. */
+body {
+  background:
+    radial-gradient(ellipse at 90% 8%, rgba(224, 255, 239, .72), transparent 42%),
+    linear-gradient(155deg, #91c7ed 0%, #b6e3ee 28%, #bcebdc 61%, #e6f5e8 100%);
+}
+body::before {
+  background:
+    radial-gradient(ellipse at 22% 18%, rgba(241, 251, 255, .55), transparent 42%),
+    radial-gradient(ellipse at 80% 76%, rgba(139, 219, 181, .22), transparent 50%);
+}
+.dune {
+  background: linear-gradient(180deg, rgba(204, 244, 230, .64), rgba(93, 178, 182, .22));
+}
+.site-header { background: rgba(240, 251, 251, .48); }
+.template-submenu { background: #e6f4ef; }
