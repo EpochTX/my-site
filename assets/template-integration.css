@@ -10,3 +10,10 @@
 /* Fit the upstream three-column header on narrow phones, without changing desktop design. */
 @media(max-width:440px){.site-header{gap:10px;padding:12px}.brand{gap:9px}.brand-mark{width:40px;height:40px}.brand strong{font-size:1rem}.brand small{font-size:.68rem}.lang-switch{min-width:64px;height:40px;padding:3px;font-size:.75rem}.lang-switch span{min-width:26px;height:32px}.nav-cta{width:40px;height:40px}.site-nav{gap:4px}}
 .tool-surface .glass-card{background:linear-gradient(145deg,rgba(255,255,255,.36),rgba(255,255,255,.08)),rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.38);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(28px) saturate(1.22)}.tool-surface .tags{display:flex;flex-wrap:wrap;gap:8px}.tool-surface .tag{padding:5px 11px;border:1px solid #ffffff66;border-radius:999px;font-size:12px}
+
+/* Personal identity: original uploaded illustration, template geometry preserved. */
+.photo-mark img { object-fit: contain; object-position: center; transform: none; background: #fff; }
+.personal-mascot img { object-fit: contain; object-position: center 36%; background: #fff; filter: none; padding: 0 8px 90px; }
+.personal-mascot .portrait-caption { background: rgba(28, 62, 78, .88); }
+.contact-actions .button:has([data-i18n="contact.address"]) { flex-basis: 100%; }
+.contact-actions [data-i18n="contact.address"] { overflow-wrap: anywhere; min-width: 0; }
