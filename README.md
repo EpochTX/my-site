@@ -6,9 +6,8 @@
 
 ## 页面
 
-- `index.html`：新版简洁个人主页，独立样式 `assets/folio.css`。
-- `panorama.html`：保留此前的大幅玻璃布局与轮播，可从首页「全景版主页」进入。
-- `classic.html`：最初的旧版首页。
+- `index.html`：两栏毛玻璃个人主页，独立样式 `assets/home-refresh.css`。
+- `panorama.html`：与主页一致的两栏布局，保留原访问地址。
 - `projects.html` / `tools.html`：项目与工具目录，保留天气、IP 查询、抽签、Step-keeper 和原导出项目入口。
 - `life.html` / `highlights.html`：独立生活相册；首页不加载照片。添加方式见 `assets/photos/README.md`。
 - `ip.html`、`chouqian.html`、`cq.html`：保留原有工具功能。
