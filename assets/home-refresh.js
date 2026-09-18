@@ -3,6 +3,42 @@
   const sections = [...document.querySelectorAll('[data-views]')];
   const views = new Set(tabs.map(tab => tab.dataset.view));
   const aliases = {skillkit:'about',contact:'about'};
+  let albumBuilt = false;
+  function buildAlbum() {
+    if (albumBuilt) return;
+    albumBuilt = true;
+    const photos = Array.isArray(window.LIFE_PHOTOS) ? window.LIFE_PHOTOS.filter(p => p && typeof p.src === 'string' && p.src.trim()) : [];
+    if (!photos.length) return;
+    const grid = document.querySelector('#life-masonry');
+    const columns = [...grid.querySelectorAll('.masonry-column')];
+    columns.forEach(column => column.replaceChildren());
+    grid.classList.add('has-photos');
+    document.querySelector('.album-empty-copy').hidden = true;
+    const dialog = document.querySelector('#life-dialog');
+    photos.forEach((photo,index) => {
+      const card = document.createElement('figure'); card.className = 'life-photo';
+      const button = document.createElement('button'); button.type = 'button';
+      const img = document.createElement('img'); img.loading = 'lazy'; img.decoding = 'async'; img.src = photo.src;
+      const label = document.createElement('figcaption');
+      label.dataset.copyZh = photo.caption || photo.alt || '生活瞬间';
+      label.dataset.copyEn = photo.captionEn || photo.altEn || photo.caption || photo.alt || 'A little moment';
+      const update = () => {
+        const english = document.documentElement.lang === 'en';
+        label.textContent = english ? label.dataset.copyEn : label.dataset.copyZh;
+        img.alt = english ? (photo.altEn || label.textContent) : (photo.alt || label.textContent);
+        button.setAttribute('aria-label', (english ? 'View photo: ' : '查看照片：') + label.textContent);
+      };
+      update(); document.addEventListener('site:language',update);
+      button.addEventListener('click',() => {
+        dialog.querySelector('img').src = photo.src;
+        dialog.querySelector('img').alt = img.alt;
+        dialog.querySelector('p').textContent = label.textContent;
+        dialog.showModal();
+      });
+      button.append(img); card.append(button,label); columns[index % columns.length].append(card);
+    });
+    dialog.querySelector('button').addEventListener('click',() => dialog.close());
+  }
   function render() {
     const hash = location.hash.slice(1);
     const view = views.has(hash) ? hash : (aliases[hash] || 'home');
@@ -13,6 +49,8 @@
     });
     sections.forEach(section => {section.hidden = !section.dataset.views.split(' ').includes(view);});
     document.querySelector('.folio-content').setAttribute('aria-labelledby', 'tab-' + view);
+    if (view === 'life') buildAlbum();
+    tabs.find(tab => tab.dataset.view === view)?.scrollIntoView({block:'nearest',inline:'nearest'});
   }
   function select(tab) {
     history.pushState(null, '', '#' + tab.dataset.view);
